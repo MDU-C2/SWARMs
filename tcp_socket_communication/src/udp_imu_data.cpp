@@ -15,16 +15,20 @@ imuData orientation;
 // and the previous timestamp used to compute the delta t.
 
 double ComputeVelocity(double accN, double velocityN, ros::Time prevTimeStamp){
-  if(abs(accN) > 0.1) {
+std::cout << accN << std::endl;
+  if(accN > 0.4 || accN < -0.4) {
     velocityN = velocityN + (accN*(ros::Time::now() - prevTimeStamp).toSec());
   }
+  std::cout << "Vel: " << velocityN;
   return velocityN;
 }
 
 void MovingCallback(const mission_control::motion &msg)
 {
+  std::cout << "Moving callback" << std::endl;
   if (msg.x != 1)
-  {
+  { 
+    std::cout << "Not moving" << std::endl;
     orientation.velocityX = 0;
     orientation.velocityY = 0;
     orientation.velocityZ = 0;
@@ -86,7 +90,7 @@ int main(int argc, char **argv)
       strAccY[iii] = buffer[iii+14];
       //std::cout << strAccY << " iii: " << iii << " " << buffer[iii+13] << std::endl;
     }
-    std::cout << "strYaw: " << strYaw << std::endl << "strAccX: " << strAccX << std::endl << "strAccY: " << strAccY << std::endl; 
+    //std::cout << "strYaw: " << strYaw << std::endl << "strAccX: " << strAccX << std::endl << "strAccY: " << strAccY << std::endl; 
     
     orientation.yaw = atof(strYaw);
     odom.pose.pose.orientation.z = orientation.yaw;
@@ -95,13 +99,13 @@ int main(int argc, char **argv)
     orientation.velocityX = ComputeVelocity(orientation.accX, orientation.velocityX, startTimeX);
     startTimeX = ros::Time::now();
     odom.twist.twist.linear.x = orientation.velocityX;
-    std::cout << "Velocity in X: " << orientation.velocityX << std::endl;
+    //std::cout << "Velocity in X: " << orientation.velocityX << std::endl;
 
     orientation.accY = atof(strAccY);
     orientation.velocityY = ComputeVelocity(orientation.accY, orientation.velocityY, startTimeY);
     startTimeY = ros::Time::now();
     odom.twist.twist.linear.y = orientation.velocityY;
-    std::cout << "Velocity in Y: " << orientation.velocityY << std::endl;
+    //std::cout << "Velocity in Y: " << orientation.velocityY << std::endl;
 
     std::cout << std::endl << "==================================" << std::endl;
 

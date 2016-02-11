@@ -1,6 +1,5 @@
 //-------------------------------
 // Mission Control
-// Last modified: 26.10.2017
 // Extra notes:
 //-------------------------------
 
@@ -75,11 +74,26 @@ float CalculateYawAngle(int onlyYawing)
   {
     //move forward
     message.yaw = 500;
-  }else //if (angleToGoal > pos.yaw)
+  }
+  else //if (angleToGoal > pos.yaw)
   {
     //turn counterclockwise
-    message.yaw = angleToGoal;
-  } 
+    //if (deltaAngle > 10)
+   // {
+      message.yaw = pos.yaw+10;
+      //message.yaw = angleToGoal;
+  
+    //}
+   // else if (deltaAngle < -10)
+    //{
+     // message.yaw = pos.yaw-10;
+   // }
+    //else
+   // {
+    //  message.yaw = angleToGoal;
+   // }
+  }
+
   if (!onlyYawing)
   {
     return deltaAngle;
@@ -241,12 +255,14 @@ int main(int argc, char **argv)
 
   SetPos(0,0,0,0,0,0);
   SetGoal(0,0,0,0,0,0);
-
+  
+  ros::Rate r(20);
 
   while(ros::ok())
   {
     ros::spinOnce();
     pub_control.publish(message);
-    pub_moving.publish(movingMsg);
+    //pub_moving.publish(movingMsg);
+    r.sleep();
   }
 }

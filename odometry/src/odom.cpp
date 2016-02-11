@@ -3,7 +3,7 @@
 
 bool moving = false;
 
-//ros::NodeHandle n;
+//ros::NodeHandle n;:
 
 //Get the current axis speed according to EKF
 //void GetAxisSpeed(const mission_control::motion &msg)
@@ -14,7 +14,13 @@ float degToRad = 3.1416/180;
 //Might me removed
 void GetImuData(const nav_msgs::Odometry &msg)
 {
-  if (moving)
+  double dt = 0.0;//(current_time - last_time).toSec();
+  double deltaX = 0.0;
+  double deltaY = 0.0;
+
+  std::cout << "Odom twist: " << msg.twist.twist.linear.x << " " << msg.twist.twist.linear.y << std::endl;
+  
+  if (!moving)
   {
     position.vx = msg.twist.twist.linear.x;
     position.vy = msg.twist.twist.linear.y;
@@ -24,12 +30,22 @@ void GetImuData(const nav_msgs::Odometry &msg)
     position.vx = 0;
     position.vy = 0;
   }
+
   position.vz = msg.twist.twist.linear.z;
   position.yaw = msg.pose.pose.orientation.z * degToRad;
   position.roll = msg.pose.pose.orientation.x * degToRad;
   position.pitch = msg.pose.pose.orientation.y * degToRad;
-  std::cout << "Odom pos yaw: " << position.yaw << std::endl; 
-  //std::cout << position.yaw << std::endl;
+  std::cout << "Odom pos yaw: " << position.yaw << " " << msg.pose.pose.orientation.z << " " << position.yaw << " " << cos(position.yaw) << " " << cos(position.pitch) << std::endl; 
+  current_time = ros::Time::now();
+  dt = (current_time - last_time).toSec();
+  deltaX = (position.vx * cos(position.yaw) * cos(position.pitch))*dt; // - position.vy * sin(position.yaw) * cos(position.roll))*dt;// + position.vz * sin(position.pitch) * sin(position.roll)) * dt;
+  deltaY = (position.vx * sin(position.yaw) * cos(position.pitch))*dt; // + position.vy * cos(position.yaw) * cos(position.roll))*dt;// + position.vz * sin(position.pitch) * sin(position.roll)) * dt;
+
+  position.x += deltaX;
+  position.y += deltaY;
+
+  std::cout << "Pos: " << position.x << " " << position.y << " DT: " << dt << std::endl;
+  last_time = ros::Time::now();
 }
 
 /* Get distance from seefloor with Gimmi2(camera)
@@ -58,18 +74,16 @@ int main(int argc, char** argv)
   ros::NodeHandle n;
   ros::start();
   ros::Publisher odom_pub = n.advertise<nav_msgs::Odometry>("odom", 5);
-  //ros::Subscriber rotation_speed_listener = n.subscribe("orientation_for_odom", 1, GetOrientation);
   ros::Subscriber axis_speed_listener = n.subscribe("IMU_data_for_odom", 1, GetImuData);
   ros::Subscriber moving_listener = n.subscribe("moving", 1, MovingCallback);
-  //ros::Time::init();
   ros::Time current_time, last_time;
-  //ros::Rate r(100.0);
   position.x = 0.0;
   position.y = 0.0;
   position.z = 0.0;
   position.yaw = 0.0;
   position.roll = 0.0;
   position.pitch = 0.0;
+
 
   current_time = ros::Time::now();
   last_time = ros::Time::now();
@@ -79,23 +93,13 @@ int main(int argc, char** argv)
   while(n.ok())
   {
     ros::spinOnce();
-    current_time = ros::Time::now();
 
-    //Compute odometry
-    double dt = (current_time - last_time).toSec();
-    //delta_x distance traveled in the global X-diriction
-    //vx * cos(yaw) * cos(pitch); Local X-velocity contribution to movement in Global X diriction.
-    //std::cout << "Odom Yaw: " << cos(position.yaw) << std::endl << "Odom velocity X: " << position.vx << std::endl << "Time: " << dt << std::endl; 
-    double delta_x = (position.vx * cos(position.yaw) * cos(position.pitch) - position.vy * sin(position.yaw) * cos(position.roll))*dt;// + position.vz * sin(position.pitch) * sin(position.roll)) * dt;
-    double delta_y = (position.vx * sin(position.yaw) * cos(position.pitch) + position.vy * cos(position.yaw) * cos(position.roll))*dt;// + position.vz * sin(position.pitch) * sin(position.roll)) * dt;
-    //std::cout << "Delta X: " << delta_x << std::endl << "Delta Y: " << delta_y << std::endl << std::endl;
-    //double delta_z = (vx * sin(pitch) * sin(yaw) - vy * sin(roll) * cos(yaw) + vz * cos(roll) * cos(pitch)) * dt;
     
 
-    //Global position/orientation of the Naiad.
-    position.x += delta_x;
-    position.y += delta_y;
-    ROS_INFO("X: %f, Y: %f", position.x, position.y);   
+    //Global position of the Naiad.
+    //ROS_INFO("X: %f, Y: %f", position.x, position.y); 
+
+    //Odom message creation.  
     odom.header.stamp = current_time;
     odom.header.frame_id = "odom";
 
@@ -116,6 +120,8 @@ int main(int argc, char** argv)
 
     last_time = current_time;
     
+
+
     //r.sleep(); //Wait the correct amount of time to keep the loop timing
   }
 }
