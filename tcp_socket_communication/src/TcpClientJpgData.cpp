@@ -164,7 +164,7 @@ int main(int argc , char *argv[])
   
     receive_image(socket_desc);
     
-    receive_image(socket_desc);
+//    receive_image(socket_desc);
 
     close(socket_desc);
 

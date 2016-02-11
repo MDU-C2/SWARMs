@@ -22,9 +22,7 @@ int receive_image(int socket)
   FILE *image;
 
 do{
-  stat = read(socket, &size, sizeof(int)); //receive size of image
-
-  printf("value of stat: %d\n", stat);
+stat = read(socket, &size, sizeof(int)); //receive size of image
 }while(stat<0);
 
 
@@ -112,7 +110,7 @@ while(recv_size < size) {
              //Increment the total number of bytes read
              recv_size += read_size;
              packet_index++;
-             printf("Total received image size: %i\n",recv_size);
+             //printf("Total received image size: %i\n",recv_size);
              //printf(" \n");
              //printf(" \n");
     }
@@ -164,7 +162,7 @@ int main(int argc , char *argv[])
   
     receive_image(socket_desc);
     
-    receive_image(socket_desc);
+//    receive_image(socket_desc);
 
     close(socket_desc);
 
