@@ -2,10 +2,6 @@
 
 SWARMs underwater robots project
 
-# Swarms
-
-Swarms underwater robots project
-
 ## Getting Started
 
 Please read through the coding style guides we are using
@@ -36,7 +32,7 @@ And check out the Git Mannerism page under InfoWiki on our team site.
 ```
 cd ~/catkin_ws/src
 
-git clone https://github.com/notlochness/SWARMS.git
+git clone https://github.com/notlochness/SWARMs.git
 ```
 
 ### Checkout the branch you want and make a local one
