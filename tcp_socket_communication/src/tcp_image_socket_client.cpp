@@ -9,37 +9,36 @@
 #include<errno.h>
 using namespace std;
 
-//This function is to be used once we have confirmed that an image is to be sent
-//It should read and output an image file
+//This function receives the image pair from the server
 
 int receive_image(int socket)
-{ // Start function 
+{  
 
   int buffersize = 0, recv_size = 0,size = 0, read_size, write_size, packet_index =1,stat,stat2;
 
-  char imagearray[10241],verify = '1';
+  char imagearray[10241]; ////,verify = '1';
   char recvd_filename[512];
   //recvd_filename.resize(256);
   FILE *image;
 
-//Find the size of the image
 do{
 stat = read(socket, &size, sizeof(int)); //receive size of image
 }while(stat<0);
+
 
 printf("Packet received.\n");
 printf("Packet size: %i\n",stat);
 printf("Image size: %i\n",size);
 printf(" \n");
+char buffer[] = "Got the image";
 
-char buffer[] = "Got it";
 
-//Send our verification signal
+//Send a verification signal
 do{
 stat = write(socket, &buffer, sizeof(int));
 }while(stat<0);
 
-printf("Reply sent\n");
+printf("Verification sent!\n");
 printf(" \n");
 
 
@@ -63,22 +62,19 @@ do{
 stat2 = write(socket, &recvd_veri, sizeof(int));
 }while(stat2 < 0);
 printf("verification sent\n");
-
 image = fopen(recvd_filename, "w");
 
 if( image == NULL) {
-printf("Error has occurred. Image file could not be opened\n");
+printf("Error when opening the image\n");
 return -1; }
 
-//Loop while we have not received the entire file yet
-
-
-int need_exit = 0;
+//int need_exit = 0;   /////////
 struct timeval timeout = {10,0};
 
 fd_set fds;
-int buffer_fd, buffer_out;
+int buffer_fd;///////, buffer_out;
 
+//Loop while the image is transferred
 while(recv_size < size) {
 //while(packet_index < 2){
 
@@ -118,16 +114,12 @@ while(recv_size < size) {
              //printf(" \n");
              //printf(" \n");
     }
-
-    
 }
-
-
   fclose(image);
   printf("Image successfully Received!\n");
 
   char buffer1[] = "Done";
-  //Send our verification signal
+  //Send a verification signal
   do{
    stat = write(socket, &buffer1, sizeof(int));
   }while(stat<0);
@@ -135,16 +127,18 @@ while(recv_size < size) {
     return 1;
   }
 
-  int main(int argc , char *argv[])
+
+
+int main(int argc , char *argv[])
   {
 
   int socket_desc;
   struct sockaddr_in server;
-  char *parray;
+  //////////char *parray;
 
 
-  //Create socket
-  socket_desc = socket(AF_INET , SOCK_STREAM , 0);
+  //Create a socket
+  socket_desc = socket(AF_INET , SOCK_STREAM , 0);//ipv4 and tcp
 
   if (socket_desc == -1) {
   printf("Could not create socket");
@@ -153,9 +147,10 @@ while(recv_size < size) {
   memset(&server,0,sizeof(server));
   server.sin_addr.s_addr = inet_addr("192.168.1.10");
   server.sin_family = AF_INET;
-  server.sin_port = htons( 8889 );
-    puts("Connecting...");
-    //Connect to remote server
+  server.sin_port = htons( 8765 );
+   puts("Connecting...");
+   
+    //Connect to the server
     if (connect(socket_desc , (struct sockaddr *)&server , sizeof(server)) < 0) {
       cout<<strerror(errno);
       close(socket_desc);
