@@ -4,7 +4,7 @@
 #include </root/catkin_ws/devel/include/mission_control/motion.h>
 
 double vx = 0.3;
-double vy = -0.3;
+double vy = 0.0;
 double vz = 0.0;
 double vyaw = 0.1;
 double vroll = 0.0;
@@ -43,7 +43,7 @@ int main(int argc, char** argv)
   current_time = ros::Time::now();
   last_time = ros::Time::now();
 
-  ros::Rate r(100.0);
+  ros::Rate r(10.0);
 
   while(n.ok())
   {

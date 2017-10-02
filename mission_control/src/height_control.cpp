@@ -2,14 +2,150 @@
 #include "mission_control/motion.h"
 #include "nav_msgs/Odometry.h"
 
+#define PI 3.14159265
 mission_control::motion message;
 float desiered_height = 2.0;
+float tolerance = desiered_height * 0.1;
+float angleTolerance = 0.05;
+float positionTolerance = 0.15;
+char checkpoint = 'O';
+
+struct position{
+  float x;
+  float y;
+  float z;
+  float yaw;
+  float roll;
+  float pitch;
+};
+
+position pos; //Position of the Naiad.
+position goal; //Current goal for the Naiad to reach.
+
+
+//Set the goal for the Naiad.
+void SetGoal(float x, float y, float z, float yaw, float roll, float pitch)
+{
+  goal.x = x;
+  goal.y = y;
+  goal.z = z;
+  goal.yaw = yaw;
+  goal.roll = roll;
+  goal.pitch = pitch;
+}
+
+void SetGoal(float x, float y, float z)
+{
+  goal.x = x;
+  goal.y = y;
+  goal.z = z;
+}
+
+void SetPos(float x, float y, float z, float yaw, float roll, float pitch)
+{
+  pos.x = x;
+  pos.y = y;
+  pos.z = z;
+  pos.yaw = yaw;
+  pos.roll = roll;
+  pos.pitch = pitch;
+}
+
+float CalculateYawAngle()
+{
+  ROS_INFO("Goal: %f, %f, %f", goal.x, goal.y, goal.z);
+  ROS_INFO("Position: %f, %f, %f", pos.x, pos.y, pos.z);
+
+  float x = goal.x - pos.x;
+  float y = goal.y - pos.y;
+  float angle = atan2(y,x) * 180/PI;
+  ROS_INFO("Angle: %f", angle);
+  return angle;
+}
+
+float HeightControl()
+{
+  float changeInHeight;
+  
+  changeInHeight = -2*pow((desiered_height-pos.z), 3);
+  
+  ROS_INFO("HeightControl: %f", changeInHeight);
+  
+  return changeInHeight;
+}
+
+/* Emergency rise
+void Rise()
+{
+  rise = 1;
+  message.z = 0;
+}
+*/
+
+void GoToCurrentGoal()
+{
+  //ROS_INFO("Goal: %f, %f, %f", goal.x, goal.y, goal.z);
+  //ROS_INFO("Position: %f, %f, %f", pos.x, pos.y, pos.z);
+
+  //Check if the goal has been reached.
+  if (pos.x <= (goal.x+positionTolerance) && pos.x > (goal.x-positionTolerance) && pos.y <= (goal.y+positionTolerance) && pos.y > (goal.y-positionTolerance))
+  {
+    ROS_INFO("SWITCH");
+    //Dive too 2 meters and go in a square pattern.
+    switch(checkpoint){
+      case 'O' :
+        SetGoal(0, 0, 0);
+        //ROS_INFO("AAAAAAAAAA");
+        //sleep(5000);
+        checkpoint = 'A';
+        break;
+      case 'B' :
+        SetGoal(0, 50, 2);
+        checkpoint = 'C';
+        break;
+      case 'C' :
+        SetGoal(50, 50, 2);
+        checkpoint = 'D';
+        break;
+      case 'D' :
+        SetGoal(0, 50, 2);
+        checkpoint = 'A';
+        break;
+      case 'A' :
+        SetGoal(0, 0, 2);
+        checkpoint = 'B';
+        break;
+    }
+  }
+  //Calculate the angle to the goal and make sure the Naiad is pointed in the right direction before moving forward.
+  message.yaw = CalculateYawAngle();
+  if (pos.yaw <= message.yaw+angleTolerance && pos.yaw > message.yaw-angleTolerance)
+  {
+    float distance = pow((goal.x - pos.x),2) + pow((goal.y - pos.y), 2);
+    message.x = sqrt(distance);
+    ROS_INFO("X-distance: %f", distance);
+  }
+  
+  //Should not move in the lockal y-direction and should not roll but maybe pitch.
+  message.y = 0;
+  message.roll = goal.roll;
+  message.pitch = goal.roll;
+
+}
 
 void callback(const nav_msgs::Odometry::ConstPtr& msg)
 {
-   message.z = -2*pow((desiered_height-msg->pose.pose.position.z), 3);
-
-   ROS_INFO("%f %f", message.z, msg->pose.pose.position.z);
+  if (msg->pose.pose.position.z <= desiered_height+tolerance && msg->pose.pose.position.z >= desiered_height-tolerance)
+  {
+    pos.z = msg->pose.pose.position.z;
+    message.z = 0;
+  }
+  else
+  {
+    message.z = HeightControl();
+  }
+  SetPos(msg->pose.pose.position.x, msg->pose.pose.position.y, msg->pose.pose.position.z, msg->pose.pose.orientation.z, msg->pose.pose.orientation.x, msg->pose.pose.orientation.y);
+  GoToCurrentGoal();
 }
 
 
@@ -20,10 +156,16 @@ int main(int argc, char **argv)
   
   ros::Publisher pub_height_speed = n.advertise<mission_control::motion>("height_control", 10);
   ros::Subscriber sub_heght_speed = n.subscribe("odom", 10, callback);
+  
+  SetPos(0,0,0,0,0,0);
+  SetGoal(0,0,0,0,0,0);
+
 
   while(ros::ok())
   {
     ros::spinOnce();
+    //ROS_INFO("Goal: %f, %f, %f", goal.x, goal.y, goal.z);
+    //ROS_INFO("Position: %f, %f, %f", pos.x, pos.y, pos.z);
     pub_height_speed.publish(message);
   }
 }
