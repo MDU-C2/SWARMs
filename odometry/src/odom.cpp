@@ -3,6 +3,8 @@
 #include "nav_msgs/Odometry.h"
 #include </root/catkin_ws/devel/include/mission_control/motion.h>
 
+#define PI 3.14159265
+
 double vx = 0.3;
 double vy = 0.0;
 double vz = 0.0;
@@ -12,13 +14,12 @@ double vpitch = 0.0;
 
 void GetSpeed(const mission_control::motion &msg)
 {
-  vx = msg.x;
+  vx = msg.x; //msg.x;
   vy = msg.y;
   vz = msg.z;
   vyaw = msg.yaw;
   vpitch = msg.pitch;
   vroll = msg.roll;
-
 }
 
 
@@ -35,7 +36,7 @@ int main(int argc, char** argv)
   double x = 0.0;
   double y = 0.0;
   double z = 0.0;
-  double yaw = 0.0;
+  double yaw = 70.0;
   double roll = 0.0;
   double pitch = 0.0;
 
@@ -67,10 +68,16 @@ int main(int argc, char** argv)
     y += delta_y;
     z += delta_z;
     yaw += delta_yaw;
+    if (yaw > 360)
+    {
+      yaw = yaw-360;
+    }
     roll += delta_roll;
     pitch += delta_pitch;
+    
 
-    geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(yaw);
+    //ROS_INFO("ODOM: %f %f %f %f", x, y, z, yaw);
+    //geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(yaw);
 
     //geometry_msgs::TransformStamped odom_trans;
     //odom_trans.header.stamp = current_time;
@@ -91,7 +98,7 @@ int main(int argc, char** argv)
     odom.pose.pose.position.x = x;
     odom.pose.pose.position.y = y;
     odom.pose.pose.position.z = z;
-    odom.pose.pose.orientation = odom_quat;
+    odom.pose.pose.orientation.z = yaw;
 
     odom.child_frame_id = "base_link";
     odom.twist.twist.linear.x = vx;

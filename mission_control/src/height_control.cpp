@@ -5,10 +5,10 @@
 #define PI 3.14159265
 mission_control::motion message;
 float desiered_height = 2.0;
-float tolerance = desiered_height * 0.1;
-float angleTolerance = 0.05;
+float tolerance = desiered_height * 0.5;
+float angleTolerance = 1.0;
 float positionTolerance = 0.15;
-char checkpoint = 'O';
+char checkpoint = 'B';
 
 struct position{
   float x;
@@ -58,8 +58,9 @@ float CalculateYawAngle()
 
   float x = goal.x - pos.x;
   float y = goal.y - pos.y;
-  float angle = atan2(y,x) * 180/PI;
-  ROS_INFO("Angle: %f", angle);
+  float angle = atan2(y,x) /* - atan2(pos.y, pos.x) */ * 180/PI; //Need the current angle? Dont think so
+  ROS_INFO("Angle to go in: %f", angle);
+  ROS_INFO("Angle pointing in: %f", pos.yaw);
   return angle;
 }
 
@@ -67,8 +68,16 @@ float HeightControl()
 {
   float changeInHeight;
   
-  changeInHeight = -2*pow((desiered_height-pos.z), 3);
-  
+  // Use the function x³for regulating height. In this way the curve has been moved to the right in
+  // order to have a neutral vertical movement at the desired height. 
+  changeInHeight = -2*(pow((desiered_height-pos.z), 3))+((desiered_height-pos.z)/3);
+  if (changeInHeight > 20)
+  {
+   changeInHeight = 20;
+  }else if( changeInHeight < -20)
+  {
+   changeInHeight = -20;
+  } 
   ROS_INFO("HeightControl: %f", changeInHeight);
   
   return changeInHeight;
@@ -91,12 +100,10 @@ void GoToCurrentGoal()
   if (pos.x <= (goal.x+positionTolerance) && pos.x > (goal.x-positionTolerance) && pos.y <= (goal.y+positionTolerance) && pos.y > (goal.y-positionTolerance))
   {
     ROS_INFO("SWITCH");
-    //Dive too 2 meters and go in a square pattern.
+    //Dive too 2 meters and go in a square pattern of length 50 meters.
     switch(checkpoint){
       case 'O' :
         SetGoal(0, 0, 0);
-        //ROS_INFO("AAAAAAAAAA");
-        //sleep(5000);
         checkpoint = 'A';
         break;
       case 'B' :
@@ -108,7 +115,7 @@ void GoToCurrentGoal()
         checkpoint = 'D';
         break;
       case 'D' :
-        SetGoal(0, 50, 2);
+        SetGoal(50, 0, 2);
         checkpoint = 'A';
         break;
       case 'A' :
@@ -118,8 +125,20 @@ void GoToCurrentGoal()
     }
   }
   //Calculate the angle to the goal and make sure the Naiad is pointed in the right direction before moving forward.
-  message.yaw = CalculateYawAngle();
-  if (pos.yaw <= message.yaw+angleTolerance && pos.yaw > message.yaw-angleTolerance)
+  if (CalculateYawAngle() - pos.yaw > 170 || CalculateYawAngle() - pos.yaw < -170)
+  {
+    message.yaw = 500;
+  }else if (CalculateYawAngle() > pos.yaw) //turn counterclockwise
+  {
+   message.yaw = 100;
+  } else //turn clockwise 
+  {
+    message.yaw = -100;
+  }
+
+  ROS_INFO("YAW: %f", message.yaw);
+  float ang = CalculateYawAngle() - pos.yaw;
+  if (ang <= angleTolerance && ang > -angleTolerance)
   {
     float distance = pow((goal.x - pos.x),2) + pow((goal.y - pos.y), 2);
     message.x = sqrt(distance);
@@ -135,7 +154,7 @@ void GoToCurrentGoal()
 
 void callback(const nav_msgs::Odometry::ConstPtr& msg)
 {
-  if (msg->pose.pose.position.z <= desiered_height+tolerance && msg->pose.pose.position.z >= desiered_height-tolerance)
+  if (msg->pose.pose.position.z == desiered_height)//+tolerance && msg->pose.pose.position.z >= desiered_height-tolerance)
   {
     pos.z = msg->pose.pose.position.z;
     message.z = 0;

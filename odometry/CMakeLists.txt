@@ -207,4 +207,6 @@ add_executable(rotation_speed src/rotation_speed.cpp)
 target_link_libraries(rotation_speed ${catkin_LIBRARIES})
 add_executable(axis_speed src/axis_speed.cpp)
 target_link_libraries(axis_speed ${catkin_LIBRARIES})
+add_executable(testing_tracking src/testing_tracking.cpp)
+target_link_libraries(testing_tracking ${catkin_LIBRARIES})
 

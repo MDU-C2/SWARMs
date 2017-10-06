@@ -14,7 +14,7 @@ void mapping(const nav_msgs::Odometry::ConstPtr& msg)
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "odom_listener_map");
-  myfile.open("temp.txt");
+  myfile.open("tracked_coordinates.txt");
   ros::NodeHandle n;
   ros::Subscriber sub = n.subscribe("odom", 1000, mapping);
 

@@ -10,9 +10,9 @@ int main(int argc, char** argv)
   image_transport::ImageTransport it(nh);
   image_transport::Publisher left_pub = it.advertise("camera_left/image_color", 1);
   image_transport::Publisher right_pub = it.advertise("camera_right/image_color", 1);
-  cv::Mat left_image = cv::imread("/home/arman/catkin_ws/src/publisher_test/src/scene_l.jpg", CV_LOAD_IMAGE_COLOR);
+  cv::Mat left_image = cv::imread("/root/catkin_ws/src/SWARMs/publisher_test/src/scene_l.jpg", CV_LOAD_IMAGE_COLOR);
   cv::waitKey(30);
-  cv::Mat right_image = cv::imread("/home/arman/catkin_ws/src/publisher_test/src/scene_r.jpg", CV_LOAD_IMAGE_COLOR);
+  cv::Mat right_image = cv::imread("/root/catkin_ws/src/SWARMs/publisher_test/src/scene_r.jpg", CV_LOAD_IMAGE_COLOR);
   cv::waitKey(30);
   
   sensor_msgs::ImagePtr left_msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", left_image).toImageMsg();

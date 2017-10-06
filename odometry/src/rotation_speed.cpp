@@ -11,9 +11,9 @@
 mission_control::motion speed_calc_from_IMU_data()
 {
   mission_control::motion msg;
-  msg.yaw = 0.0;
-  msg.roll = 1.6;
-  msg.pitch = 2.0;
+  msg.yaw = 1.0;
+  msg.roll = 0.0;
+  msg.pitch = 0.0;
 
   return msg;
 }

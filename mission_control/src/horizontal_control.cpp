@@ -23,6 +23,13 @@ struct position{
 
 position desiered_position;
 
+/*
+void GoInASquare()
+{
+  char grade;
+}
+*/
+
 void callback(const nav_msgs::Odometry::ConstPtr& msg)
 {
   if (msg->pose.pose.position.x < desiered_position.x) //Check and ajust x-thrust
@@ -30,6 +37,7 @@ void callback(const nav_msgs::Odometry::ConstPtr& msg)
   if (msg->pose.pose.position.y < desiered_position.y) //Chech and ajust y-thrust
     message.y = 10;
 
+  //GoInASquare();
 }
 
 int main(int argc, char **argv)
