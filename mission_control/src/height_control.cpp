@@ -83,41 +83,35 @@ float HeightControl()
   return changeInHeight;
 }
 
-/* Emergency rise
-void Rise()
-{
-  rise = 1;
-  message.z = 0;
-}
-*/
-
 void GoToCurrentGoal()
 {
-  //ROS_INFO("Goal: %f, %f, %f", goal.x, goal.y, goal.z);
-  //ROS_INFO("Position: %f, %f, %f", pos.x, pos.y, pos.z);
-
   //Check if the goal has been reached.
   if (pos.x <= (goal.x+positionTolerance) && pos.x > (goal.x-positionTolerance) && pos.y <= (goal.y+positionTolerance) && pos.y > (goal.y-positionTolerance))
   {
     ROS_INFO("SWITCH");
-    //Dive too 2 meters and go in a square pattern of length 50 meters.
+    //Dive 2 meters and go in a square pattern of length 50 meters.
     switch(checkpoint){
+      //starting position
       case 'O' :
         SetGoal(0, 0, 0);
         checkpoint = 'A';
         break;
+      //move to the upper left corner
       case 'B' :
         SetGoal(0, 50, 2);
         checkpoint = 'C';
         break;
+      //move to the upper right corner
       case 'C' :
         SetGoal(50, 50, 2);
         checkpoint = 'D';
         break;
+      //move to the lower right corner
       case 'D' :
         SetGoal(50, 0, 2);
         checkpoint = 'A';
         break;
+      //move to the initial position but 2 meters lower
       case 'A' :
         SetGoal(0, 0, 2);
         checkpoint = 'B';
@@ -127,12 +121,14 @@ void GoToCurrentGoal()
   //Calculate the angle to the goal and make sure the Naiad is pointed in the right direction before moving forward.
   if (CalculateYawAngle() - pos.yaw > 170 || CalculateYawAngle() - pos.yaw < -170)
   {
+    //move forward
     message.yaw = 500;
-  }else if (CalculateYawAngle() > pos.yaw) //turn counterclockwise
+  }else if (CalculateYawAngle() > pos.yaw)
   {
-   message.yaw = 100;
-  } else //turn clockwise 
-  {
+    //turn counterclockwise
+    message.yaw = 100;
+  } else {
+    //turn clockwise
     message.yaw = -100;
   }
 
@@ -154,7 +150,7 @@ void GoToCurrentGoal()
 
 void callback(const nav_msgs::Odometry::ConstPtr& msg)
 {
-  if (msg->pose.pose.position.z == desiered_height)//+tolerance && msg->pose.pose.position.z >= desiered_height-tolerance)
+  if (msg->pose.pose.position.z == desiered_height)
   {
     pos.z = msg->pose.pose.position.z;
     message.z = 0;
@@ -183,8 +179,6 @@ int main(int argc, char **argv)
   while(ros::ok())
   {
     ros::spinOnce();
-    //ROS_INFO("Goal: %f, %f, %f", goal.x, goal.y, goal.z);
-    //ROS_INFO("Position: %f, %f, %f", pos.x, pos.y, pos.z);
     pub_height_speed.publish(message);
   }
 }
