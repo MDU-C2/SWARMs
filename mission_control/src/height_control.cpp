@@ -1,5 +1,5 @@
 #include "ros/ros.h"
-#include "mission_control/motion.h"
+#include "/root/catkin_ws/devel/include/mission_control/motion.h"
 #include "nav_msgs/Odometry.h"
 
 #define PI 3.14159265

@@ -201,8 +201,8 @@ include_directories(
 
 add_executable(height_control src/height_control.cpp)
 target_link_libraries(height_control ${catkin_LIBRARIES})
-add_executable(horizontal_control src/horizontal_control.cpp)
-target_link_libraries(horizontal_control ${catkin_LIBRARIES})
-add_executable(rotation_control src/rotation_control.cpp)
-target_link_libraries(rotation_control ${catkin_LIBRARIES})
+#add_executable(horizontal_control src/horizontal_control.cpp)
+#target_link_libraries(horizontal_control ${catkin_LIBRARIES})
+#add_executable(rotation_control src/rotation_control.cpp)
+#target_link_libraries(rotation_control ${catkin_LIBRARIES})
 
