@@ -1,50 +1,47 @@
-#include "ros/ros.h"
-#include "tf/transform_broadcaster.h"
-#include "nav_msgs/Odometry.h"
-#include </root/catkin_ws/devel/include/mission_control/motion.h>
+#include "odom.h"
 
-#define PI 3.14159265
-
-double vx = 0.3;
-double vy = 0.0;
-double vz = 0.0;
-double vyaw = 0.1;
-double vroll = 0.0;
-double vpitch = 0.0;
-
-void GetSpeed(const mission_control::motion &msg)
+//Get the current axis speed according to EKF
+void GetAxisSpeed(const mission_control::motion &msg)
 {
-  vx = msg.x; //msg.x;
-  vy = msg.y;
-  vz = msg.z;
-  vyaw = msg.yaw;
-  vpitch = msg.pitch;
-  vroll = msg.roll;
+  position.vx = msg.x;
+  position.vy = msg.y;
+  position.vz = msg.z;
 }
 
+//Might me removed
+void GetOrientation(const mission_control::motion &msg)
+{
+  position.vyaw = msg.yaw;
+  position.vpitch = msg.pitch;
+  position.vroll = msg.roll;
+}
+
+/* Get distance from seefloor with Gimmi2(camera)
+void GetHeight(heightmessage &msg)
+{
+  z = msg;
+}
+*/
 
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "odometry_publisher");
 
   ros::NodeHandle n;
-  ros::Publisher odom_pub = n.advertise<nav_msgs::Odometry>("odom", 50);
-  ros::Subscriber rotation_speed_listener = n.subscribe("rotation_speed_for_odom", 1, GetSpeed);
-  ros::Subscriber axis_speed_listener = n.subscribe("axis_speed_for_odom", 1, GetSpeed);
-  //tf::TransformBroadcaster odom_broadcaster;
+  ros::Publisher odom_pub = n.advertise<nav_msgs::Odometry>("odom", 5);
+  ros::Subscriber rotation_speed_listener = n.subscribe("orientation_for_odom", 1, GetOrientation);
+  ros::Subscriber axis_speed_listener = n.subscribe("axis_speed_for_odom", 1, GetAxisSpeed);
+  //ros::Subscriber hight_listener = n.subscribe("height", 1, GetHeight);
 
-  double x = 0.0;
-  double y = 0.0;
-  double z = 0.0;
-  double yaw = 70.0;
-  double roll = 0.0;
-  double pitch = 0.0;
+  position.x = 0.0;
+  position.y = 0.0;
+  position.z = 0.0;
+  position.yaw = 0.0;
+  position.roll = 0.0;
+  position.pitch = 0.0;
 
-  ros::Time current_time, last_time;
   current_time = ros::Time::now();
   last_time = ros::Time::now();
-
-  ros::Rate r(10.0);
 
   while(n.ok())
   {
@@ -55,62 +52,49 @@ int main(int argc, char** argv)
     double dt = (current_time - last_time).toSec();
     //delta_x distance traveled in the global X-diriction
     //vx * cos(yaw) * cos(pitch); Local X-velocity contribution to movement in Global X diriction. 
-    double delta_x = (vx * cos(yaw) * cos(pitch) - vy * sin(yaw) * cos(roll) + vz * sin(pitch) * sin(roll)) * dt;
-    double delta_y = (vx * sin(yaw) * cos(pitch) + vy * cos(yaw) * cos(roll) + vz * sin(pitch) * sin(roll)) * dt;
-    double delta_z = (vx * sin(pitch) * sin(yaw) - vy * sin(roll) * cos(yaw) + vz * cos(roll) * cos(pitch)) * dt;
-    double delta_yaw = vyaw * dt;
-    double delta_roll = vroll * dt;
-    double delta_pitch = vpitch *dt;
+    double delta_x = (position.vx * cos(position.yaw) * cos(position.pitch) - position.vy * sin(position.yaw) * cos(position.roll) + position.vz * sin(position.pitch) * sin(position.roll)) * dt;
+    double delta_y = (position.vx * sin(position.yaw) * cos(position.pitch) + position.vy * cos(position.yaw) * cos(position.roll) + position.vz * sin(position.pitch) * sin(position.roll)) * dt;
+    //double delta_z = (vx * sin(pitch) * sin(yaw) - vy * sin(roll) * cos(yaw) + vz * cos(roll) * cos(pitch)) * dt;
+    double delta_yaw = position.vyaw * dt;
+    double delta_roll = position.vroll * dt;
+    double delta_pitch = position.vpitch *dt;
     
 
     //Global position/orientation of the Naiad.
-    x += delta_x;
-    y += delta_y;
-    z += delta_z;
-    yaw += delta_yaw;
-    if (yaw > 360)
+    position.x += delta_x;
+    position.y += delta_y;
+    //z += delta_z;
+    position.yaw += delta_yaw;
+    if (position.yaw > 360)
     {
-      yaw = yaw-360;
+      position.yaw = position.yaw-360;
     }
-    roll += delta_roll;
-    pitch += delta_pitch;
+
+    //yaw = vyaw;
+    position.roll += delta_roll;
+    position.pitch += delta_pitch;
     
-
-    //ROS_INFO("ODOM: %f %f %f %f", x, y, z, yaw);
-    //geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(yaw);
-
-    //geometry_msgs::TransformStamped odom_trans;
-    //odom_trans.header.stamp = current_time;
-    //odom_trans.header.frame_id = "odom";
-    //odom_trans.child_frame_id = "base_link";
-    
-    //odom_trans.transform.translation.x = x;
-    //odom_trans.transform.translation.y = y;
-    //odom_trans.transform.translation.z = 0.0;
-    //odom_trans.transform.rotation = odom_quat;
-
-    //odom_broadcaster.sendTransform(odom_trans);
-
     nav_msgs::Odometry odom;
     odom.header.stamp = current_time;
     odom.header.frame_id = "odom";
 
-    odom.pose.pose.position.x = x;
-    odom.pose.pose.position.y = y;
-    odom.pose.pose.position.z = z;
-    odom.pose.pose.orientation.z = yaw;
+    odom.pose.pose.position.x = position.x;
+    odom.pose.pose.position.y = position.y;
+    odom.pose.pose.position.z = position.z;
+    odom.pose.pose.orientation.z = position.yaw;
 
     odom.child_frame_id = "base_link";
-    odom.twist.twist.linear.x = vx;
-    odom.twist.twist.linear.y = vy;
-    odom.twist.twist.linear.z = vz;
-    odom.twist.twist.angular.z = vyaw;
-    odom.twist.twist.angular.y = vpitch;
-    odom.twist.twist.angular.x = vroll;
+    odom.twist.twist.linear.x = position.vx;
+    odom.twist.twist.linear.y = position.vy;
+    odom.twist.twist.linear.z = position.vz;
+    odom.twist.twist.angular.z = position.vyaw;
+    odom.twist.twist.angular.y = position.vpitch;
+    odom.twist.twist.angular.x = position.vroll;
 
     odom_pub.publish(odom);
 
     last_time = current_time;
-    r.sleep();
+    
+    r.sleep(); //Wait the correct amount of time to keep the loop timing
   }
 }

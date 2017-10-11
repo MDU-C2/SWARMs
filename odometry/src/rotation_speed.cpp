@@ -10,6 +10,7 @@
 
 mission_control::motion speed_calc_from_IMU_data()
 {
+  //Need access to the IMU ether through BBB(ethernet, TCP socket?) or direct contact(UART)
   mission_control::motion msg;
   msg.yaw = 1.0;
   msg.roll = 0.0;
@@ -22,13 +23,13 @@ mission_control::motion speed_calc_from_IMU_data()
 int main(int argc, char **argv)
 {
   // Call ros::init before using any other part of the ROS system
-  ros::init(argc, argv, "rotation_speed_calculator");
+  ros::init(argc, argv, "orientation");
 
   // Main access point to communication with the ROS system
   ros::NodeHandle n;
 
   // Fist parameter represent the message and the second the size of the message.
-  ros::Publisher pub_rotation_speed = n.advertise<mission_control::motion>("rotation_speed_for_odom", 10);
+  ros::Publisher pub_rotation_speed = n.advertise<mission_control::motion>("orientation_for_odom", 10);
   
   // This is the message object. Fill it with data and then pubblish it.
   mission_control::motion msg;

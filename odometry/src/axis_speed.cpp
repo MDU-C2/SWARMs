@@ -32,9 +32,13 @@ int main(int argc, char **argv)
   
  // This is the message object. Fill it with data and then pubblish it.
   mission_control::motion msg;
-
+  
+  ros::Time test;
+  
+  ros::Rate r(400);
   while(n.ok())
   {
+
     //ros::spinOnce() //need IMU connection
     
     //speed_calc_from_IMU_data() //need IMU connection
@@ -42,8 +46,6 @@ int main(int argc, char **argv)
     msg = speed_calc_from_IMU_data();
 
     pub_axis_speed.publish(msg);
-
+    r.sleep(); //Loop at 400 Hz because of the IMU speed.
   }
-
-
 }

@@ -166,10 +166,10 @@ void callback(const nav_msgs::Odometry::ConstPtr& msg)
 
 int main(int argc, char **argv)
 {
-  ros::init(argc, argv, "height_speed_publisher");
+  ros::init(argc, argv, "control_publisher");
   ros::NodeHandle n;
   
-  ros::Publisher pub_height_speed = n.advertise<mission_control::motion>("height_control", 10);
+  ros::Publisher pub_control = n.advertise<mission_control::motion>("control", 10);
   ros::Subscriber sub_heght_speed = n.subscribe("odom", 10, callback);
   
   SetPos(0,0,0,0,0,0);
@@ -179,6 +179,6 @@ int main(int argc, char **argv)
   while(ros::ok())
   {
     ros::spinOnce();
-    pub_height_speed.publish(message);
+    pub_control.publish(message);
   }
 }

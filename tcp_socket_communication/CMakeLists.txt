@@ -11,7 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
-  nav_msgs
+  #nav_msgs
   message_generation
 )
 
@@ -56,11 +56,11 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate services in the 'srv' folder
- add_service_files(
-   FILES
-   GetMap.srv
-   SetMap.srv
- )
+# add_service_files(
+#   FILES
+   #GetMap.srv
+   #SetMap.srv
+   # )
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -70,11 +70,11 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate added messages and services with any dependencies listed here
- generate_messages(
-   DEPENDENCIES
-   std_msgs
-   nav_msgs
- )
+# generate_messages(
+#   DEPENDENCIES
+#   std_msgs
+   #nav_msgs
+   # )
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -204,8 +204,8 @@ include_directories(
 add_executable(tcp src/tcp.cpp)
 target_link_libraries(tcp ${catkin_LIBRARIES})
 
-add_executable(coord_sender src/coord_sender.cpp)
-target_link_libraries(coord_sender ${catkin_LIBRARIES})
+#add_executable(coord_sender src/coord_sender.cpp)
+#target_link_libraries(coord_sender ${catkin_LIBRARIES})
 
 add_executable(tcp_image_socket_client src/tcp_image_socket_client.cpp)
 target_link_libraries(tcp_image_socket_client ${catkin_LIBRARIES})
