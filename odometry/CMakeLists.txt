@@ -104,7 +104,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
+  INCLUDE_DIRS include
 #  LIBRARIES odometry
 #  CATKIN_DEPENDS nav_msgs roscpp rospy std_msgs
 #  DEPENDS system_lib
@@ -119,6 +119,7 @@ catkin_package(
 include_directories(
 # include
   ${catkin_INCLUDE_DIRS}
+
 )
 
 ## Declare a C++ library
@@ -209,4 +210,5 @@ add_executable(axis_speed src/axis_speed.cpp)
 target_link_libraries(axis_speed ${catkin_LIBRARIES})
 add_executable(testing_tracking src/testing_tracking.cpp)
 target_link_libraries(testing_tracking ${catkin_LIBRARIES})
-
+#add_executable(test_imu src/test_imu.cpp)
+#target_link_libraries(test_imu ${catkin_LIBRARIES})
