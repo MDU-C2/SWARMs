@@ -1,0 +1,89 @@
+V "GNAT Lib v4.9"
+M P W=b
+P ZX
+
+RN
+RV NO_IO
+RV NO_DEFAULT_INITIALIZATION
+RV NO_IMPLEMENTATION_ATTRIBUTES
+RV SPARK_05
+
+U test_client%b		test_client.adb		4a21fede NE OO SU IL
+W ada%s			ada.ads			ada.ali
+W ada.streams%s		a-stream.adb		a-stream.ali
+W ada.text_io%s		a-textio.adb		a-textio.ali
+W gnat%s		gnat.ads		gnat.ali
+W gnat.sockets%s	g-socket.adb		g-socket.ali
+W system.concat_2%s	s-conca2.adb		s-conca2.ali
+W system.img_int%s	s-imgint.adb		s-imgint.ali
+
+D ada.ads		20070406091342 3ffc8e18
+D a-except.ads		20140129161953 f86a4103
+D a-finali.ads		20111121113555 52ecdc1b
+D a-ioexce.ads		20140225151544 e4a01f64
+D a-stream.ads		20140122164720 1a984740
+D a-tags.ads		20111212115430 6c0509d0
+D a-textio.ads		20140129155348 386df5d4
+D a-unccon.ads		20070406091342 f9eb8f06
+D a-uncdea.ads		20070406091342 f15a5ed1
+D gnat.ads		20110801150502 fd2ad2f1
+D g-socket.ads		20140219150543 923c234a
+D interfac.ads		20140225151838 69adb1b9
+D i-c.ads		20110801143639 5421119b
+D i-cstrea.ads		20130412125801 8128536b
+D system.ads		20160213152625 72a1f35b
+D s-conca2.ads		20140225151544 02a0d7d0
+D s-crtl.ads		20140225151544 840e6817
+D s-exctab.ads		20140225151139 54135002
+D s-ficobl.ads		20120709130952 55a71d43
+D s-finmas.ads		20140225151139 814daec4
+D s-finroo.ads		20120426095924 4ff27390
+D s-imgint.ads		20090409150019 02dbe0c2
+D s-oscons.ads		20160213152628 5c2b9008
+D s-parame.ads		20140225151139 ab8cb46a
+D s-pooglo.ads		20110804083314 542f33d0
+D s-soflin.ads		20140225151139 aa763b52
+D s-stache.ads		20140225151139 a37c21ec
+D s-stalib.ads		20140225151139 a891183f
+D s-stoele.ads		20140225151139 2dc34a04
+D s-stoele.adb		20140225151139 ed88f8fb
+D s-stopoo.ads		20131010103753 b16154c2
+D s-traent.ads		20140225151139 b5116092
+D s-unstyp.ads		20140225151139 510692af
+D s-wchcon.ads		20140225151139 1b7d22d2
+D test_client.adb	20171017083641 fae86f00
+X 1 ada.ads
+16K9*Ada 19e8 35|1r6 2r6 10r16 14r23 29r16 35r9
+X 5 a-stream.ads
+36K13*Streams 84e16 35|1w10 10r20 14r27
+42M9*Stream_Element
+44I9*Stream_Element_Offset<integer> 35|10r28
+51A9*Stream_Element_Array(42M9)<44I9> 35|14r35
+X 7 a-textio.ads
+49K13*Text_IO 471e16 35|2w10 29r20 35r13
+208U14*Put 35|29s28
+263U14*Put_Line 35|35s21
+X 10 gnat.ads
+34K9*GNAT 37e9 35|4r6 7r13 27r9
+X 11 g-socket.ads
+58K14*Sockets 1263e17 35|4w11 7r18 27r14
+412I9*Socket_Type<integer> 35|9r18
+463n25*Family_Inet{463E9} 35|22r32
+467n38*Socket_Datagram{467E9} 35|22r45
+479I9*Port_Type<integer>
+494r4*Any_Inet_Addr{488R9} 35|21r25
+505R9*Sock_Addr_Type 508e14 35|8r25
+506r7*Addr{488R9} 35|21m17
+507i7*Port{479I9} 35|20m17
+805U14*Create_Socket 35|22s9
+836U14*Bind_Socket 35|23s9
+910U14*Receive_Socket 35|27s22
+X 35 test_client.adb
+6U11*test_client 6b11 37l5 37t16
+8r9 Address{11|505R9} 20m9 21m9 23r29
+8r18 From{11|505R9} 27m65
+9i9 Socket{11|412I9} 22m24 23r21 27r38
+10i9 Last{5|44I9} 27m59 28r23 35r42
+14a9 Data_Stream{5|51A9} 27m46 29r46
+28i13 I<integer> 29r58
+

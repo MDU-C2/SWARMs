@@ -10,8 +10,10 @@ procedure Echo_server is
 	Client     : GNAT.Sockets.Sock_Addr_Type;
 	Channel    : GNAT.Sockets.Stream_Access;
 	Offset : Ada.Streams.Stream_Element_Count;
-	Data   : Ada.Streams.Stream_Element_Array (1 .. 1024);
+	--Data   : Ada.Streams.Stream_Element_Array (1 .. 1024);
+  Data_Stream : Ada.Streams.Stream_Element_Array (1 .. Ada.Streams.Stream_Element_Offset(Data'Length));
 
+			--Send the data onward.
 	
 	dataString : string(1 .. 50); --A string to store received data, before converting it to floats.
 	ii : Integer := 1; --Loop var, string posision for recieved data.
@@ -50,28 +52,37 @@ begin
 		begin
 			
 			--Reed the data in the socket.
-			Ada.Text_IO.Put_Line("Receiving data");
+			Ada.Text_IO.Put_Line("Sending JSON string.");
+      dataString := "{""id"": 2, ""name"": ""abc""}";
+      for I in Data_Stream'Range loop
+           Data_Stream(I) := Ada.Streams.Stream_Element(Character'Pos(Data(Integer(I))));
+           --Ada.Text_IO.Put(Character'Val(Data_Stream(I)));
+      end loop;
+
 			loop
-				Ada.Streams.Read(Channel.All, Data, Offset);
-				Ada.Text_IO.Put_Line("Printing received data: ");
+        
+
+
+				--Ada.Streams.Read(Channel.All, Data, Offset);
+				--Ada.Text_IO.Put_Line("Printing received data: ");
 		        	--Character'Output (Channel, Character'Input (Channel));
-				exit when Offset = 0;
-				ii := 1;
+				--exit when Offset = 0;
+				--ii := 1;
 
 				--Store the data to dataString so that it can be converted to a float.
-				for I in 1 .. Offset loop
-					dataString(ii) := Character'Val(Data(I));
-					ii := ii + 1;
-				end loop;
+				--for I in 1 .. Offset loop
+					--dataString(ii) := Character'Val(Data(I));
+					--ii := ii + 1;
+				--end loop;
 			end loop;
-			Ada.Text_IO.Put_Line(dataString);
+			--Ada.Text_IO.Put_Line(dataString);
 			--Convert and store the data from the string to correct varibles.
-			X := Float'Value(dataString(1 .. 8));
-			Ada.Text_IO.Put_Line("I got: " & Float'Image(X));
-			Y := Float'Value(dataString(9 .. 16));
-			Ada.Text_IO.Put_Line("I got: " & Float'Image(Y));
-			Z := Float'Value(dataString(17	.. 25));
-			Ada.Text_IO.Put_Line("I got: " & Float'Image(Z));
+			--X := Float'Value(dataString(1 .. 8));
+			--Ada.Text_IO.Put_Line("I got: " & Float'Image(X));
+			--Y := Float'Value(dataString(9 .. 16));
+			--Ada.Text_IO.Put_Line("I got: " & Float'Image(Y));
+			--Z := Float'Value(dataString(17	.. 25));
+			--Ada.Text_IO.Put_Line("I got: " & Float'Image(Z));
 
 			--Send the data onward.
 		exception
