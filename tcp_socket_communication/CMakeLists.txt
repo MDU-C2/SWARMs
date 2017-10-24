@@ -211,5 +211,5 @@ add_executable(tcp_image_socket_client src/tcp_image_socket_client.cpp)
 target_link_libraries(tcp_image_socket_client ${catkin_LIBRARIES})
 
 
-add_executable(tcp_imu_data src/tcp_imu_data.cpp)
-target_link_libraries(tcp_imu_data ${catkin_LIBRARIES})
+add_executable(udp_imu_data src/udp_imu_data.cpp)
+target_link_libraries(udp_imu_data ${catkin_LIBRARIES})

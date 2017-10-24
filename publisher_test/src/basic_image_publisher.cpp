@@ -11,7 +11,7 @@ int main(int argc, char** argv)
   image_transport::Publisher left_pub = it.advertise("camera_left/image_color", 1);
   image_transport::Publisher right_pub = it.advertise("camera_right/image_color", 1);
 
-  ros::Rate loop_rate(5);
+  ros::Rate loop_rate(15);
   while (nh.ok()) {
     cv::Mat left_image = cv::imread("/root/catkin_ws/src/SWARMs/publisher_test/src/scene_l.jpg", CV_LOAD_IMAGE_COLOR);
     cv::waitKey(30);
