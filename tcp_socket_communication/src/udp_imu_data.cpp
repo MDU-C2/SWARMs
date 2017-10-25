@@ -1,6 +1,25 @@
+//----------------------------
+// UDP IMU communication
+// Last modified: 25.10.2017
+// Extra notes: 
+//----------------------------
+
+
 #include "udp_imu_data.h"
 
 tcp_client client;
+
+// This function compute the velocity given the acceleration. 
+// The parameters are: the acceleration from the IMU, the previous velocity
+// and the previous timestamp used to compute the delta t.
+
+double ComputeVelocity(double accN, double velocityN, ros::Time prevTimeStamp){
+  if(abs(accN) > 0.1) {
+    velocityN = velocityN + (accN*(ros::Time::now() - prevTimeStamp).toSec());
+  }
+  return velocityN;
+}
+
 
 int main(int argc, char **argv)
 {
@@ -22,73 +41,57 @@ int main(int argc, char **argv)
   
   bind(client.sock, (struct sockaddr *) &client.server, sizeof(client.server));
 
-  int count = 0;
-  int indexBegin = 0;
-  int indexEnd = 0;
-  int tempStrIndex = 0;
   double yaw = 0.0;
-  float imuData[5] = {};
-  int imuDataIndex = 0;
-  char tempStr[6]; 
+  double accX = 0.0;
+  double accY = 0.0;
+  double accZ = 0.0;
+  double velocityX = 0.0;
+  double velocityY = 0.0;
+  double velocityZ = 0.0;
+  ros::Time startTimeX = ros::Time::now();
+  ros::Time startTimeY = ros::Time::now();
+  ros::Time startTimeZ = ros::Time::now();
   while(1)
   {
-
+    std::cout << std::endl;
     recv(client.sock, buffer,sizeof(buffer), 0);
     std::cout << "Buffer content: " << buffer << std::endl;
     std::cout << "buffer[0] " << buffer[0] << std::endl;
     std::cout << "buffer[1] " << buffer[1] << std::endl;
-    //if (buffer[0] == '1')
-    //{
-      //std::cout << "buffer[0]" << std::endl;
-      //while(buffer[count] != '#' && count < 35)
-      //{
-        /*std::cout << "buffer count: " << count << std::endl;
-        if (buffer[count] == '*'){
-          
-          std::cout << "first * encountered" << std::endl;
-          indexBegin = count + 1;
-          //move to the next star. This is for indexing reference.
-          while(buffer[count] != '*'){
-          count++;
-          for(int iii = count; iii < count+5; iii++){
-            tempStr[iii] = buffer[iii];
-            //indexEnd = count;
-            //count ++;
-            //tempStrIndex ++;
-            //std::cout << "temp index: " << tempStrIndex << std::endl;
-          }
-          count = count+5;
-          tempStrIndex = 0;
-          std::cout << "second * encountered" << std::endl;
-          imuData[imuDataIndex] = atof(tempStr);
-          //tempStr = {};
-          imuDataIndex ++;
-        } else {
-          count ++;
-        }
-
-      }
-      count = 0;
-      std::cout << "encounter #" << std::endl;
-      std::cout << "DATA IMU ARRAY: " << imuData << std::endl;*/
-      while(buffer[count] != ' '){
-        count++;
-        //std::cout << "Count: " << count << std::endl;
-      }
-      char str[count];
-      for(int iii = 2; iii < 8; iii++)
-      {
-        str[iii-2] = buffer[iii];
-      }
-      std::cout << "Count: " << count << std::endl;
-      std::cout << str << std::endl;
-      yaw = atof(str);
-      std::cout << "Yaw: " << yaw << std::endl;
-      count = 2;
+    char str[7];
+    for(int iii = 0; iii < 8; iii++)
+    {
+      str[iii] = buffer[iii+4];
     }
+    switch(buffer[1]){
+      case '1':
+        yaw = atof(str);
+        std::cout << "Yaw: " << yaw << std::endl;
+        break;
+      case '2':
+        accX = atof(str);
+        velocityX = ComputeVelocity(accX, velocityX, startTimeX);
+        startTimeX = ros::Time::now();
+        std::cout << "Velocity in X: " << velocityX << std::endl;
+        break;
+      case '3':
+        accY = atof(str);
+        velocityY = ComputeVelocity(accY, velocityY, startTimeY);
+        startTimeY = ros::Time::now();
+        std::cout << "Velocity in Y: " << velocityY << std::endl;
+        break;
+      case '4':
+        accZ = atof(str);
+        velocityZ = ComputeVelocity(accZ, velocityZ, startTimeZ);
+        startTimeZ = ros::Time::now();
+        std::cout << "Velocity in Z: " << velocityZ << std::endl;
+        std::cout << std::endl << "==================================" << std::endl;
+        break;
+      default:
+        std::cout << "Invalid data! " << std::endl;
+    }
+    // Publish data over ROS topic.
     odom.pose.pose.orientation.z = yaw;
     pub.publish(odom);
-    std::cout << "Yaw: " << yaw << std::endl;
   }
- //}
 }

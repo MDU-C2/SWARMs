@@ -1,3 +1,9 @@
+//--------------------------------
+// UDP communication header file
+// Last modified: 25.10.2017
+//--------------------------------
+
+
 #include "ros/ros.h"
 #include "std_msgs/String.h"
 #include "stdio.h"

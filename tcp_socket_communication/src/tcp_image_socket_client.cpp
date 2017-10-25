@@ -45,6 +45,7 @@ printf(" \n");
 //read the name of the image
 //do{
 stat2 = recv(socket, &recvd_filename, 512, 0);// sizeof(recvd_filename));
+//stat2 = read(socket, &recvd_filename, 14);
 printf("stat2, recv filename: %i\n",stat2);
 //}while(stat2 < 0);
 printf("name received\n");
@@ -62,7 +63,7 @@ do{
 stat2 = write(socket, &recvd_veri, sizeof(int));
 }while(stat2 < 0);
 printf("verification sent\n");
-image = fopen(recvd_filename, "w");
+image = fopen(recvd_filename, "w");  //open a new file to insert data
 
 if( image == NULL) {
 printf("Error when opening the image\n");
@@ -74,10 +75,12 @@ struct timeval timeout = {10,0};
 fd_set fds;
 int buffer_fd;///////, buffer_out;
 
+//printf("start receiving img data before while");
 //Loop while the image is transferred
 while(recv_size < size) {
 //while(packet_index < 2){
 
+//  printf("receiving inside while");
     FD_ZERO(&fds);
     FD_SET(socket,&fds);
 
@@ -99,13 +102,6 @@ while(recv_size < size) {
         //printf("Packet size: %i\n",read_size);
 
 
-        //Write the currently read data into our image file
-         write_size = fwrite(imagearray,1,read_size, image);
-      //   printf("Written image size: %i\n",write_size); 
-
-             if(read_size !=write_size) {
-                 printf("error in read write\n");    }
-
 
              //Increment the total number of bytes read
              recv_size += read_size;
@@ -114,7 +110,57 @@ while(recv_size < size) {
              //printf(" \n");
              //printf(" \n");
     }
+
+
+        //Write the currently read data into our image file together with bmp info
+
+       // .w = 1920, .h = 1080, .bpp = 3
+       uint16_t width = 1920/4;
+       uint16_t height = 1080/4;
+       uint16_t bpp = 3;
+       uint16_t scale = 1;
+
+          uint32_t w = width/scale;
+          uint32_t h = height/scale;
+          uint32_t filesize = w*h*bpp + 54;
+
+
+
+        unsigned char bmpfileheader[14] = {'B','M', 0,0,0,0, 0,0, 0,0, 54,0,0,0};
+        unsigned char bmpinfoheader[40] = {40,0,0,0,
+                          0,0,0,0,
+                          0,0,0,0,
+                          1,0,
+                          24,0};
+      
+        bmpfileheader[ 2] = (unsigned char)(filesize      );
+        bmpfileheader[ 3] = (unsigned char)(filesize >>  8);
+        bmpfileheader[ 4] = (unsigned char)(filesize >> 16);
+        bmpfileheader[ 5] = (unsigned char)(filesize >> 24);
+      
+        bmpinfoheader[ 4] = (unsigned char)(       w      );
+        bmpinfoheader[ 5] = (unsigned char)(       w >>  8);
+        bmpinfoheader[ 6] = (unsigned char)(       w >> 16);
+        bmpinfoheader[ 7] = (unsigned char)(       w >> 24);
+        bmpinfoheader[ 8] = (unsigned char)(       h      );
+        bmpinfoheader[ 9] = (unsigned char)(       h >>  8);
+        bmpinfoheader[10] = (unsigned char)(       h >> 16);
+        bmpinfoheader[11] = (unsigned char)(       h >> 24);
+
+
+
+        fwrite(bmpfileheader,1,14,image);
+        fwrite(bmpinfoheader,1,40,image);
+         write_size = fwrite(imagearray,1,read_size, image);
+      //   printf("Written image size: %i\n",write_size); 
+
+ //            if(read_size !=write_size) {
+   //              printf("error in read write\n");    }
+
+
 }
+
+
   fclose(image);
   printf("Image successfully Received!\n");
 
