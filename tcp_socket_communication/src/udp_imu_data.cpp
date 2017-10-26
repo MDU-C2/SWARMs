@@ -69,11 +69,13 @@ int main(int argc, char **argv)
       str[iii] = buffer[iii+4];
     }
     switch(buffer[1]){
+      // Data contained in the buffer realted to yaw values.
       case '1':
         orientation.yaw = atof(str);
         std::cout << "Yaw: " << orientation.yaw << std::endl;
         odom.pose.pose.orientation.z = orientation.yaw;
         break;
+      // Data contained in the buffer related to the acceleration in x axis.
       case '2':
         orientation.accX = atof(str);
         orientation.velocityX = ComputeVelocity(orientation.accX, orientation.velocityX, startTimeX);
@@ -81,6 +83,7 @@ int main(int argc, char **argv)
         odom.twist.twist.linear.x = orientation.velocityX;
         std::cout << "Velocity in X: " << orientation.velocityX << std::endl;
         break;
+      // Data contatined in the buffer related to the acceleration in y axis
       case '3':
         orientation.accY = atof(str);
         orientation.velocityY = ComputeVelocity(orientation.accY, orientation.velocityY, startTimeY);
@@ -88,6 +91,7 @@ int main(int argc, char **argv)
         odom.twist.twist.linear.y = orientation.velocityY;
         std::cout << "Velocity in Y: " << orientation.velocityY << std::endl;
         break;
+      // Data contatined in the buffer related to the acceleration in z axis
       case '4':
         orientation.accZ = atof(str);
         orientation.velocityZ = ComputeVelocity(orientation.accZ, orientation.velocityZ, startTimeZ);
@@ -95,10 +99,12 @@ int main(int argc, char **argv)
         odom.twist.twist.linear.z = orientation.velocityZ;
         std::cout << "Velocity in Z: " << orientation.velocityZ << std::endl;
         break;
+      // Data contained in the buffer related to the roll angle.
       case '5':
         orientation.roll = atof(str);
         odom.pose.pose.orientation.x = orientation.roll;
         break;
+      // Data contatined in the buffer related to the pitch angle.
       case '6':
         orientation.pitch = atof(str);
         odom.pose.pose.orientation.y = orientation.pitch;

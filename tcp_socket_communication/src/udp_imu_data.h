@@ -39,7 +39,6 @@ class tcp_client
     void init()
     {
       server.sin_family = AF_INET;
-      //Address to the BBB board. (Localhost now)
       server.sin_addr.s_addr = INADDR_ANY;
       server.sin_port = htons(server_port);
     }

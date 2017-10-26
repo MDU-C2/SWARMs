@@ -1,6 +1,13 @@
+//-------------------------------
+// Mission Control
+// Last modified: 26.10.2017
+// Extra notes:
+//-------------------------------
+
+
 #include "mission_control.h"
 
-//Set the goal for the Naiad.
+// Set the goal for the NAIAD in 3D coordinates. This will consider also yaw, roll and pitch.
 void SetGoal(float x, float y, float z, float yaw, float roll, float pitch)
 {
   goal.x = x;
@@ -11,6 +18,7 @@ void SetGoal(float x, float y, float z, float yaw, float roll, float pitch)
   goal.pitch = pitch;
 }
 
+// Set the goal for the NAIAD in 2D coordinates. This will only consider x, y and z axis.
 void SetGoal(float x, float y, float z)
 {
   goal.x = x;
@@ -18,6 +26,7 @@ void SetGoal(float x, float y, float z)
   goal.z = z;
 }
 
+// Set the position of the NAIAD in 3D coordinates.
 void SetPos(float x, float y, float z, float yaw, float roll, float pitch)
 {
   pos.x = x;
@@ -28,6 +37,8 @@ void SetPos(float x, float y, float z, float yaw, float roll, float pitch)
   pos.pitch = pitch;
 }
 
+// TODO REFACTOR THIS FUNCTION!!!
+// comment in here.
 float CalculateYawAngle()
 {
   ROS_INFO("Goal: %f, %f, %f", goal.x, goal.y, goal.z);
@@ -35,18 +46,18 @@ float CalculateYawAngle()
 
   float x = goal.x - pos.x;
   float y = goal.y - pos.y;
-  float angle = atan2(y,x) /* - atan2(pos.y, pos.x) */ * 180/PI; //Need the current angle? Dont think so
+  float angle = atan2(y,x) * 180/PI;
+  //float angle = atan2(y,x) - atan2(pos.y, pos.x) * 180/PI; //Need the current angle? Dont think so
   ROS_INFO("Angle to go in: %f", angle);
   ROS_INFO("Angle pointing in: %f", pos.yaw);
   return angle;
 }
 
+// This function is usded to control the NAIAD in order to keep it at a desired distance from the sea-floor.
+// Check the documentation for better information about this function. 
 float HeightControl()
 {
   float changeInHeight;
-  
-  // Use the function x³for regulating height. In this way the curve has been moved to the right in
-  // order to have a neutral vertical movement at the desired height. 
   changeInHeight = -2*(pow((desiered_height-pos.z), 3))+((desiered_height-pos.z)/3);
   if (changeInHeight > 20)
   {
@@ -60,6 +71,7 @@ float HeightControl()
   return changeInHeight;
 }
 
+// This function is used to plan the movements of the NAIAD.
 void GoToCurrentGoal()
 {
   //Check if the goal has been reached.
