@@ -16,6 +16,19 @@
 //define a prot to be used.
 #define server_port 12345
 
+//Definition of IMU variables
+struct imuData{
+  double yaw;
+  double roll;
+  double pitch;
+  double accX;
+  double accY; 
+  double accZ;   
+  double velocityX;
+  double velocityY;
+  double velocityZ;
+};
+
 //TCP client socket class
 class tcp_client
 {

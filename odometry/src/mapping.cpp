@@ -8,7 +8,8 @@ std::ofstream myfile;
 
 void mapping(const nav_msgs::Odometry::ConstPtr& msg)
 {
-  myfile << msg->pose.pose.position.x << " " << msg->pose.pose.position.y << " " << msg->pose.pose.position.z << std::endl;
+  std::cout << "Mapping" << std::endl;
+  myfile << msg->pose.pose.position.x << " " << msg->pose.pose.position.y << " " << msg->pose.pose.orientation.z << std::endl;
 }
 
 int main(int argc, char** argv)

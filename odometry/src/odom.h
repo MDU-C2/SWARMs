@@ -21,8 +21,8 @@ struct pos{
 
 pos position;
 
-ros::Time current_time, last_time;
+//ros::Time current_time, last_time;
 //Keep track of the distance travelled 
 //by computing the delta time
-ros::Rate r(10.0);
+//ros::Rate r(10.0);
 

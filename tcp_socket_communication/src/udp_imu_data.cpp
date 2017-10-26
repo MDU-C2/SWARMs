@@ -23,9 +23,11 @@ double ComputeVelocity(double accN, double velocityN, ros::Time prevTimeStamp){
 
 int main(int argc, char **argv)
 {
+  //instantiation of imuData
+  imuData orientation;
   ros::init(argc, argv, "UDP_YAW_Receiver");
   ros::NodeHandle n;
-  ros::Publisher pub = n.advertise<nav_msgs::Odometry>("Yaw", 1);
+  ros::Publisher pub = n.advertise<nav_msgs::Odometry>("IMU_data_for_odom", 1);
   nav_msgs::Odometry odom;
 
 	int valread;
@@ -41,13 +43,16 @@ int main(int argc, char **argv)
   
   bind(client.sock, (struct sockaddr *) &client.server, sizeof(client.server));
 
-  double yaw = 0.0;
-  double accX = 0.0;
-  double accY = 0.0;
-  double accZ = 0.0;
-  double velocityX = 0.0;
-  double velocityY = 0.0;
-  double velocityZ = 0.0;
+  //initialization of variables.
+  orientation.yaw = 0.0;
+  orientation.roll = 0.0;
+  orientation.pitch = 0.0;
+  orientation.accX = 0.0;
+  orientation.accY = 0.0;
+  orientation.accZ = 0.0;
+  orientation.velocityX = 0.0;
+  orientation.velocityY = 0.0;
+  orientation.velocityZ = 0.0;
   ros::Time startTimeX = ros::Time::now();
   ros::Time startTimeY = ros::Time::now();
   ros::Time startTimeZ = ros::Time::now();
@@ -65,33 +70,44 @@ int main(int argc, char **argv)
     }
     switch(buffer[1]){
       case '1':
-        yaw = atof(str);
-        std::cout << "Yaw: " << yaw << std::endl;
+        orientation.yaw = atof(str);
+        std::cout << "Yaw: " << orientation.yaw << std::endl;
+        odom.pose.pose.orientation.z = orientation.yaw;
         break;
       case '2':
-        accX = atof(str);
-        velocityX = ComputeVelocity(accX, velocityX, startTimeX);
+        orientation.accX = atof(str);
+        orientation.velocityX = ComputeVelocity(orientation.accX, orientation.velocityX, startTimeX);
         startTimeX = ros::Time::now();
-        std::cout << "Velocity in X: " << velocityX << std::endl;
+        odom.twist.twist.linear.x = orientation.velocityX;
+        std::cout << "Velocity in X: " << orientation.velocityX << std::endl;
         break;
       case '3':
-        accY = atof(str);
-        velocityY = ComputeVelocity(accY, velocityY, startTimeY);
+        orientation.accY = atof(str);
+        orientation.velocityY = ComputeVelocity(orientation.accY, orientation.velocityY, startTimeY);
         startTimeY = ros::Time::now();
-        std::cout << "Velocity in Y: " << velocityY << std::endl;
+        odom.twist.twist.linear.y = orientation.velocityY;
+        std::cout << "Velocity in Y: " << orientation.velocityY << std::endl;
         break;
       case '4':
-        accZ = atof(str);
-        velocityZ = ComputeVelocity(accZ, velocityZ, startTimeZ);
+        orientation.accZ = atof(str);
+        orientation.velocityZ = ComputeVelocity(orientation.accZ, orientation.velocityZ, startTimeZ);
         startTimeZ = ros::Time::now();
-        std::cout << "Velocity in Z: " << velocityZ << std::endl;
+        odom.twist.twist.linear.z = orientation.velocityZ;
+        std::cout << "Velocity in Z: " << orientation.velocityZ << std::endl;
+        break;
+      case '5':
+        orientation.roll = atof(str);
+        odom.pose.pose.orientation.x = orientation.roll;
+        break;
+      case '6':
+        orientation.pitch = atof(str);
+        odom.pose.pose.orientation.y = orientation.pitch;
         std::cout << std::endl << "==================================" << std::endl;
         break;
       default:
         std::cout << "Invalid data! " << std::endl;
     }
     // Publish data over ROS topic.
-    odom.pose.pose.orientation.z = yaw;
     pub.publish(odom);
   }
 }

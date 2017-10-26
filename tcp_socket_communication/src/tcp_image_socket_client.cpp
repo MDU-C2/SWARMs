@@ -17,6 +17,7 @@ int receive_image(int socket)
   int buffersize = 0, recv_size = 0,size = 0, read_size, write_size, packet_index =1,stat,stat2;
 
   char imagearray[10241]; ////,verify = '1';
+//char imagearray[6220801];
   char recvd_filename[512];
   //recvd_filename.resize(256);
   FILE *image;
@@ -30,7 +31,7 @@ printf("Packet received.\n");
 printf("Packet size: %i\n",stat);
 printf("Image size: %i\n",size);
 printf(" \n");
-char buffer[] = "Got the image";
+char buffer[] = "Got the size in client";
 
 
 //Send a verification signal
@@ -74,6 +75,43 @@ struct timeval timeout = {10,0};
 
 fd_set fds;
 int buffer_fd;///////, buffer_out;
+    
+        //Write the currently read data into our image file together with bmp info
+
+       // .w = 1920, .h = 1080, .bpp = 3
+       uint16_t width = 1920;
+       uint16_t height = 1080;
+       uint16_t bpp = 3;
+       uint16_t scale = 1;
+
+          uint32_t w = width/scale;
+          uint32_t h = height/scale;
+          uint32_t filesize = w*h*bpp + 54;
+
+
+
+        unsigned char bmpfileheader[14] = {'B','M', 0,0,0,0, 0,0, 0,0, 54,0,0,0};
+        unsigned char bmpinfoheader[40] = {40,0,0,0,0,0,0,0,0,0,0,0,1,0,24,0};
+      
+        bmpfileheader[ 2] = (unsigned char)(filesize      );
+        bmpfileheader[ 3] = (unsigned char)(filesize >>  8);
+        bmpfileheader[ 4] = (unsigned char)(filesize >> 16);
+        bmpfileheader[ 5] = (unsigned char)(filesize >> 24);
+      
+        bmpinfoheader[ 4] = (unsigned char)(       w      );
+        bmpinfoheader[ 5] = (unsigned char)(       w >>  8);
+        bmpinfoheader[ 6] = (unsigned char)(       w >> 16);
+        bmpinfoheader[ 7] = (unsigned char)(       w >> 24);
+        bmpinfoheader[ 8] = (unsigned char)(       h      );
+        bmpinfoheader[ 9] = (unsigned char)(       h >>  8);
+        bmpinfoheader[10] = (unsigned char)(       h >> 16);
+        bmpinfoheader[11] = (unsigned char)(       h >> 24);
+
+
+
+        fwrite(bmpfileheader,1,14,image);
+        fwrite(bmpinfoheader,1,40,image);
+   //      write_size = fwrite(imagearray,1,read_size, image);
 
 //printf("start receiving img data before while");
 //Loop while the image is transferred
@@ -95,13 +133,17 @@ while(recv_size < size) {
     if (buffer_fd > 0)
     {
         do{
-               read_size = read(socket,imagearray, 10241);
+               read_size = read(socket,imagearray, 10241); //6220801
             }while(read_size <0);
 
           //  printf("Packet number received: %i\n",packet_index);
         //printf("Packet size: %i\n",read_size);
 
 
+         write_size = fwrite(imagearray,1,read_size, image);
+
+             if(read_size !=write_size) {
+                 printf("error in read write\n");    }
 
              //Increment the total number of bytes read
              recv_size += read_size;
@@ -109,56 +151,12 @@ while(recv_size < size) {
              //printf("Total received image size: %i\n",recv_size);
              //printf(" \n");
              //printf(" \n");
-    }
-
-
-        //Write the currently read data into our image file together with bmp info
-
-       // .w = 1920, .h = 1080, .bpp = 3
-       uint16_t width = 1920/4;
-       uint16_t height = 1080/4;
-       uint16_t bpp = 3;
-       uint16_t scale = 1;
-
-          uint32_t w = width/scale;
-          uint32_t h = height/scale;
-          uint32_t filesize = w*h*bpp + 54;
-
-
-
-        unsigned char bmpfileheader[14] = {'B','M', 0,0,0,0, 0,0, 0,0, 54,0,0,0};
-        unsigned char bmpinfoheader[40] = {40,0,0,0,
-                          0,0,0,0,
-                          0,0,0,0,
-                          1,0,
-                          24,0};
-      
-        bmpfileheader[ 2] = (unsigned char)(filesize      );
-        bmpfileheader[ 3] = (unsigned char)(filesize >>  8);
-        bmpfileheader[ 4] = (unsigned char)(filesize >> 16);
-        bmpfileheader[ 5] = (unsigned char)(filesize >> 24);
-      
-        bmpinfoheader[ 4] = (unsigned char)(       w      );
-        bmpinfoheader[ 5] = (unsigned char)(       w >>  8);
-        bmpinfoheader[ 6] = (unsigned char)(       w >> 16);
-        bmpinfoheader[ 7] = (unsigned char)(       w >> 24);
-        bmpinfoheader[ 8] = (unsigned char)(       h      );
-        bmpinfoheader[ 9] = (unsigned char)(       h >>  8);
-        bmpinfoheader[10] = (unsigned char)(       h >> 16);
-        bmpinfoheader[11] = (unsigned char)(       h >> 24);
-
-
-
-        fwrite(bmpfileheader,1,14,image);
-        fwrite(bmpinfoheader,1,40,image);
-         write_size = fwrite(imagearray,1,read_size, image);
-      //   printf("Written image size: %i\n",write_size); 
-
- //            if(read_size !=write_size) {
-   //              printf("error in read write\n");    }
-
-
+    }    
 }
+      //   printf("Written image size: %i\n",write_size); 
+    
+
+
 
 
   fclose(image);
@@ -208,7 +206,7 @@ int main(int argc , char *argv[])
   
     receive_image(socket_desc);
     
-    receive_image(socket_desc);
+//    receive_image(socket_desc);
 
     close(socket_desc);
 
