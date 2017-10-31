@@ -6,7 +6,7 @@
 
 
 #include "mission_control.h"
-
+mission_control::motion movingMsg;
 // Set the goal for the NAIAD in 3D coordinates. This will consider also yaw, roll and pitch.
 void SetGoal(float x, float y, float z, float yaw, float roll, float pitch)
 {
@@ -33,7 +33,7 @@ void SetPos(float x, float y, float z, float yaw, float roll, float pitch)
   pos.x = x;
   pos.y = y;
   pos.z = z;
-  pos.yaw = yaw;
+  pos.yaw = yaw*180/PI; //conversion from radiant to degree.
   pos.roll = roll;
   pos.pitch = pitch;
 }
@@ -42,15 +42,15 @@ void SetPos(float x, float y, float z, float yaw, float roll, float pitch)
 // comment in here.
 float CalculateYawAngle()
 {
-  ROS_INFO("Goal: %f, %f, %f", goal.x, goal.y, goal.z);
-  ROS_INFO("Position: %f, %f, %f", pos.x, pos.y, pos.z);
+  //ROS_INFO("Goal: %f, %f, %f", goal.x, goal.y, goal.z);
+  //ROS_INFO("Position: %f, %f, %f", pos.x, pos.y, pos.z);
 
   float x = goal.x - pos.x;
   float y = goal.y - pos.y;
   float angle = atan2(y,x) * 180/PI;
   //float angle = atan2(y,x) - atan2(pos.y, pos.x) * 180/PI; //Need the current angle? Dont think so
-  ROS_INFO("Angle to go in: %f", angle);
-  ROS_INFO("Angle pointing in: %f", pos.yaw);
+  //ROS_INFO("Angle to go in: %f", angle);
+  //ROS_INFO("Angle pointing in: %f", pos.yaw);
   return angle;
 }
 
@@ -67,7 +67,7 @@ float HeightControl()
   {
    changeInHeight = -20;
   } 
-  ROS_INFO("HeightControl: %f", changeInHeight);
+  //ROS_INFO("HeightControl: %f", changeInHeight);
   
   return changeInHeight;
 }
@@ -82,8 +82,8 @@ void GoToCurrentGoal()
     ROS_INFO("GOAL REACHED");
   }
   
-  ROS_INFO("GOAL: (%f, %f, %f)", goal.x, goal.y, goal.z);
-  ROS_INFO("POS: (%f, %f, %f)", pos.x, pos.y, pos.z);
+  //ROS_INFO("GOAL: (%f, %f, %f)", goal.x, goal.y, goal.z);
+  //ROS_INFO("POS: (%f, %f, %f)", pos.x, pos.y, pos.z);
   
   /*  ROS_INFO("SWITCH");
     //Dive 2 meters and go in a square pattern of length 50 meters.
@@ -116,13 +116,14 @@ void GoToCurrentGoal()
     }
   }*/
 
-
+  float angleToGoal = CalculateYawAngle();
+  float deltaAngle = angleToGoal - pos.yaw; 
   //Calculate the angle to the goal and make sure the Naiad is pointed in the right direction before moving forward.
-  if (CalculateYawAngle() - pos.yaw > 170 || CalculateYawAngle() - pos.yaw < -170)
+  if (deltaAngle > 170 || deltaAngle < -170)
   {
     //move forward
     message.yaw = 500;
-  }else if (CalculateYawAngle() > pos.yaw)
+  }else if (angleToGoal > pos.yaw)
   {
     //turn counterclockwise
     message.yaw = 100;
@@ -131,13 +132,18 @@ void GoToCurrentGoal()
     message.yaw = -100;
   }
 
-  ROS_INFO("YAW: %f", message.yaw);
-  float ang = CalculateYawAngle() - pos.yaw;
-  if (ang <= angleTolerance && ang > -angleTolerance)
+  //ROS_INFO("YAW: %f", message.yaw);
+  ROS_INFO("ANG: %f", deltaAngle);
+  if (deltaAngle <= angleTolerance && deltaAngle > -angleTolerance)
   {
     float distance = pow((goal.x - pos.x),2) + pow((goal.y - pos.y), 2);
     message.x = sqrt(distance);
-    ROS_INFO("X-distance: %f", distance);
+    ROS_INFO("X-distance: %f", message.x);
+    movingMsg.x = 1;
+  }
+  else{
+    message.x = 0;
+    movingMsg.x = -1;
   }
   
   //Should not move in the lockal y-direction and should not roll but maybe pitch.
@@ -174,8 +180,9 @@ int main(int argc, char **argv)
   ros::init(argc, argv, "control_publisher");
   ros::NodeHandle n;
   
-  ros::Publisher pub_control = n.advertise<mission_control::motion>("control", 10);
-  ros::Subscriber sub_heght_speed = n.subscribe("odom", 10, callback);
+  ros::Publisher pub_control = n.advertise<mission_control::motion>("control", 1);
+  ros::Publisher pub_moving = n.advertise<mission_control::motion>("moving", 1);
+  ros::Subscriber sub_heght_speed = n.subscribe("odom", 1, callback);
   ros::Subscriber sub_testing = n.subscribe("naiad_testing", 1, TestingCallback); 
 
   SetPos(0,0,0,0,0,0);
@@ -186,5 +193,7 @@ int main(int argc, char **argv)
   {
     ros::spinOnce();
     pub_control.publish(message);
+    pub_moving.publish(movingMsg);
+
   }
 }

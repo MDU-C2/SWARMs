@@ -1,5 +1,8 @@
 #include "odom.h"
 
+
+bool moving = false;
+
 //ros::NodeHandle n;
 
 //Get the current axis speed according to EKF
@@ -11,14 +14,21 @@ float degToRad = 3.1416/180;
 //Might me removed
 void GetImuData(const nav_msgs::Odometry &msg)
 {
-  position.vx = msg.twist.twist.linear.x;
-  position.vy = msg.twist.twist.linear.y;
+  if (moving)
+  {
+    position.vx = msg.twist.twist.linear.x;
+    position.vy = msg.twist.twist.linear.y;
+  }
+  else
+  {
+    position.vx = 0;
+    position.vy = 0;
+  }
   position.vz = msg.twist.twist.linear.z;
-
   position.yaw = msg.pose.pose.orientation.z * degToRad;
   position.roll = msg.pose.pose.orientation.x * degToRad;
   position.pitch = msg.pose.pose.orientation.y * degToRad;
-
+  
   //std::cout << position.yaw << std::endl;
 }
 
@@ -29,6 +39,18 @@ void GetHeight(heightmessage &msg)
 }
 */
 
+void MovingCallback(const mission_control::motion &msg)
+{
+  if (msg.x == 1)
+  {
+    moving = true;
+    ROS_INFO("Moving is true");
+  }else{
+    moving = false;
+  }
+}
+  
+
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "odometry_publisher");
@@ -38,7 +60,7 @@ int main(int argc, char** argv)
   ros::Publisher odom_pub = n.advertise<nav_msgs::Odometry>("odom", 5);
   //ros::Subscriber rotation_speed_listener = n.subscribe("orientation_for_odom", 1, GetOrientation);
   ros::Subscriber axis_speed_listener = n.subscribe("IMU_data_for_odom", 1, GetImuData);
-  //ros::Subscriber hight_listener = n.subscribe("height", 1, GetHeight);
+  ros::Subscriber moving_listener = n.subscribe("moving", 1, MovingCallback);
   //ros::Time::init();
   ros::Time current_time, last_time;
   ros::Rate r(10.0);

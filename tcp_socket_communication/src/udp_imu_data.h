@@ -12,6 +12,8 @@
 #include "netinet/in.h"
 #include "arpa/inet.h"
 #include <nav_msgs/Odometry.h>
+#include "/root/catkin_ws/devel/include/mission_control/motion.h"
+
 
 //define a prot to be used.
 #define server_port 12345

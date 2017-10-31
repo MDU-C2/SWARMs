@@ -8,6 +8,7 @@
 #include "udp_imu_data.h"
 
 tcp_client client;
+imuData orientation;
 
 // This function compute the velocity given the acceleration. 
 // The parameters are: the acceleration from the IMU, the previous velocity
@@ -20,14 +21,24 @@ double ComputeVelocity(double accN, double velocityN, ros::Time prevTimeStamp){
   return velocityN;
 }
 
+void MovingCallback(const mission_control::motion &msg)
+{
+  if (msg.x != 1)
+  {
+    orientation.velocityX = 0;
+    orientation.velocityY = 0;
+    orientation.velocityZ = 0;
+  }
+}
+
 
 int main(int argc, char **argv)
 {
   //instantiation of imuData
-  imuData orientation;
   ros::init(argc, argv, "UDP_YAW_Receiver");
   ros::NodeHandle n;
   ros::Publisher pub = n.advertise<nav_msgs::Odometry>("IMU_data_for_odom", 1);
+  ros::Subscriber sub_moving = n.subscribe("moving", 1, MovingCallback);
   nav_msgs::Odometry odom;
 
 	int valread;
@@ -56,13 +67,10 @@ int main(int argc, char **argv)
   ros::Time startTimeX = ros::Time::now();
   ros::Time startTimeY = ros::Time::now();
   ros::Time startTimeZ = ros::Time::now();
-  while(1)
+  while(n.ok())
   {
     std::cout << std::endl;
     recv(client.sock, buffer,sizeof(buffer), 0);
-    std::cout << "Buffer content: " << buffer << std::endl;
-    std::cout << "buffer[0] " << buffer[0] << std::endl;
-    std::cout << "buffer[1] " << buffer[1] << std::endl;
     char str[7];
     for(int iii = 0; iii < 8; iii++)
     {
@@ -114,6 +122,7 @@ int main(int argc, char **argv)
         std::cout << "Invalid data! " << std::endl;
     }
     // Publish data over ROS topic.
+    ros::spinOnce();
     pub.publish(odom);
   }
 }

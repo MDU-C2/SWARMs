@@ -41,7 +41,7 @@ bool TcpSender(const mission_control::motion msg)
 		} else {
       break;
     }
-    rate.sleep();
+    //rate.sleep();
 	}
 	ROS_INFO("Connection established");
 	//Putting the values to be sent into a character array
@@ -72,7 +72,7 @@ bool TcpSender(const mission_control::motion msg)
     return 0;
   }
   close(client.sock);
-  rate.sleep();
+  //rate.sleep();
 }
 
 //
