@@ -7,6 +7,7 @@
 //{
 //}
 
+float degToRad = 3.1416/180;
 //Might me removed
 void GetImuData(const nav_msgs::Odometry &msg)
 {
@@ -14,11 +15,11 @@ void GetImuData(const nav_msgs::Odometry &msg)
   position.vy = msg.twist.twist.linear.y;
   position.vz = msg.twist.twist.linear.z;
 
-  position.yaw = msg.pose.pose.orientation.z;
-  position.roll = msg.pose.pose.orientation.x;
-  position.pitch = msg.pose.pose.orientation.y;
+  position.yaw = msg.pose.pose.orientation.z * degToRad;
+  position.roll = msg.pose.pose.orientation.x * degToRad;
+  position.pitch = msg.pose.pose.orientation.y * degToRad;
 
-  std::cout << position.yaw << std::endl;
+  //std::cout << position.yaw << std::endl;
 }
 
 /* Get distance from seefloor with Gimmi2(camera)
@@ -59,9 +60,11 @@ int main(int argc, char** argv)
     //Compute odometry
     double dt = (current_time - last_time).toSec();
     //delta_x distance traveled in the global X-diriction
-    //vx * cos(yaw) * cos(pitch); Local X-velocity contribution to movement in Global X diriction. 
-    double delta_x = (position.vx * cos(position.yaw) * cos(position.pitch) - position.vy * sin(position.yaw) * cos(position.roll) + position.vz * sin(position.pitch) * sin(position.roll)) * dt;
-    double delta_y = (position.vx * sin(position.yaw) * cos(position.pitch) + position.vy * cos(position.yaw) * cos(position.roll) + position.vz * sin(position.pitch) * sin(position.roll)) * dt;
+    //vx * cos(yaw) * cos(pitch); Local X-velocity contribution to movement in Global X diriction.
+    std::cout << "Odom Yaw: " << cos(position.yaw) << std::endl << "Odom velocity X: " << position.vx << std::endl << "Time: " << dt << std::endl; 
+    double delta_x = (position.vx * cos(position.yaw) * cos(position.pitch) - position.vy * sin(position.yaw) * cos(position.roll))*dt;// + position.vz * sin(position.pitch) * sin(position.roll)) * dt;
+    double delta_y = (position.vx * sin(position.yaw) * cos(position.pitch) + position.vy * cos(position.yaw) * cos(position.roll))*dt;// + position.vz * sin(position.pitch) * sin(position.roll)) * dt;
+    std::cout << "Delta X: " << delta_x << std::endl << "Delta Y: " << delta_y << std::endl << std::endl;
     //double delta_z = (vx * sin(pitch) * sin(yaw) - vy * sin(roll) * cos(yaw) + vz * cos(roll) * cos(pitch)) * dt;
     //double delta_yaw = position.vyaw * dt;
     //double delta_roll = position.vroll * dt;
@@ -86,9 +89,9 @@ int main(int argc, char** argv)
     odom.header.stamp = current_time;
     odom.header.frame_id = "odom";
 
-    odom.pose.pose.position.x = position.vx;
-    odom.pose.pose.position.y = position.vy;
-    odom.pose.pose.position.z = position.vz;
+    odom.pose.pose.position.x = position.x;
+    odom.pose.pose.position.y = position.y;
+    odom.pose.pose.position.z = position.z;
     odom.pose.pose.orientation.z = position.yaw;
     odom.pose.pose.orientation.x = position.roll;
     odom.pose.pose.orientation.y = position.pitch;

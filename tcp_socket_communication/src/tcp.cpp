@@ -4,6 +4,8 @@
  * PID controller (BBB) throught tcp sockets.
  */
 
+bool goToSurface = false;
+
 //Callcback function used for sending control information to the BBB:
 bool TcpSender(const mission_control::motion msg)
 {
@@ -19,6 +21,9 @@ bool TcpSender(const mission_control::motion msg)
     ROS_INFO("Creating socket failed");
     return 0;
   }
+
+  std::cout << msg.x << " " << msg.y << std::endl;
+
   //If no error occurs
   ROS_INFO("Connecting to server");
   ros::Rate rate(10);
@@ -46,7 +51,17 @@ bool TcpSender(const mission_control::motion msg)
 	sprintf(buffer+24, "%f", msg.roll);
 	sprintf(buffer+32, "%f", msg.pitch);
 	sprintf(buffer+40, "%f", msg.yaw);
-  
+
+  if (goToSurface)
+  {
+    sprintf(buffer+48, "%d", 88);
+    goToSurface = false;
+  }
+  else
+  {
+    sprintf(buffer+48, "%d", 99);
+  }
+
   //Just a print to see that all is OK
   std::cout << buffer << " " << strlen(buffer);
   //Send the information to the ADA server.
@@ -70,6 +85,12 @@ void ControlTcpCallback(const mission_control::motion &msg)
     ROS_INFO("FAILURE! GOOD LUCK WITH THAT!!");
   }
 }
+
+void GoToSurfaceCallback(const mission_control::motion &msg)
+{
+  goToSurface = true;
+}
+
 int main(int argc, char **argv)
 {
 	ros::init(argc, argv, "tcp_coord_service");
@@ -77,7 +98,7 @@ int main(int argc, char **argv)
 
 	//ros::ServiceServer service = n.advertiseService("coord_service", client_service);
   ros::Subscriber sub = n.subscribe("control", 1, ControlTcpCallback);
-
+  ros::Subscriber sub_surf = n.subscribe("go_to_surface", 1, GoToSurfaceCallback);
 	//Instasiate TCP client
 	ROS_INFO("Starting Client");
 

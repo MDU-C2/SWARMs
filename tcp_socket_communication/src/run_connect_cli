@@ -1,0 +1,11 @@
+#!/bin/bash
+
+
+while :
+do
+
+cd /root/catkin_ws/src/SWARMs/tcp_socket_communication/src && rosrun tcp_socket_communication tcp_image_socket_client ;
+
+done
+exit 0
+

@@ -24,6 +24,7 @@ void SetGoal(float x, float y, float z)
   goal.x = x;
   goal.y = y;
   goal.z = z;
+  ROS_INFO("New goal has been set. (%f, %f, %f)", x,y,z);
 }
 
 // Set the position of the NAIAD in 3D coordinates.
@@ -75,9 +76,16 @@ float HeightControl()
 void GoToCurrentGoal()
 {
   //Check if the goal has been reached.
+  
   if (pos.x <= (goal.x+positionTolerance) && pos.x > (goal.x-positionTolerance) && pos.y <= (goal.y+positionTolerance) && pos.y > (goal.y-positionTolerance))
   {
-    ROS_INFO("SWITCH");
+    ROS_INFO("GOAL REACHED");
+  }
+  
+  ROS_INFO("GOAL: (%f, %f, %f)", goal.x, goal.y, goal.z);
+  ROS_INFO("POS: (%f, %f, %f)", pos.x, pos.y, pos.z);
+  
+  /*  ROS_INFO("SWITCH");
     //Dive 2 meters and go in a square pattern of length 50 meters.
     switch(checkpoint){
       //starting position
@@ -106,7 +114,9 @@ void GoToCurrentGoal()
         checkpoint = 'B';
         break;
     }
-  }
+  }*/
+
+
   //Calculate the angle to the goal and make sure the Naiad is pointed in the right direction before moving forward.
   if (CalculateYawAngle() - pos.yaw > 170 || CalculateYawAngle() - pos.yaw < -170)
   {
@@ -150,6 +160,12 @@ void callback(const nav_msgs::Odometry::ConstPtr& msg)
   }
   SetPos(msg->pose.pose.position.x, msg->pose.pose.position.y, msg->pose.pose.position.z, msg->pose.pose.orientation.z, msg->pose.pose.orientation.x, msg->pose.pose.orientation.y);
   GoToCurrentGoal();
+  std::cout << std::endl << "---------------------------------" << std::endl;
+}
+
+void TestingCallback(const nav_msgs::Odometry::ConstPtr& msg)
+{
+  SetGoal(msg->pose.pose.position.x, msg->pose.pose.position.y, 2);
 }
 
 
@@ -160,7 +176,8 @@ int main(int argc, char **argv)
   
   ros::Publisher pub_control = n.advertise<mission_control::motion>("control", 10);
   ros::Subscriber sub_heght_speed = n.subscribe("odom", 10, callback);
-  
+  ros::Subscriber sub_testing = n.subscribe("naiad_testing", 1, TestingCallback); 
+
   SetPos(0,0,0,0,0,0);
   SetGoal(0,0,0,0,0,0);
 

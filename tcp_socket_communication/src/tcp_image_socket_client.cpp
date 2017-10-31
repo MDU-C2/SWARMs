@@ -136,8 +136,8 @@ while(recv_size < size) {
                read_size = read(socket,imagearray, 10241); //6220801
             }while(read_size <0);
 
-          //  printf("Packet number received: %i\n",packet_index);
-        //printf("Packet size: %i\n",read_size);
+//        printf("Packet number received: %i\n",packet_index);
+//        printf("Packet size: %i\n",read_size);
 
 
          write_size = fwrite(imagearray,1,read_size, image);

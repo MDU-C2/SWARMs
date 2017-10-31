@@ -201,6 +201,8 @@ include_directories(
 
 add_executable(mission_control src/mission_control.cpp)
 target_link_libraries(mission_control ${catkin_LIBRARIES})
+add_executable(naiad_testing_node src/naiad_testing_node.cpp)
+target_link_libraries(naiad_testing_node ${catkin_LIBRARIES})
 #add_executable(horizontal_control src/horizontal_control.cpp)
 #target_link_libraries(horizontal_control ${catkin_LIBRARIES})
 #add_executable(rotation_control src/rotation_control.cpp)
