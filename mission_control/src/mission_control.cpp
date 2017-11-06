@@ -7,6 +7,8 @@
 
 #include "mission_control.h"
 mission_control::motion movingMsg;
+bool gotGoal = false;
+bool onlyAngle = false;
 // Set the goal for the NAIAD in 3D coordinates. This will consider also yaw, roll and pitch.
 void SetGoal(float x, float y, float z, float yaw, float roll, float pitch)
 {
@@ -25,6 +27,7 @@ void SetGoal(float x, float y, float z)
   goal.y = y;
   goal.z = z;
   ROS_INFO("New goal has been set. (%f, %f, %f)", x,y,z);
+  gotGoal = true;
 }
 
 // Set the position of the NAIAD in 3D coordinates.
@@ -40,18 +43,59 @@ void SetPos(float x, float y, float z, float yaw, float roll, float pitch)
 
 // TODO REFACTOR THIS FUNCTION!!!
 // comment in here.
-float CalculateYawAngle()
+float CalculateYawAngle(int onlyYawing)
 {
   //ROS_INFO("Goal: %f, %f, %f", goal.x, goal.y, goal.z);
   //ROS_INFO("Position: %f, %f, %f", pos.x, pos.y, pos.z);
+  
+  float angleToGoal = 0.0;
+  if (onlyYawing != 1)
+  {
+    float x = goal.x - pos.x;
+    float y = goal.y - pos.y;
+    angleToGoal = (atan2(y,x) * 180/PI);// -90) * -1);
+  }
+  else
+  {
+    angleToGoal = goal.yaw;
+  }
+  std::cout << "Angle to goal: " << angleToGoal << std::endl << "Pos.yaw: " << pos.yaw << std::endl;
+  float deltaAngle = angleToGoal - (-pos.yaw); 
+  //Calculate the angle to the goal and make sure the Naiad is pointed in the right direction before moving forward.
+  if (deltaAngle > 180)
+  {
+    deltaAngle = deltaAngle - 360;
+  }
+  else if (deltaAngle < -180)
+  {
+    deltaAngle = deltaAngle + 360;
+  }
 
-  float x = goal.x - pos.x;
-  float y = goal.y - pos.y;
-  float angle = atan2(y,x) * 180/PI;
+  if (deltaAngle > 170 || deltaAngle < -170)
+  {
+    //move forward
+    message.yaw = 500;
+  }else //if (angleToGoal > pos.yaw)
+  {
+    //turn counterclockwise
+    message.yaw = deltaAngle * 0.2;
+  } 
+  if (!onlyYawing)
+  {
+    return deltaAngle;
+  }
+  else
+  {
+    return 10;
+  }
+  /*else {
+    //turn clockwise
+    message.yaw = -100;
+  }*/
   //float angle = atan2(y,x) - atan2(pos.y, pos.x) * 180/PI; //Need the current angle? Dont think so
   //ROS_INFO("Angle to go in: %f", angle);
   //ROS_INFO("Angle pointing in: %f", pos.yaw);
-  return angle;
+  //return angle;
 }
 
 // This function is usded to control the NAIAD in order to keep it at a desired distance from the sea-floor.
@@ -76,10 +120,11 @@ float HeightControl()
 void GoToCurrentGoal()
 {
   //Check if the goal has been reached.
-  
-  if (pos.x <= (goal.x+positionTolerance) && pos.x > (goal.x-positionTolerance) && pos.y <= (goal.y+positionTolerance) && pos.y > (goal.y-positionTolerance))
+  float deltaAngle = 0.0;
+  if (pos.x <= (goal.x+positionTolerance) && pos.x > (goal.x-positionTolerance) && pos.y <= (goal.y+positionTolerance) && pos.y > (goal.y-positionTolerance) && !onlyAngle)
   {
     ROS_INFO("GOAL REACHED");
+    gotGoal = false;
   }
   
   //ROS_INFO("GOAL: (%f, %f, %f)", goal.x, goal.y, goal.z);
@@ -115,22 +160,9 @@ void GoToCurrentGoal()
         break;
     }
   }*/
-
-  float angleToGoal = CalculateYawAngle();
-  float deltaAngle = angleToGoal - pos.yaw; 
-  //Calculate the angle to the goal and make sure the Naiad is pointed in the right direction before moving forward.
-  if (deltaAngle > 170 || deltaAngle < -170)
-  {
-    //move forward
-    message.yaw = 500;
-  }else if (angleToGoal > pos.yaw)
-  {
-    //turn counterclockwise
-    message.yaw = 100;
-  } else {
-    //turn clockwise
-    message.yaw = -100;
-  }
+  
+  deltaAngle = CalculateYawAngle(0);
+ 
 
   //ROS_INFO("YAW: %f", message.yaw);
   ROS_INFO("ANG: %f", deltaAngle);
@@ -163,15 +195,37 @@ void callback(const nav_msgs::Odometry::ConstPtr& msg)
   else
   {
     message.z = HeightControl();
+    ROS_INFO("HightControl: %f", message.z);
   }
   SetPos(msg->pose.pose.position.x, msg->pose.pose.position.y, msg->pose.pose.position.z, msg->pose.pose.orientation.z, msg->pose.pose.orientation.x, msg->pose.pose.orientation.y);
-  GoToCurrentGoal();
+  if (gotGoal)
+  {
+    GoToCurrentGoal();
+  }
+  else
+  {
+    ROS_INFO("Set new Goal.");
+  }
   std::cout << std::endl << "---------------------------------" << std::endl;
 }
 
+
+
 void TestingCallback(const nav_msgs::Odometry::ConstPtr& msg)
 {
-  SetGoal(msg->pose.pose.position.x, msg->pose.pose.position.y, 2);
+  ros::Rate r(0.1);
+  if (msg->pose.pose.position.x == 100)
+  {
+    goal.yaw = msg->pose.pose.orientation.z;
+    gotGoal = true;
+    onlyAngle = true;
+    CalculateYawAngle(1);
+  }
+  else
+  {
+    onlyAngle = false;
+    SetGoal(msg->pose.pose.position.x, msg->pose.pose.position.y, 2);
+  }
 }
 
 
@@ -194,6 +248,5 @@ int main(int argc, char **argv)
     ros::spinOnce();
     pub_control.publish(message);
     pub_moving.publish(movingMsg);
-
   }
 }

@@ -26,23 +26,23 @@ bool TcpSender(const mission_control::motion msg)
 
   //If no error occurs
   ROS_INFO("Connecting to server");
-  ros::Rate rate(10);
-  for(int iii=0; iii<10; iii++)
-  {
+  //ros::Rate rate(10);
+  //for(int iii=0; iii<10; iii++)
+  //{
 		if (connect(client.sock,(struct sockaddr *) &client.server,sizeof(client.server)) < 0)
 		{
 
 			ROS_INFO("Could not connect to server");
-      if(iii==9)
-      {
+      //if(iii==9)
+      //{
         close(client.sock);
         return 0;
-      }
-		} else {
-      break;
+      //}
+		//} else {
+      //break;
     }
     //rate.sleep();
-	}
+	//}
 	ROS_INFO("Connection established");
 	//Putting the values to be sent into a character array
 	sprintf(buffer, "%f", msg.x);
@@ -54,12 +54,12 @@ bool TcpSender(const mission_control::motion msg)
 
   if (goToSurface)
   {
-    sprintf(buffer+48, "%d", 88);
+    sprintf(buffer+48, "%d", 99);
     goToSurface = false;
   }
   else
   {
-    sprintf(buffer+48, "%d", 99);
+    sprintf(buffer+48, "%d", 88);
   }
 
   //Just a print to see that all is OK
@@ -72,6 +72,7 @@ bool TcpSender(const mission_control::motion msg)
     return 0;
   }
   close(client.sock);
+  return 1;
   //rate.sleep();
 }
 
@@ -89,6 +90,7 @@ void ControlTcpCallback(const mission_control::motion &msg)
 void GoToSurfaceCallback(const mission_control::motion &msg)
 {
   goToSurface = true;
+  ROS_INFO("Going to surface");
 }
 
 int main(int argc, char **argv)

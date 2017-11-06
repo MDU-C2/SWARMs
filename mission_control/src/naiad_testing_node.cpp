@@ -11,9 +11,25 @@ int CheckInput()
   std::string inputY;
   std::cout << "Enter 'q' to quit" << std::endl << "Enter goal for X: " << std::endl;
   std::cin >> inputX;
+  
+  int check = 0.0;
+  check = std::atoi(inputX.c_str());
+  /*
+  switch(input[0])
+  case 'q':
+  case 'm':
+  case 'r':
+    */
   if (inputX[0] == 'q'){
     std::cout << "Exiting...\n" << std::endl;
     return -1;
+  }
+  else if (check == 100)
+  {
+    std::cout << "Enter angle: ";
+    std::cin >> msg.pose.pose.orientation.z;
+    msg.pose.pose.position.x = 100;
+    return 1;
   }
   else if (abs(std::atoi(inputX.c_str())) < MAX_DIST){
     msg.pose.pose.position.x = std::atoi(inputX.c_str());

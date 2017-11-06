@@ -64,9 +64,11 @@ int main(int argc, char **argv)
   orientation.velocityX = 0.0;
   orientation.velocityY = 0.0;
   orientation.velocityZ = 0.0;
+  
   ros::Time startTimeX = ros::Time::now();
   ros::Time startTimeY = ros::Time::now();
   ros::Time startTimeZ = ros::Time::now();
+  
   while(n.ok())
   {
     std::cout << std::endl;

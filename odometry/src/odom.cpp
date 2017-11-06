@@ -63,7 +63,7 @@ int main(int argc, char** argv)
   ros::Subscriber moving_listener = n.subscribe("moving", 1, MovingCallback);
   //ros::Time::init();
   ros::Time current_time, last_time;
-  ros::Rate r(10.0);
+  //ros::Rate r(100.0);
   position.x = 0.0;
   position.y = 0.0;
   position.z = 0.0;
@@ -74,6 +74,8 @@ int main(int argc, char** argv)
   current_time = ros::Time::now();
   last_time = ros::Time::now();
 
+  nav_msgs::Odometry odom;
+
   while(n.ok())
   {
     ros::spinOnce();
@@ -83,31 +85,17 @@ int main(int argc, char** argv)
     double dt = (current_time - last_time).toSec();
     //delta_x distance traveled in the global X-diriction
     //vx * cos(yaw) * cos(pitch); Local X-velocity contribution to movement in Global X diriction.
-    std::cout << "Odom Yaw: " << cos(position.yaw) << std::endl << "Odom velocity X: " << position.vx << std::endl << "Time: " << dt << std::endl; 
+    //std::cout << "Odom Yaw: " << cos(position.yaw) << std::endl << "Odom velocity X: " << position.vx << std::endl << "Time: " << dt << std::endl; 
     double delta_x = (position.vx * cos(position.yaw) * cos(position.pitch) - position.vy * sin(position.yaw) * cos(position.roll))*dt;// + position.vz * sin(position.pitch) * sin(position.roll)) * dt;
     double delta_y = (position.vx * sin(position.yaw) * cos(position.pitch) + position.vy * cos(position.yaw) * cos(position.roll))*dt;// + position.vz * sin(position.pitch) * sin(position.roll)) * dt;
     std::cout << "Delta X: " << delta_x << std::endl << "Delta Y: " << delta_y << std::endl << std::endl;
     //double delta_z = (vx * sin(pitch) * sin(yaw) - vy * sin(roll) * cos(yaw) + vz * cos(roll) * cos(pitch)) * dt;
-    //double delta_yaw = position.vyaw * dt;
-    //double delta_roll = position.vroll * dt;
-    //double delta_pitch = position.vpitch *dt;
     
 
     //Global position/orientation of the Naiad.
     position.x += delta_x;
     position.y += delta_y;
-    //z += delta_z;
-    /*position.yaw += delta_yaw;
-    if (position.yaw > 360)
-    {
-      position.yaw = position.yaw-360;
-    }*/
-
-    //yaw = vyaw;
-    //position.roll += delta_roll;
-    //position.pitch += delta_pitch;
-    
-    nav_msgs::Odometry odom;
+    ROS_INFO("X: %f, Y: %f", position.x, position.y);   
     odom.header.stamp = current_time;
     odom.header.frame_id = "odom";
 
@@ -123,14 +111,11 @@ int main(int argc, char** argv)
     odom.twist.twist.linear.x = position.vx;
     odom.twist.twist.linear.y = position.vy;
     odom.twist.twist.linear.z = position.vz;
-    //odom.twist.twist.angular.z = position.vyaw;
-    //odom.twist.twist.angular.y = position.vpitch;
-    //odom.twist.twist.angular.x = position.vroll;
 
     odom_pub.publish(odom);
 
     last_time = current_time;
     
-    r.sleep(); //Wait the correct amount of time to keep the loop timing
+    //r.sleep(); //Wait the correct amount of time to keep the loop timing
   }
 }
