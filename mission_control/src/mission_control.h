@@ -9,9 +9,11 @@
 mission_control::motion message;
 float desiered_height = 2.0;
 float tolerance = desiered_height * 0.5;
-float angleTolerance = 3.0;
+float angleTolerance = 5.0;
 float positionTolerance = 0.15;
 char checkpoint = 'B';
+int timeToTravel = 10;
+
 
 struct position{
   float x;

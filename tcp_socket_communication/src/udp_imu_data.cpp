@@ -42,7 +42,7 @@ int main(int argc, char **argv)
   nav_msgs::Odometry odom;
 
 	int valread;
-  char buffer[33];
+  char buffer[21] = {};
   client.init();
   //int dataSize = sizeof( "{""id"": 2, ""name"": ""abc""}" );
   client.sock = socket(AF_INET, SOCK_DGRAM, 0);
@@ -64,18 +64,48 @@ int main(int argc, char **argv)
   orientation.velocityX = 0.0;
   orientation.velocityY = 0.0;
   orientation.velocityZ = 0.0;
+  
   ros::Time startTimeX = ros::Time::now();
   ros::Time startTimeY = ros::Time::now();
   ros::Time startTimeZ = ros::Time::now();
+  
   while(n.ok())
   {
     std::cout << std::endl;
     recv(client.sock, buffer,sizeof(buffer), 0);
-    char str[7];
-    for(int iii = 0; iii < 8; iii++)
+    char strAccX[7] = {};
+    char strAccY[7] = {};
+    char strYaw[7] = {};
+
+    std::cout << buffer << std::endl;
+    
+    for(int iii = 0; iii < 7; iii++)
     {
-      str[iii] = buffer[iii+4];
+      strYaw[iii] = buffer[iii];
+      strAccX[iii] = buffer[iii+7];
+      strAccY[iii] = buffer[iii+14];
+      //std::cout << strAccY << " iii: " << iii << " " << buffer[iii+13] << std::endl;
     }
+    std::cout << "strYaw: " << strYaw << std::endl << "strAccX: " << strAccX << std::endl << "strAccY: " << strAccY << std::endl; 
+    
+    orientation.yaw = atof(strYaw);
+    odom.pose.pose.orientation.z = orientation.yaw;
+
+    orientation.accX = atof(strAccX);
+    orientation.velocityX = ComputeVelocity(orientation.accX, orientation.velocityX, startTimeX);
+    startTimeX = ros::Time::now();
+    odom.twist.twist.linear.x = orientation.velocityX;
+    std::cout << "Velocity in X: " << orientation.velocityX << std::endl;
+
+    orientation.accY = atof(strAccY);
+    orientation.velocityY = ComputeVelocity(orientation.accY, orientation.velocityY, startTimeY);
+    startTimeY = ros::Time::now();
+    odom.twist.twist.linear.y = orientation.velocityY;
+    std::cout << "Velocity in Y: " << orientation.velocityY << std::endl;
+
+    std::cout << std::endl << "==================================" << std::endl;
+
+    /*
     switch(buffer[1]){
       // Data contained in the buffer realted to yaw values.
       case '1':
@@ -121,6 +151,7 @@ int main(int argc, char **argv)
       default:
         std::cout << "Invalid data! " << std::endl;
     }
+    */
     // Publish data over ROS topic.
     ros::spinOnce();
     pub.publish(odom);
