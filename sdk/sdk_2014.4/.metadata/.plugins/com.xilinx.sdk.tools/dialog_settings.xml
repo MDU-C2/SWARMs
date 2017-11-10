@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<item value="" key="top_hw_platform_0-offSet"/>
+	<item value="false" key="top_hw_platform_0-verifyFlash"/>
+	<item value="" key="top_hw_platform_0-imgFile"/>
+	<item value="qspi_single" key="top_hw_platform_0-flashType"/>
+	<item value="false" key="top_hw_platform_0-blankCheck"/>
+	<item value="" key="top_hw_platform_0-fsblFile"/>
+	<item value="Local" key="top_hw_platform_0-target"/>
+</section>

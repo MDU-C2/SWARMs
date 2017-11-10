@@ -1,0 +1,46 @@
+#-----------------------------------------------------------
+# Webtalk v2014.4 (64-bit)
+# SW Build 1071353 on Tue Nov 18 17:18:21 MST 2014
+# 
+# Start of session at: Tue Jun 23 10:18:09 2015
+# Process ID: 2476
+# Log file: C:/Users/cag01/Documents/mdh/vhdl/gimme2a/sdk_2014.4/webtalk/webtalk.log
+# Journal file: C:/Users/cag01/Documents/mdh/vhdl/gimme2a/sdk_2014.4/webtalk\webtalk.jou
+#-----------------------------------------------------------
+WARNING: [Common 17-204] Your XILINX environment variable is undefined. You will not be able to run Synthesis and Implementation using ISE based strategies, or import ngc netlists. Please set up your XILINX environment to get full functionality.
+source sdk_webtalk.tcl
+# webtalk_init -webtalk_dir C:\\Users\\cag01\\Documents\\mdh\\vhdl\\gimme2a\\sdk_2014.4\\webtalk
+# webtalk_register_client -client project
+# webtalk_add_data -client project -key date_generated -value "ti jun 23 10:18:04 2015" -context "software_version_and_target_device"
+# webtalk_add_data -client project -key product_version -value "SDK v2014.4" -context "software_version_and_target_device"
+# webtalk_add_data -client project -key build_version -value "2014.4" -context "software_version_and_target_device"
+# webtalk_add_data -client project -key os_platform -value "amd64" -context "software_version_and_target_device"
+# webtalk_add_data -client project -key registration_id -value "" -context "software_version_and_target_device"
+# webtalk_add_data -client project -key tool_flow -value "SDK" -context "software_version_and_target_device"
+# webtalk_add_data -client project -key beta -value "false" -context "software_version_and_target_device"
+# webtalk_add_data -client project -key route_design -value "NA" -context "software_version_and_target_device"
+# webtalk_add_data -client project -key target_family -value "NA" -context "software_version_and_target_device"
+# webtalk_add_data -client project -key target_device -value "NA" -context "software_version_and_target_device"
+# webtalk_add_data -client project -key target_package -value "NA" -context "software_version_and_target_device"
+# webtalk_add_data -client project -key target_speed -value "NA" -context "software_version_and_target_device"
+# webtalk_add_data -client project -key random_id -value "9nsdnj2tsotptjvrq4ajuedakl" -context "software_version_and_target_device"
+# webtalk_add_data -client project -key project_id -value "2014.4_5" -context "software_version_and_target_device"
+# webtalk_add_data -client project -key project_iteration -value "5" -context "software_version_and_target_device"
+# webtalk_add_data -client project -key os_name -value "Microsoft Windows 7 , 64-bit" -context "user_environment"
+# webtalk_add_data -client project -key os_release -value "Service Pack 1  (build 7601)" -context "user_environment"
+# webtalk_add_data -client project -key cpu_name -value "Intel(R) Core(TM) i7-3667U CPU @ 2.00GHz" -context "user_environment"
+# webtalk_add_data -client project -key cpu_speed -value "2494 MHz" -context "user_environment"
+# webtalk_add_data -client project -key total_processors -value "1" -context "user_environment"
+# webtalk_add_data -client project -key system_ram -value "8.000 GB" -context "user_environment"
+# webtalk_register_client -client sdk
+# webtalk_add_data -client sdk -key uid -value "1434964781154" -context "sdk\\\\application/1434964781154"
+# webtalk_add_data -client sdk -key hwid -value "1429798056218" -context "sdk\\\\application/1434964781154"
+# webtalk_add_data -client sdk -key os -value "linux" -context "sdk\\\\application/1434964781154"
+# webtalk_add_data -client sdk -key apptemplate -value "linux_hello_world" -context "sdk\\\\application/1434964781154"
+# webtalk_transmit -clientid 726976543 -regid "" -xml C:\\Users\\cag01\\Documents\\mdh\\vhdl\\gimme2a\\sdk_2014.4\\webtalk\\usage_statistics_ext_sdk.xml -html C:\\Users\\cag01\\Documents\\mdh\\vhdl\\gimme2a\\sdk_2014.4\\webtalk\\usage_statistics_ext_sdk.html -wdm C:\\Users\\cag01\\Documents\\mdh\\vhdl\\gimme2a\\sdk_2014.4\\webtalk\\sdk_webtalk.wdm -intro "<H3>SDK Usage Report</H3><BR>"
+webtalk_transmit: Time (s): cpu = 00:00:00 ; elapsed = 00:00:07 . Memory (MB): peak = 63.027 ; gain = 0.023
+
+    while executing
+"webtalk_transmit -clientid 726976543 -regid "" -xml C:\\Users\\cag01\\Documents\\mdh\\vhdl\\gimme2a\\sdk_2014.4\\webtalk\\usage_statistics_ext_sdk.xml..."
+    (file "sdk_webtalk.tcl" line 29)
+INFO: [Common 17-206] Exiting Webtalk at Tue Jun 23 10:18:16 2015...

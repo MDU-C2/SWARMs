@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>tmp</name>
+	<comment>Created by SDK v2014.4</comment>
+	<projects>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>org.eclipse.cdt.managedbuilder.core.genmakebuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
+			<name>org.eclipse.cdt.managedbuilder.core.ScannerConfigBuilder</name>
+			<triggers>full,incremental,</triggers>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>org.eclipse.cdt.core.cnature</nature>
+		<nature>org.eclipse.cdt.managedbuilder.core.managedBuildNature</nature>
+		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
+	</natures>
+	<linkedResources>
+		<link>
+			<name>src2</name>
+			<type>2</type>
+			<location>/home/charles/Mdh/CDT508/gimme2/sdk/sdk_2014.2/src</location>
+		</link>
+		<link>
+			<name>src_shared</name>
+			<type>2</type>
+			<location>/opt/Xilinx/SDK/2014.4/bin/C::/Users/cag01/Documents/mdh/vhdl/gimme2a/sdk_2014.2/src</location>
+		</link>
+	</linkedResources>
+</projectDescription>

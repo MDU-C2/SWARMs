@@ -1,0 +1,84 @@
+/*
+ * Copyright (c) 2012 Xilinx, Inc.  All rights reserved.
+ *
+ * Xilinx, Inc.
+ * XILINX IS PROVIDING THIS DESIGN, CODE, OR INFORMATION "AS IS" AS A
+ * COURTESY TO YOU.  BY PROVIDING THIS DESIGN, CODE, OR INFORMATION AS
+ * ONE POSSIBLE   IMPLEMENTATION OF THIS FEATURE, APPLICATION OR
+ * STANDARD, XILINX IS MAKING NO REPRESENTATION THAT THIS IMPLEMENTATION
+ * IS FREE FROM ANY CLAIMS OF INFRINGEMENT, AND YOU ARE RESPONSIBLE
+ * FOR OBTAINING ANY RIGHTS YOU MAY REQUIRE FOR YOUR IMPLEMENTATION.
+ * XILINX EXPRESSLY DISCLAIMS ANY WARRANTY WHATSOEVER WITH RESPECT TO
+ * THE ADEQUACY OF THE IMPLEMENTATION, INCLUDING BUT NOT LIMITED TO
+ * ANY WARRANTIES OR REPRESENTATIONS THAT THIS IMPLEMENTATION IS FREE
+ * FROM CLAIMS OF INFRINGEMENT, IMPLIED WARRANTIES OF MERCHANTABILITY
+ * AND FITNESS FOR A PARTICULAR PURPOSE.
+ *
+ */
+
+#include <stdio.h>
+#include <sys/mman.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <unistd.h>
+#include <linux/fb.h>
+#include <string.h>
+#include <stdlib.h>
+#include <sys/time.h>
+#include <sys/stat.h>
+#include <inttypes.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/select.h>
+#include <termios.h>
+#include <stdio.h>
+#include <time.h>
+
+#include "hw_base.h"
+#include "VDMA.h"
+
+
+
+
+int main(int argc, char *argv[])
+{
+
+	char filename [30];
+	uint16_t seq_no = 0;
+	FILE *ofp;
+	uint32_t w = 3840; //640;
+	uint32_t h = 2748; //240;
+	uint8_t bpp = 3;
+	uint32_t n_bytes = w*h*bpp;
+
+	if (argc>1) n_bytes = atoi(argv[1]);
+
+//	char *fb = (char *)malloc(n_bytes);
+
+
+	printf("Starting test, n_bytes = %d\n",n_bytes);
+
+	while (1) {
+		seq_no++;
+		sprintf(filename, "%d.dat",seq_no);
+
+//		ofp = fopen(filename, "w");
+//
+//		if (ofp == NULL) {
+//		  printf( "Can't open output file!\n");
+//		  exit(1);
+//		}
+//
+//		fwrite(fb,1,n_bytes,ofp);
+//		fclose(ofp);
+
+		SaveImage(FB1_ADDR, filename, w, h, bpp, 1);
+
+		printf( "Wrote: %s\n",filename);
+
+	}
+
+    return 0;
+}

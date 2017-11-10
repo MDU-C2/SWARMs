@@ -1,0 +1,26 @@
+Connect to GIMME2:
+set host to 192.168.1.100
+connect over ssh 192.168.1.10, port 22
+u: root
+p: root
+
+Demo is located on SD-card:
+cd /media/card/demo
+
+Host application is located under
+/media/card/demo/demo_host
+Copy folder to host and execute CVSharp.exe
+
+Run the demo application on GIMME2:
+
+Right camera
+./cam.elf 0
+
+Left camera
+./cam.elf 1
+
+SAD block matching
+./cam.elf 2
+
+Harris (first threshold corners, second edges)
+./cam.elf 3 10000 100

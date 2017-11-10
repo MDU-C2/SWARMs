@@ -1,0 +1,53 @@
+12:15:09 **** Auto Build of configuration Debug for project cam_opencv ****
+make all 
+'Building file: C:/Users/cag01/Documents/mdh/vhdl/gimme2a/sdk_2014.2/src/vasa_udp_client.c'
+'Invoking: ARM Linux gcc compiler'
+arm-xilinx-linux-gnueabi-gcc -Wall -O0 -g3 -I"C:\Xilinx\SDK\2014.4\data\embeddedsw\ThirdParty\opencv\include" -I"C:\Xilinx\SDK\2014.4\data\embeddedsw\ThirdParty\opencv\include\opencv" -I"C:\Users\cag01\Documents\mdh\vhdl\gimme2a\sdk_2014.2\src" -I"C:\Users\cag01\Documents\mdh\vhdl\gimme2a\sdk_2014.4\fsbl_bsp\ps7_cortexa9_0\include" -c -fmessage-length=0 -MT"src_shared/vasa_udp_client.o" -MMD -MP -MF"src_shared/vasa_udp_client.d" -MT"src_shared/vasa_udp_client.d" -o "src_shared/vasa_udp_client.o" "C:/Users/cag01/Documents/mdh/vhdl/gimme2a/sdk_2014.2/src/vasa_udp_client.c"
+'Finished building: C:/Users/cag01/Documents/mdh/vhdl/gimme2a/sdk_2014.2/src/vasa_udp_client.c'
+' '
+'Building file: ../src/udp_test.c'
+'Invoking: ARM Linux gcc compiler'
+arm-xilinx-linux-gnueabi-gcc -Wall -O0 -g3 -I"C:\Xilinx\SDK\2014.4\data\embeddedsw\ThirdParty\opencv\include" -I"C:\Xilinx\SDK\2014.4\data\embeddedsw\ThirdParty\opencv\include\opencv" -I"C:\Users\cag01\Documents\mdh\vhdl\gimme2a\sdk_2014.2\src" -I"C:\Users\cag01\Documents\mdh\vhdl\gimme2a\sdk_2014.4\fsbl_bsp\ps7_cortexa9_0\include" -c -fmessage-length=0 -MT"src/udp_test.o" -MMD -MP -MF"src/udp_test.d" -MT"src/udp_test.d" -o "src/udp_test.o" "../src/udp_test.c"
+../src/udp_test.c: In function 'main':
+../src/udp_test.c:134:2: error: too few arguments to function 'InitFB'
+  InitFB(FB0_ADDR); //write DEADBEEFs
+  ^
+In file included from ../src/udp_test.c:32:0:
+C:\Users\cag01\Documents\mdh\vhdl\gimme2a\sdk_2014.2\src/VDMA.h:30:6: note: declared here
+ void InitFB(off_t FB_addr, uint16_t width, uint16_t height, uint16_t bpp);
+      ^
+../src/udp_test.c:135:2: error: too few arguments to function 'InitFB'
+  InitFB(FB1_ADDR);
+  ^
+In file included from ../src/udp_test.c:32:0:
+C:\Users\cag01\Documents\mdh\vhdl\gimme2a\sdk_2014.2\src/VDMA.h:30:6: note: declared here
+ void InitFB(off_t FB_addr, uint16_t width, uint16_t height, uint16_t bpp);
+      ^
+../src/udp_test.c:136:2: error: too few arguments to function 'InitFB'
+  InitFB(FB2_ADDR);
+  ^
+In file included from ../src/udp_test.c:32:0:
+C:\Users\cag01\Documents\mdh\vhdl\gimme2a\sdk_2014.2\src/VDMA.h:30:6: note: declared here
+ void InitFB(off_t FB_addr, uint16_t width, uint16_t height, uint16_t bpp);
+      ^
+../src/udp_test.c:139:2: warning: large integer implicitly truncated to unsigned type [-Woverflow]
+  SetupVDMAs2mm(vdma_addr,FB0_ADDR,FB1_ADDR,FB2_ADDR);
+  ^
+../src/udp_test.c:139:2: warning: large integer implicitly truncated to unsigned type [-Woverflow]
+../src/udp_test.c:139:2: warning: large integer implicitly truncated to unsigned type [-Woverflow]
+../src/udp_test.c:139:2: error: too few arguments to function 'SetupVDMAs2mm'
+In file included from ../src/udp_test.c:32:0:
+C:\Users\cag01\Documents\mdh\vhdl\gimme2a\sdk_2014.2\src/VDMA.h:45:6: note: declared here
+ void SetupVDMAs2mm(uint32_t BaseAddress, uint16_t width, uint16_t height, uint16_t bpp, uint32_t frameAddress1, uint32_t frameAddress2, uint32_t frameAddress3);
+      ^
+../src/udp_test.c:160:3: warning: passing argument 1 of 'SendImage_mem' from incompatible pointer type [enabled by default]
+   SendImage_mem(im.data,id);
+   ^
+In file included from ../src/udp_test.c:32:0:
+C:\Users\cag01\Documents\mdh\vhdl\gimme2a\sdk_2014.2\src/VDMA.h:33:5: note: expected 'struct image_t *' but argument is of type 'char *'
+ int SendImage_mem(image_t* img, char id);
+     ^
+make: *** [src/udp_test.o] Fel 1
+
+12:15:10 Build Finished (took 786ms)
+

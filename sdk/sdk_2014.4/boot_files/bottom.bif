@@ -1,0 +1,9 @@
+the_ROM_image:
+{
+	[bootloader]C:\Users\cag01\Documents\mdh\vhdl\gimme2a\sdk_2014.4\fsbl\Debug\fsbl.elf
+	C:\Users\cag01\Documents\mdh\vhdl\gimme2a\robosub\robosub.runs\impl_1\top.bit
+	C:\Users\cag01\Documents\mdh\vhdl\gimme2a\sdk_2014.4\boot_files\u-boot_b.elf
+	[offset = 0x00450000]C:\Users\cag01\Documents\mdh\vhdl\gimme2a\sdk_2014.4\boot_files\uImage
+	[offset = 0x00800000]C:\Users\cag01\Documents\mdh\vhdl\gimme2a\sdk_2014.4\device_tree_bsp_0\devicetree.dtb
+	[offset = 0x00805000]C:\Users\cag01\Documents\mdh\vhdl\gimme2a\sdk_2014.4\boot_files\uramdisk_b.image.gz
+}

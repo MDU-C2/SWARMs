@@ -1,0 +1,9 @@
+C:\Users\cag01\Documents\mdh\c#\CVSharp\CVSharp\bin\Release\CVSharp.exe
+C:\Users\cag01\Documents\mdh\c#\CVSharp\CVSharp\bin\Release\CVSharp.pdb
+C:\Users\cag01\Documents\mdh\c#\CVSharp\CVSharp\bin\Release\OpenCvSharp.dll
+C:\Users\cag01\Documents\mdh\c#\CVSharp\CVSharp\obj\x86\Release\CVSharp.csprojResolveAssemblyReference.cache
+C:\Users\cag01\Documents\mdh\c#\CVSharp\CVSharp\obj\x86\Release\CVSharp.Form1.resources
+C:\Users\cag01\Documents\mdh\c#\CVSharp\CVSharp\obj\x86\Release\CVSharp.Properties.Resources.resources
+C:\Users\cag01\Documents\mdh\c#\CVSharp\CVSharp\obj\x86\Release\CVSharp.csproj.GenerateResource.Cache
+C:\Users\cag01\Documents\mdh\c#\CVSharp\CVSharp\obj\x86\Release\CVSharp.exe
+C:\Users\cag01\Documents\mdh\c#\CVSharp\CVSharp\obj\x86\Release\CVSharp.pdb

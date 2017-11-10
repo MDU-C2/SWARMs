@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">&#x0A;<refactoring comment="Rename resource &apos;cam/src/stereo_pair.c&apos; to &apos;stereo_pair.c.bak&apos;" description="Rename resource &apos;stereo_pair.c&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="src/stereo_pair.c" name="stereo_pair.c.bak" stamp="1435559812388" updateReferences="true"/>&#x0A;<refactoring comment="Rename resource &apos;cam/src/udp_test.c.bak&apos; to &apos;udp_test.c&apos;" description="Rename resource &apos;udp_test.c.bak&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="src/udp_test.c.bak" name="udp_test.c" stamp="1435559826811" updateReferences="true"/>
+</session>

@@ -1,0 +1,45 @@
+#include <jpeglib.h>
+
+
+int ConvertImage(unsigned char *img){
+
+BITMAPFILEHEADER bfh;
+BITMAPINFO bi; 
+BITMAPINFOHEADER *bih;
+FILE *input;
+int image_height;
+int image_width;
+
+fopen_s( &input, img, "rb" ); // Open existing file
+
+// Read bitmap file header
+fread_s( &bfh, sizeof(BITMAPFILEHEADER), 1, sizeof(BITMAPFILEHEADER), input );
+
+// Read bitmap info header
+fread_s( &bi, sizeof(BITMAPINFO), 1, sizeof(BITMAPINFO), input );
+
+bih = &bi.bmiHeader;
+image_height = bih->biHeight;
+image_width = bih->biWidth;
+int data_size = image_width * image_height * 3; // Compute image data size
+
+// Allocate image buffer; this is the buffer write_JPEG_file() will use
+JSAMPLE * image_buffer = (JSAMPLE *)malloc( data_size );
+
+// Read image pixel data from file
+fread_s( image_buffer, data_size, 1, data_size, input );
+
+fclose( input );
+
+write_JPEG_file( "image.jpg", 100 /* quality */ );
+
+
+
+
+
+
+
+
+
+return 0;
+}

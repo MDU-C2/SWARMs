@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;tmp/src/udp_test.c&apos; to &apos;tmp.c&apos;" description="Rename resource &apos;udp_test.c&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="src/udp_test.c" name="tmp.c" stamp="1452778322250" updateReferences="true"/>
+</session>

@@ -1,0 +1,153 @@
+/*
+ * Copyright (c) 2012 Xilinx, Inc.  All rights reserved.
+ *
+ * Xilinx, Inc.
+ * XILINX IS PROVIDING THIS DESIGN, CODE, OR INFORMATION "AS IS" AS A
+ * COURTESY TO YOU.  BY PROVIDING THIS DESIGN, CODE, OR INFORMATION AS
+ * ONE POSSIBLE   IMPLEMENTATION OF THIS FEATURE, APPLICATION OR
+ * STANDARD, XILINX IS MAKING NO REPRESENTATION THAT THIS IMPLEMENTATION
+ * IS FREE FROM ANY CLAIMS OF INFRINGEMENT, AND YOU ARE RESPONSIBLE
+ * FOR OBTAINING ANY RIGHTS YOU MAY REQUIRE FOR YOUR IMPLEMENTATION.
+ * XILINX EXPRESSLY DISCLAIMS ANY WARRANTY WHATSOEVER WITH RESPECT TO
+ * THE ADEQUACY OF THE IMPLEMENTATION, INCLUDING BUT NOT LIMITED TO
+ * ANY WARRANTIES OR REPRESENTATIONS THAT THIS IMPLEMENTATION IS FREE
+ * FROM CLAIMS OF INFRINGEMENT, IMPLIED WARRANTIES OF MERCHANTABILITY
+ * AND FITNESS FOR A PARTICULAR PURPOSE.
+ *
+ */
+
+#include <stdio.h>
+#include <sys/mman.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <unistd.h>
+#include <linux/fb.h>
+#include <string.h>
+#include <stdlib.h>
+#include <sys/time.h>
+#include <sys/stat.h>
+#include <inttypes.h>
+#include <stdbool.h>
+#include "hw_base.h"
+#include "VDMA.h"
+#include "axi_gpio.h"
+#include "vasa_udp_client.h"
+#include <time.h>
+#include "mem_op.h"
+//#include <cv.h>
+//#include <highgui.h>
+
+int kbhit()
+{
+    // timeout structure passed into select
+    struct timeval tv;
+    // fd_set passed into select
+    fd_set fds;
+    // Set up the timeout.  here we can wait for 1 second
+    tv.tv_sec = 0;
+    tv.tv_usec = 0;
+
+    // Zero out the fd_set - make sure it's pristine
+    FD_ZERO(&fds);
+    // Set the FD that we want to read
+    FD_SET(STDIN_FILENO, &fds); //STDIN_FILENO is 0
+    // select takes the last file descriptor value + 1 in the fdset to check,
+    // the fdset for reads, writes, and errors.  We are only passing in reads.
+    // the last parameter is the timeout.  select will return if an FD is ready or
+    // the timeout has occurred
+    select(STDIN_FILENO+1, &fds, NULL, NULL, &tv);
+    // return 0 if STDIN is not ready to be read.
+    return FD_ISSET(STDIN_FILENO, &fds);
+}
+
+int main(int argc, char *argv[])
+{
+	uint32_t pin_data = 0;
+	uint32_t pin_dir = 0x0;
+
+	uint32_t w = 1920; //640;
+	uint32_t h = 1080; //240;
+//	uint32_t w = 640;
+//	uint32_t h = 240;
+
+	uint8_t cam = 0;
+
+//	uint32_t vdma_addr = VDMA0_BASEADDR;
+////	uint32_t vdma_addr = VDMA1_BASEADDR;
+
+	uint8_t bpp = 3;
+
+	uint32_t frame_ptr = 0x0; //first fb
+
+	if (argc>1)
+		switch(atoi(argv[1])) {
+		case 0:
+			cam = 0;
+			printf("Cam0\n");
+			break;
+		case 1:
+			cam = 1;
+			printf("Cam1\n");
+			break;
+		}
+
+	SetSize(w,h,bpp);
+
+	init_vasa_address(VASA_FV_PORT);
+	if (init_vasa_socket_udp () == -1) return -1;
+
+	axi_gpio_init_dir();
+	axi_gpio_init_val(&pin_data); //cam i2c high, resets low
+
+
+
+	cam_reset(&pin_data);
+	init_cams_sync(&pin_data,&pin_dir, SIOD_0, SIOC_0, SIOD_1, SIOC_1);
+	fpga_clk_reset(&pin_data);
+	usleep(100);
+//	getchar();
+
+	ResetVDMA(VDMA0_BASEADDR);
+	ResetVDMA(VDMA1_BASEADDR);
+	SetupVDMAs2mm(VDMA0_BASEADDR,w,h,bpp,FB0_ADDR,FB1_ADDR,FB0_ADDR); //only two FP in use
+	SetupVDMAs2mm(VDMA1_BASEADDR,w,h,bpp,FB2_ADDR,FB3_ADDR,FB2_ADDR);
+//	DumpRegisters(vdma_addr);
+//	CheckAndClearErrors(vdma_addr);
+
+
+	fpga_pipe_reset(&pin_data); //release fgpa soft reset
+
+
+
+	sleep(1);
+
+	while (1) {
+		toggle_fp(&frame_ptr);
+
+		if (frame_ptr == 0 || frame_ptr == 3) {
+			if (cam == 0)
+				SendImage(FB1_ADDR);
+			else
+				SendImage(FB3_ADDR);
+		}
+		else {
+			if (cam == 0)
+				SendImage(FB0_ADDR);
+			else
+				SendImage(FB2_ADDR);
+		}
+
+		if (kbhit()) break;
+	}
+
+//
+//	DumpRegisters(VDMA0_BASEADDR);
+//	DumpRegisters(VDMA1_BASEADDR);
+//	CheckAndClearErrors(VDMA0_BASEADDR);
+//	CheckAndClearErrors(VDMA1_BASEADDR);
+
+	StopVDMA(VDMA0_BASEADDR);
+	StopVDMA(VDMA1_BASEADDR);
+
+    return 0;
+}

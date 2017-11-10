@@ -1,0 +1,21 @@
+12:14:21 **** Auto Build of configuration Debug for project tmp ****
+make all 
+'Building file: ../src/view_dump_thread.c'
+'Invoking: ARM Linux gcc compiler'
+arm-xilinx-linux-gnueabi-gcc -Wall -O0 -g3 -I"C:\Users\cag01\Documents\mdh\vhdl\gimme2a\sdk_2014.2\src" -c -fmessage-length=0 -MT"src/view_dump_thread.o" -MMD -MP -MF"src/view_dump_thread.d" -MT"src/view_dump_thread.d" -o "src/view_dump_thread.o" "../src/view_dump_thread.c"
+'Finished building: ../src/view_dump_thread.c'
+' '
+'Building target: tmp.elf'
+'Invoking: ARM Linux gcc linker'
+arm-xilinx-linux-gnueabi-gcc  -o "tmp.elf"  ./src_shared/VDMA.o ./src_shared/axi_gpio.o ./src_shared/col_disc.o ./src_shared/exposure_reg.o ./src_shared/histogram.o ./src_shared/mem_op.o ./src_shared/tpg.o ./src_shared/vasa_udp_client.o  ./src/view_dump_thread.o   -lpthread
+'Finished building target: tmp.elf'
+' '
+'Invoking: ARM Linux Print Size'
+arm-xilinx-linux-gnueabi-size tmp.elf  |tee "tmp.elf.size"
+   text	   data	    bss	    dec	    hex	filename
+  56988	    492	    120	  57600	   e100	tmp.elf
+'Finished building: tmp.elf.size'
+' '
+
+12:14:22 Build Finished (took 1s.312ms)
+

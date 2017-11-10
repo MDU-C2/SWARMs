@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">&#x0A;<refactoring comment="Rename resource &apos;tmp/src/view_dump.c&apos; to &apos;view_dump.c.bak&apos;" description="Rename resource &apos;view_dump.c&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="src/view_dump.c" name="view_dump.c.bak" stamp="1471941682810" updateReferences="true"/>&#x0A;<refactoring comment="Rename resource &apos;tmp/src/thread_test.c&apos; to &apos;thread_test.c.bak&apos;" description="Rename resource &apos;thread_test.c&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="src/thread_test.c" name="thread_test.c.bak" stamp="1471949974507" updateReferences="true"/>
+</session>
