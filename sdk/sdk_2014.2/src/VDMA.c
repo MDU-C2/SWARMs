@@ -285,10 +285,10 @@ printf("Image received on the server side, sending next pic\n");
 
 
 //////////////////////////////////////////////////////
-void SendTcpImgDataFromServer(int socket, char *memo_data, char *name){
+void SendTcpImgDataFromServer(int socket, unsigned char *memo_data, char *name, unsigned long mem_size){
 
 //FILE *pic; //picture
-	char *pic = NULL;
+char *pic = NULL;
 int read_size, stat,stat2, packet_index;
 char send_buffer[10240], read_buffer[256];
 packet_index = 1;
@@ -298,12 +298,13 @@ pic = memo_data;
 printf("Getting Picture Size\n");
 
 if(pic == NULL) {
-     printf("Error opening pic"); }
+     printf("Error opening pic\n"); }
 
 //fseek(pic, 0, SEEK_END);
 //size = ftell(pic);
 //size = sizeof memo_data / sizeof memo_data[0]; //////
-size_t size = strlen(memo_data);
+//size_t size = strlen(memo_data);
+size_t size = mem_size;
 
 //fseek(pic, 0, SEEK_SET);
 printf("Total Picture size: %i\n",size);
@@ -330,9 +331,9 @@ printf("Received data in socket\n");
 //printf("writing filename: %i\n",fn_check);
 
 void *p = name;
-//int bytes_read = sizeof(filename);
+//int bytes_read = sizeof filename;
 //int bytes_read = length(filename);
-int bytes_read = 14; //this is the length of the filename
+int bytes_read = 18; //this is the length of the filename
 printf("bytes_read %i\n",bytes_read);
 
 //while (bytes_read > 0){
@@ -375,8 +376,8 @@ while (index < size){
 	int sent_bytes = send(socket, memo_data+index, offs,0 ); //I MAD CHANGES HERE, CHECK IT AND PERHAPS DO THE SAME IN CLIENT OR REDO THIS
    /////}while (stat < 0);
 index = index + offs;
-   //printf("sent_bytes: %d\n", sent_bytes);
-   //printf("Packet Number: %i\n",packet_index);
+   printf("sent_bytes: %d\n", sent_bytes);
+   printf("Packet Number: %i\n",packet_index);
    //printf("Packet Size Sent: %i\n",size);//read_size);
    //printf(" \n");
    //printf(" \n");
@@ -503,7 +504,7 @@ while(recv_size < size) {
 
 
 
-//int InitTcpServer(char *memory_data, char *name)//, char *filename1)  , char *name
+//int InitTcpServer(unsigned char *memory_data, char *name, unsigned long mem_size)//, char *filename1)  , char *name
 int InitTcpServer(char *filename0, char *filename1)
 {
   int socket_desc, new_socket, size_struct;///////////////////////, read_size,buffer = 0;
@@ -574,10 +575,12 @@ if (new_socket<0)
 //send_image(new_socket);
 
 //init finished, now send the image pair
-//SendTcpImgDataFromServer(new_socket, memory_data, name);
+
+//SendTcpImgDataFromServer(new_socket, memory_data, name, mem_size);
 
 SendTcpImageFromServer(new_socket, filename0);
 SendTcpImageFromServer(new_socket, filename1);
+
 
 
 close(socket_desc);
@@ -981,7 +984,15 @@ int SaveImage(uint32_t BaseAddress, char* filename, uint16_t width, uint16_t hei
 
 //the next four rows are for sending image data and not images
 	memcpy(&mem_arr, mem_base, map_len); //copy the image data from the shared memory, from start address mem_base, copy the length of map_len to the char array mem_arr
+	//unsigned char * mem = NULL;
+	//unsigned long mem_size = 0;
 	ConvertImage(filename, mem_arr, width, height, bpp);
+
+	//InitTcpServer(mem, filename, mem_size);
+	//free(mem);
+
+
+
 	//printf("after mem\n");
 
 	//printf("map_len: %d\n",map_len);

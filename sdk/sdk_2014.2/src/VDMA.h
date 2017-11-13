@@ -24,9 +24,10 @@
 #include "mem_op.h"
 //added
 void SendTcpImageFromServer(int socket, char* filename);
-void SendTcpImgDataFromServer(int socket, char *memo_data, char *name);
+void SendTcpImgDataFromServer(int socket, unsigned char *memo_data, char *name, unsigned long mem_size);
 int receive_tcp_image_client(int socket);
-int InitTcpServer(char *memory_data, char *name); //, char *filename1);
+//int InitTcpServer(unsigned char *memory_data, char *name, unsigned long mem_size); //, char *filename1);
+int InitTcpServer( char *filename0, char *filename1);
 int init_tcp_client();
 //end added
 void SetSize (uint32_t w, uint32_t h, uint32_t bpp);

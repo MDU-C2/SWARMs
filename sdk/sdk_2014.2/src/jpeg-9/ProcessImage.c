@@ -2,6 +2,9 @@
 #include "stdio.h"
 
 JSAMPLE * image_buffer = NULL;
+//unsigned char *mem = NULL;
+//unsigned long mem_size = 0;
+
 
 typedef struct tagRGBQUAD
 {
@@ -87,6 +90,7 @@ BYTE* ConvertBMPToRGBBuffer ( BYTE* Buffer, int width, int height )
 
 int write_jpeg_file( unsigned char *filename )
 {
+
 struct jpeg_compress_struct cinfo;
 struct jpeg_error_mgr jerr;
 printf("start jpeg processing!\n");
@@ -96,13 +100,14 @@ FILE *outfile = fopen( filename, "wb" );
 
 if ( !outfile )
 {
-//printf("Error opening output jpeg file %s\n!", filename );
+printf("Error opening output jpeg file %s\n!", filename );
 return -1;
 }
-//printf("created file!");
+printf("created file!");
 cinfo.err = jpeg_std_error( &jerr );
 jpeg_create_compress(&cinfo);
 jpeg_stdio_dest(&cinfo, outfile);
+//jpeg_mem_dest(&cinfo, &mem, &mem_size);
 
 /* Setting the parameters of the output file here */
 cinfo.image_width = 1920;
@@ -127,19 +132,23 @@ while( cinfo.next_scanline < cinfo.image_height )
 row_pointer[0] = &newbuf[ cinfo.next_scanline * cinfo.image_width * cinfo.input_components];
 jpeg_write_scanlines( &cinfo, row_pointer, 1 );
 }
+
 //printf("finninshed writing!");
 /* similar to read file, clean up after we're done compressing */
 jpeg_finish_compress( &cinfo );
 jpeg_destroy_compress( &cinfo );
+
+
 fclose( outfile );
 free(newbuf);
+//free(mem);
 /* success code is 1! */
 return 1;
 }
 
 
 
-int ConvertImage(unsigned char *img, unsigned char *img_arr, int image_width, int image_height, int bpp){
+int ConvertImage(unsigned char *img, unsigned char *img_arr, int image_width, int image_height, int bpp ){
 
 //BITMAPFILEHEADER bfh;
 //BITMAPINFO bi;
@@ -174,6 +183,10 @@ image_buffer = img_arr;//(JSAMPLE *)malloc( data_size );
 //fclose( input );
 
 write_jpeg_file( img);
+
+//printf("MEM SIZE = %d", sizeof(mem));
+////output_mem = mem;
+////*output_size = mem_size;
 //free(image_buffer);//       <----------------------------------------------------------------
 return 0;
 }
