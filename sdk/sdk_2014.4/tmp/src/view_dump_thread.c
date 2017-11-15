@@ -215,6 +215,9 @@ char add_ms[4];
 
 InitTcpServer(filename0, filename1); //send the stereo pairs to the odroid
 
+remove(filename0);
+remove(filename1);
+
 
 //	sprintf(filename0, "%d_0.bmp",im_save->seq_no);
 //	SaveImage(im_save->fb_addr0, filename0, im_save->image_size.w, im_save->image_size.h, im_save->image_size.bpp, 1);
