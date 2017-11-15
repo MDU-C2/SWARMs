@@ -46,6 +46,7 @@
 #include "histogram.h"
 
 #include "jpeg-9/jpeglib.h"
+//#include "libjpeg-turbo/turbojpeg.h"
 #include "jpeg-9/ProcessImage.h"
 
 //#include <convert.h>
@@ -207,13 +208,10 @@ char add_ms[4];
 //		  //printf("bind returns: %d\n",bind_result);
 //		  return 1;
 //	  }
-//ResizeImage(&filename0,&filename0);
-	//ResizeImgFunc(filename0);
 
-//ConvertImage(filename0);
-//ConvertImage(filename1);
 
-InitTcpServer(filename0, filename1); //send the stereo pairs to the odroid
+
+//InitTcpServer(filename0, filename1); //send the stereo pairs to the odroid
 
 
 //	sprintf(filename0, "%d_0.bmp",im_save->seq_no);

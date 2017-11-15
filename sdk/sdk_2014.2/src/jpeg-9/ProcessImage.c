@@ -103,7 +103,7 @@ if ( !outfile )
 printf("Error opening output jpeg file %s\n!", filename );
 return -1;
 }
-printf("created file!");
+printf("created file!\n");
 cinfo.err = jpeg_std_error( &jerr );
 jpeg_create_compress(&cinfo);
 jpeg_stdio_dest(&cinfo, outfile);
@@ -120,7 +120,7 @@ jpeg_set_defaults( &cinfo );
 cinfo.num_components = 3;
 //cinfo.data_precision = 4;
 cinfo.dct_method = JDCT_FLOAT; //Try JDCT_IFAST
-jpeg_set_quality(&cinfo, 95, TRUE);
+jpeg_set_quality(&cinfo, 85, TRUE);
 /* Now do the compression .. */
 jpeg_start_compress( &cinfo, TRUE );
 /* like reading a file, this time write one row at a time */
