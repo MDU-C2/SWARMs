@@ -38,7 +38,11 @@
 							<tool id="xilinx.gnu.armlinux.toolchain.archiver.1520479779" name="ARM Linux archiver" superClass="xilinx.gnu.armlinux.toolchain.archiver"/>
 							<tool id="xilinx.gnu.armlinux.c.toolchain.linker.debug.898527281" name="ARM Linux gcc linker" superClass="xilinx.gnu.armlinux.c.toolchain.linker.debug">
 								<option id="xilinx.gnu.c.link.option.libs.269878037" name="Libraries (-l)" superClass="xilinx.gnu.c.link.option.libs" valueType="libs">
+									<listOptionValue builtIn="false" value="jpeg"/>
 									<listOptionValue builtIn="false" value="pthread"/>
+								</option>
+								<option id="xilinx.gnu.c.link.option.paths.183878569" name="Library search path (-L)" superClass="xilinx.gnu.c.link.option.paths" valueType="libPaths">
+									<listOptionValue builtIn="false" value="/home/charles/Mdh/CDT508/gimme2/sdk/sdk_2014.4/libjpeg-build/lib"/>
 								</option>
 								<inputType id="xilinx.gnu.linker.input.11268729" superClass="xilinx.gnu.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>

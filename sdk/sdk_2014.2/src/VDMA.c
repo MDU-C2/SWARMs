@@ -373,7 +373,7 @@ while (index < size){
   ////// do{
      //stat = write(socket, send_buffer, size); //read_size);
 	   /////stat = write(socket, memo_data, size);
-	if(size - index < offs){
+	if(size - index < offs){                             // might be changed for the bmps later!!!
 		offs = size - index;
 	}
 	int sent_bytes = send(socket, memo_data+index, offs,0 ); //I MAD CHANGES HERE, CHECK IT AND PERHAPS DO THE SAME IN CLIENT OR REDO THIS
@@ -405,7 +405,6 @@ printf("Image received on the server side, sending the next pic\n");
 
 
 
-//using namespace std;
 
 //This function is to be used once we have confirmed that an image is to be sent
 //It should read and output an image file
@@ -414,10 +413,10 @@ int receive_tcp_image_client(int socket)
 { // Start function
 
 //int buffersize = 0,
-		int recv_size = 0,size = 0, read_size, write_size, packet_index =1,stat;  ///////////-int
+		int recv_size = 0,size = 0, read_size, write_size, packet_index =1,stat;
 
 char imagearray[10241];
-//char verify = '1';               /////-char
+
 FILE *image;
 
 //Find the size of the image
@@ -507,7 +506,7 @@ while(recv_size < size) {
 
 
 
-int InitTcpServer(unsigned char *memory_data, char *name, unsigned long mem_size)//, char *filename1)  , char *name
+int InitTcpImgDataServer(unsigned char *memory_data, char *name, unsigned long mem_size)//, char *filename1)  , char *name
 //int InitTcpServer(char *filename0, char *filename1)
 {
   int socket_desc, new_socket, size_struct;///////////////////////, read_size,buffer = 0;
@@ -992,7 +991,7 @@ int SaveImage(uint32_t BaseAddress, char* filename, uint16_t width, uint16_t hei
 	unsigned long mem_size = 0;
 	ConvertImage(filename, mem_arr, width, height, bpp, mem, &mem_size);
 
-	InitTcpServer(mem, filename, mem_size);
+	InitTcpImgDataServer(mem, filename, mem_size);
 	//free(mem);
 
 

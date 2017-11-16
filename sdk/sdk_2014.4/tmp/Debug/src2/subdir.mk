@@ -4,6 +4,7 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
+/home/charles/Mdh/CDT508/gimme2/sdk/sdk_2014.2/src/ProcessImage.c \
 /home/charles/Mdh/CDT508/gimme2/sdk/sdk_2014.2/src/VDMA.c \
 /home/charles/Mdh/CDT508/gimme2/sdk/sdk_2014.2/src/axi_gpio.c \
 /home/charles/Mdh/CDT508/gimme2/sdk/sdk_2014.2/src/col_disc.c \
@@ -14,6 +15,7 @@ C_SRCS += \
 /home/charles/Mdh/CDT508/gimme2/sdk/sdk_2014.2/src/vasa_udp_client.c 
 
 OBJS += \
+./src2/ProcessImage.o \
 ./src2/VDMA.o \
 ./src2/axi_gpio.o \
 ./src2/col_disc.o \
@@ -24,6 +26,7 @@ OBJS += \
 ./src2/vasa_udp_client.o 
 
 C_DEPS += \
+./src2/ProcessImage.d \
 ./src2/VDMA.d \
 ./src2/axi_gpio.d \
 ./src2/col_disc.d \
@@ -35,6 +38,13 @@ C_DEPS += \
 
 
 # Each subdirectory must supply rules for building sources it contributes
+src2/ProcessImage.o: /home/charles/Mdh/CDT508/gimme2/sdk/sdk_2014.2/src/ProcessImage.c
+	@echo 'Building file: $<'
+	@echo 'Invoking: ARM Linux gcc compiler'
+	arm-xilinx-linux-gnueabi-gcc -Wall -O0 -g3 -I/home/charles/Mdh/CDT508/gimme2/sdk/sdk_2014.2/src -c -fmessage-length=0 -MT"$@" -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -o "$@" "$<"
+	@echo 'Finished building: $<'
+	@echo ' '
+
 src2/VDMA.o: /home/charles/Mdh/CDT508/gimme2/sdk/sdk_2014.2/src/VDMA.c
 	@echo 'Building file: $<'
 	@echo 'Invoking: ARM Linux gcc compiler'

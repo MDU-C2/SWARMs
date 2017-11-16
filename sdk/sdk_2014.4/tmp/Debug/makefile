@@ -8,7 +8,6 @@ RM := rm -rf
 
 # All of the sources participating in the build are defined here
 -include sources.mk
--include src2/jpeg-9/subdir.mk
 -include src2/subdir.mk
 -include src/subdir.mk
 -include subdir.mk
@@ -37,7 +36,7 @@ all: tmp.elf secondary-outputs
 tmp.elf: $(OBJS)  $(USER_OBJS)
 	@echo 'Building target: $@'
 	@echo 'Invoking: ARM Linux gcc linker'
-	arm-xilinx-linux-gnueabi-gcc  -o "tmp.elf" $(OBJS) $(USER_OBJS) $(LIBS)
+	arm-xilinx-linux-gnueabi-gcc -L/home/charles/Mdh/CDT508/gimme2/sdk/sdk_2014.4/libjpeg-build/lib -o "tmp.elf" $(OBJS) $(USER_OBJS) $(LIBS)
 	@echo 'Finished building target: $@'
 	@echo ' '
 

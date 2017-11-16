@@ -45,9 +45,9 @@
 #include "errno.h"
 #include "histogram.h"
 
-#include "jpeg-9/jpeglib.h"
+#include "jpeglib.h"
 //#include "libjpeg-turbo/turbojpeg.h"
-#include "jpeg-9/ProcessImage.h"
+#include "ProcessImage.h"
 
 //#include <convert.h>
 //#include "ResizeImage.h"

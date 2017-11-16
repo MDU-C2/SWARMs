@@ -26,7 +26,7 @@
 void SendTcpImageFromServer(int socket, char* filename);
 void SendTcpImgDataFromServer(int socket, unsigned char *memo_data, char *name, unsigned long mem_size);
 int receive_tcp_image_client(int socket);
-int InitTcpServer(unsigned char *memory_data, char *name, unsigned long mem_size); //, char *filename1);
+int InitTcpImgDataServer(unsigned char *memory_data, char *name, unsigned long mem_size); //, char *filename1);
 //int InitTcpServer( char *filename0, char *filename1);
 int init_tcp_client();
 //end added

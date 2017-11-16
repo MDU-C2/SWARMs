@@ -17,6 +17,5 @@ ELFSIZE :=
 # Every subdirectory with source files must be described here
 SUBDIRS := \
 src2 \
-src2/jpeg-9 \
 src \
 

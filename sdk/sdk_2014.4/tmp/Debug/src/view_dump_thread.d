@@ -10,11 +10,11 @@ src/view_dump_thread.o src/view_dump_thread.d: ../src/view_dump_thread.c \
  /home/charles/Mdh/CDT508/gimme2/sdk/sdk_2014.2/src/mem_op.h \
  /home/charles/Mdh/CDT508/gimme2/sdk/sdk_2014.2/src/histogram.h \
  /home/charles/Mdh/CDT508/gimme2/sdk/sdk_2014.2/src/hw_base.h \
- /home/charles/Mdh/CDT508/gimme2/sdk/sdk_2014.2/src/jpeg-9/jpeglib.h \
- /home/charles/Mdh/CDT508/gimme2/sdk/sdk_2014.2/src/jpeg-9/jconfig.h \
- /home/charles/Mdh/CDT508/gimme2/sdk/sdk_2014.2/src/jpeg-9/jmorecfg.h \
- /home/charles/Mdh/CDT508/gimme2/sdk/sdk_2014.2/src/jpeg-9/ProcessImage.h \
- /home/charles/Mdh/CDT508/gimme2/sdk/sdk_2014.2/src/jpeg-9/jpeglib.h
+ /home/charles/Mdh/CDT508/gimme2/sdk/sdk_2014.2/src/jpeglib.h \
+ /home/charles/Mdh/CDT508/gimme2/sdk/sdk_2014.2/src/jconfig.h \
+ /home/charles/Mdh/CDT508/gimme2/sdk/sdk_2014.2/src/jmorecfg.h \
+ /home/charles/Mdh/CDT508/gimme2/sdk/sdk_2014.2/src/ProcessImage.h \
+ /home/charles/Mdh/CDT508/gimme2/sdk/sdk_2014.2/src/jpeglib.h
 
 /home/charles/Mdh/CDT508/gimme2/sdk/sdk_2014.2/src/hw_base.h:
 
@@ -38,12 +38,12 @@ src/view_dump_thread.o src/view_dump_thread.d: ../src/view_dump_thread.c \
 
 /home/charles/Mdh/CDT508/gimme2/sdk/sdk_2014.2/src/hw_base.h:
 
-/home/charles/Mdh/CDT508/gimme2/sdk/sdk_2014.2/src/jpeg-9/jpeglib.h:
+/home/charles/Mdh/CDT508/gimme2/sdk/sdk_2014.2/src/jpeglib.h:
 
-/home/charles/Mdh/CDT508/gimme2/sdk/sdk_2014.2/src/jpeg-9/jconfig.h:
+/home/charles/Mdh/CDT508/gimme2/sdk/sdk_2014.2/src/jconfig.h:
 
-/home/charles/Mdh/CDT508/gimme2/sdk/sdk_2014.2/src/jpeg-9/jmorecfg.h:
+/home/charles/Mdh/CDT508/gimme2/sdk/sdk_2014.2/src/jmorecfg.h:
 
-/home/charles/Mdh/CDT508/gimme2/sdk/sdk_2014.2/src/jpeg-9/ProcessImage.h:
+/home/charles/Mdh/CDT508/gimme2/sdk/sdk_2014.2/src/ProcessImage.h:
 
-/home/charles/Mdh/CDT508/gimme2/sdk/sdk_2014.2/src/jpeg-9/jpeglib.h:
+/home/charles/Mdh/CDT508/gimme2/sdk/sdk_2014.2/src/jpeglib.h:
