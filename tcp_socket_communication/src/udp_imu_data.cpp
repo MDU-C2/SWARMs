@@ -15,20 +15,16 @@ imuData orientation;
 // and the previous timestamp used to compute the delta t.
 
 double ComputeVelocity(double accN, double velocityN, ros::Time prevTimeStamp){
-std::cout << accN << std::endl;
-  if(accN > 0.4 || accN < -0.4) {
+  if(abs(accN) > 0.1) {
     velocityN = velocityN + (accN*(ros::Time::now() - prevTimeStamp).toSec());
   }
-  std::cout << "Vel: " << velocityN;
   return velocityN;
 }
 
 void MovingCallback(const mission_control::motion &msg)
 {
-  std::cout << "Moving callback" << std::endl;
   if (msg.x != 1)
-  { 
-    std::cout << "Not moving" << std::endl;
+  {
     orientation.velocityX = 0;
     orientation.velocityY = 0;
     orientation.velocityZ = 0;
@@ -46,7 +42,7 @@ int main(int argc, char **argv)
   nav_msgs::Odometry odom;
 
 	int valread;
-  char buffer[21] = {};
+  char buffer[33];
   client.init();
   //int dataSize = sizeof( "{""id"": 2, ""name"": ""abc""}" );
   client.sock = socket(AF_INET, SOCK_DGRAM, 0);
@@ -77,39 +73,12 @@ int main(int argc, char **argv)
   {
     std::cout << std::endl;
     recv(client.sock, buffer,sizeof(buffer), 0);
-    char strAccX[7] = {};
-    char strAccY[7] = {};
-    char strYaw[7] = {};
-
+    char str[7];
     std::cout << buffer << std::endl;
-    
-    for(int iii = 0; iii < 7; iii++)
+    for(int iii = 0; iii < 8; iii++)
     {
-      strYaw[iii] = buffer[iii];
-      strAccX[iii] = buffer[iii+7];
-      strAccY[iii] = buffer[iii+14];
-      //std::cout << strAccY << " iii: " << iii << " " << buffer[iii+13] << std::endl;
+      str[iii] = buffer[iii+4];
     }
-    //std::cout << "strYaw: " << strYaw << std::endl << "strAccX: " << strAccX << std::endl << "strAccY: " << strAccY << std::endl; 
-    
-    orientation.yaw = atof(strYaw);
-    odom.pose.pose.orientation.z = orientation.yaw;
-
-    orientation.accX = atof(strAccX);
-    orientation.velocityX = ComputeVelocity(orientation.accX, orientation.velocityX, startTimeX);
-    startTimeX = ros::Time::now();
-    odom.twist.twist.linear.x = orientation.velocityX;
-    //std::cout << "Velocity in X: " << orientation.velocityX << std::endl;
-
-    orientation.accY = atof(strAccY);
-    orientation.velocityY = ComputeVelocity(orientation.accY, orientation.velocityY, startTimeY);
-    startTimeY = ros::Time::now();
-    odom.twist.twist.linear.y = orientation.velocityY;
-    //std::cout << "Velocity in Y: " << orientation.velocityY << std::endl;
-
-    std::cout << std::endl << "==================================" << std::endl;
-
-    /*
     switch(buffer[1]){
       // Data contained in the buffer realted to yaw values.
       case '1':
@@ -155,7 +124,6 @@ int main(int argc, char **argv)
       default:
         std::cout << "Invalid data! " << std::endl;
     }
-    */
     // Publish data over ROS topic.
     ros::spinOnce();
     pub.publish(odom);

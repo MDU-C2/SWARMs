@@ -23,7 +23,7 @@ class tcp_client
 		void init()
 		{
 			server.sin_family = AF_INET;
-			server.sin_addr.s_addr = inet_addr("192.168.1.1"); //BBB address
+			server.sin_addr.s_addr = inet_addr("192.168.1.30");
 			server.sin_port = htons(server_port);
   	}
 };

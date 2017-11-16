@@ -1,13 +1,20 @@
 //-------------------------------
 // Mission Control
+// Last Modified: 15.11.17
 // Extra notes:
 //-------------------------------
 
 
 #include "mission_control.h"
 mission_control::motion movingMsg;
+std_msgs::String controlMsg;
 bool gotGoal = false;
 bool onlyAngle = false;
+bool square = false;
+float height = 0.0;
+char buffer[BUFFER_SIZE];
+
+
 // Set the goal for the NAIAD in 3D coordinates. This will consider also yaw, roll and pitch.
 void SetGoal(float x, float y, float z, float yaw, float roll, float pitch)
 {
@@ -42,22 +49,16 @@ void SetPos(float x, float y, float z, float yaw, float roll, float pitch)
 
 // TODO REFACTOR THIS FUNCTION!!!
 // comment in here.
-float CalculateYawAngle(int onlyYawing)
+float CalculateYawAngle()
 {
   //ROS_INFO("Goal: %f, %f, %f", goal.x, goal.y, goal.z);
   //ROS_INFO("Position: %f, %f, %f", pos.x, pos.y, pos.z);
   
   float angleToGoal = 0.0;
-  if (onlyYawing != 1)
-  {
-    float x = goal.x - pos.x;
-    float y = goal.y - pos.y;
-    angleToGoal = (atan2(y,x) * 180/PI);// -90) * -1);
-  }
-  else
-  {
-    angleToGoal = goal.yaw;
-  }
+  float x = goal.x - pos.x;
+  float y = goal.y - pos.y;
+  angleToGoal = (atan2(y,x) * 180/PI);// -90) * -1);
+
   std::cout << "Angle to goal: " << angleToGoal << std::endl << "Pos.yaw: " << pos.yaw << std::endl;
   float deltaAngle = angleToGoal - (pos.yaw); 
   //Calculate the angle to the goal and make sure the Naiad is pointed in the right direction before moving forward.
@@ -80,7 +81,7 @@ float CalculateYawAngle(int onlyYawing)
     //turn counterclockwise
     //if (deltaAngle > 10)
    // {
-      message.yaw = pos.yaw+10;
+      //message.yaw = pos.yaw+10;
       //message.yaw = angleToGoal;
   
     //}
@@ -90,18 +91,11 @@ float CalculateYawAngle(int onlyYawing)
    // }
     //else
    // {
-    //  message.yaw = angleToGoal;
+      message.yaw = angleToGoal;
    // }
   }
 
-  if (!onlyYawing)
-  {
-    return deltaAngle;
-  }
-  else
-  {
-    return 10;
-  }
+  return deltaAngle;
   /*else {
     //turn clockwise
     message.yaw = -100;
@@ -130,55 +124,11 @@ float HeightControl()
   return changeInHeight;
 }
 
-// This function is used to plan the movements of the NAIAD.
-void GoToCurrentGoal()
+float CalculateXThrust()
 {
-  //Check if the goal has been reached.
-  float deltaAngle = 0.0;
-  if (pos.x <= (goal.x+positionTolerance) && pos.x > (goal.x-positionTolerance) && pos.y <= (goal.y+positionTolerance) && pos.y > (goal.y-positionTolerance) && !onlyAngle)
-  {
-    ROS_INFO("GOAL REACHED");
-    gotGoal = false;
-  }
+  //Update Yaw-Thrust
+  float deltaAngle = CalculateYawAngle();
   
-  //ROS_INFO("GOAL: (%f, %f, %f)", goal.x, goal.y, goal.z);
-  //ROS_INFO("POS: (%f, %f, %f)", pos.x, pos.y, pos.z);
-  
-  /*  ROS_INFO("SWITCH");
-    //Dive 2 meters and go in a square pattern of length 50 meters.
-    switch(checkpoint){
-      //starting position
-      case 'O' :
-        SetGoal(0, 0, 0);
-        checkpoint = 'A';
-        break;
-      //move to the upper left corner
-      case 'B' :
-        SetGoal(0, 50, 2);
-        checkpoint = 'C';
-        break;
-      //move to the upper right corner
-      case 'C' :
-        SetGoal(50, 50, 2);
-        checkpoint = 'D';
-        break;
-      //move to the lower right corner
-      case 'D' :
-        SetGoal(50, 0, 2);
-        checkpoint = 'A';
-        break;
-      //move to the initial position but 2 meters lower
-      case 'A' :
-        SetGoal(0, 0, 2);
-        checkpoint = 'B';
-        break;
-    }
-  }*/
-  
-  deltaAngle = CalculateYawAngle(0);
- 
-
-  //ROS_INFO("YAW: %f", message.yaw);
   ROS_INFO("ANG: %f", deltaAngle);
   if (deltaAngle <= angleTolerance && deltaAngle > -angleTolerance)
   {
@@ -191,12 +141,73 @@ void GoToCurrentGoal()
     message.x = 0;
     movingMsg.x = -1;
   }
+
+}
+
+
+// This function is used to plan the movements of the NAIAD.
+void GoToCurrentGoal()
+{
+  //Check if the goal has been reached.
+  float deltaAngle = 0.0;
+  if (pos.x <= (goal.x+positionTolerance) && pos.x > (goal.x-positionTolerance) && pos.y <= (goal.y+positionTolerance) && pos.y > (goal.y-positionTolerance) && !onlyAngle)
+  {
+    ROS_INFO("GOAL REACHED");
+    //gotGoal = false;
+  
+  //ROS_INFO("GOAL: (%f, %f, %f)", goal.x, goal.y, goal.z);
+  //ROS_INFO("POS: (%f, %f, %f)", pos.x, pos.y, pos.z);
+    if(square){ 
+      ROS_INFO("SWITCH");
+      //Dive 2 meters and go in a square pattern of length 50 meters.
+      switch(checkpoint){
+        //starting position
+        case 'O' :
+         SetGoal(0, 0, 0);
+         checkpoint = 'A';
+         break;
+        //move to the initial position but 2 meters lower
+        case 'A' :
+         SetGoal(0, 0, 2);
+         checkpoint = 'B';
+         break;
+        //move to the upper left corner
+        case 'B' :
+          SetGoal(0, 50, 2);
+          checkpoint = 'C';
+          break;
+        //move to the upper right corner
+        case 'C' :
+         SetGoal(50, 50, 2);
+         checkpoint = 'D';
+         break;
+        //move to the lower right corner
+        case 'D' :
+         SetGoal(50, 0, 2);
+         checkpoint = 'A';
+         break;
+      }
+    }
+  }
+  
+ 
+  //Update X-thrust
+  CalculateXThrust();
+  //ROS_INFO("YAW: %f", message.yaw);
   
   //Should not move in the lockal y-direction and should not roll but maybe pitch.
   message.y = 0;
   message.roll = goal.roll;
   message.pitch = goal.roll;
+  sprintf(buffer, "%f", message.x);
+  sprintf(buffer+8, "%f", message.y);
+  sprintf(buffer+16, "%f", height);
+  sprintf(buffer+24, "%f", message.roll);
+  sprintf(buffer+32, "%f", message.pitch);
+  sprintf(buffer+40, "%f", message.yaw);
+  sprintf(buffer+48, "%d", 88); //Filler so the BBB dont crash!
 
+  std::cout << "mission control msg: " << buffer << std::endl;
 }
 
 void callback(const nav_msgs::Odometry::ConstPtr& msg)
@@ -211,14 +222,11 @@ void callback(const nav_msgs::Odometry::ConstPtr& msg)
     message.z = HeightControl();
     ROS_INFO("HightControl: %f", message.z);
   }
-  SetPos(msg->pose.pose.position.x, msg->pose.pose.position.y, msg->pose.pose.position.z, msg->pose.pose.orientation.z, msg->pose.pose.orientation.x, msg->pose.pose.orientation.y);
+  
   if (gotGoal)
   {
+    SetPos(msg->pose.pose.position.x, msg->pose.pose.position.y, msg->pose.pose.position.z, msg->pose.pose.orientation.z, msg->pose.pose.orientation.x, msg->pose.pose.orientation.y);
     GoToCurrentGoal();
-  }
-  else
-  {
-    ROS_INFO("Set new Goal.");
   }
   std::cout << std::endl << "---------------------------------" << std::endl;
 }
@@ -228,6 +236,71 @@ void callback(const nav_msgs::Odometry::ConstPtr& msg)
 void TestingCallback(const nav_msgs::Odometry::ConstPtr& msg)
 {
   ros::Rate r(0.1);
+  //int sw = (int)msg->pose.pose.position.z;
+  
+  switch((int)msg->pose.pose.position.z)
+  {
+    // Increase the trashold.
+    case 1:
+      sprintf(buffer+48, "%d", 11);
+      std::cout << "" << std::endl;
+      break;
+    // Decrease the trashold.
+    case 2:
+      sprintf(buffer+48, "%d", 22);
+      break;
+    // Go in a square pattern.
+    case 3:
+      gotGoal = true;
+      square = true;
+      break;
+    // Set the destination in x,y coordinates.
+    case 4:
+        SetGoal(msg->pose.pose.position.x, msg->pose.pose.position.y, 2);
+        //std::cout << "Pos: " << msg->pose.pose.position.x << " " << msg->pose.pose.position.y << std::endl;
+        gotGoal = true;
+        square = false;
+        break;
+    // Decrease the height.
+    case 5:
+        height -= 0.1;
+        sprintf(buffer+16, "%f", height);
+        break;
+    // Increase the height.
+    case 6:
+        height += 0.1;
+        sprintf(buffer+16, "%f", height);
+        break;
+    // Set an angle.
+    case 7:
+        sprintf(buffer+40, "%f", msg->pose.pose.orientation.z);
+        gotGoal = false;
+        break;
+    // Stop
+    case 8:
+        pos.x = 0.0;
+        pos.y = 0.0;
+        sprintf(buffer, "%f", 0.0);
+        sprintf(buffer+8, "%f", 0.0);
+        sprintf(buffer+16, "%f", height);
+        sprintf(buffer+24, "%f", 0.0);
+        sprintf(buffer+32, "%f", 0.0);
+        sprintf(buffer+40, "%f", pos.yaw);
+        sprintf(buffer+48, "%d", 88); //Filler so the BBB dont crash!
+        square = false;
+        gotGoal = false;
+        break;
+    // Quit.
+    case 9:
+        sprintf(buffer+48, "%d", 99);
+        square = false;
+        gotGoal = false;
+        onlyAngle = false;
+        checkpoint = '0';
+        break;
+        //quit
+  }
+  /*
   if (msg->pose.pose.position.x == 100)
   {
     goal.yaw = msg->pose.pose.orientation.z; 
@@ -239,16 +312,25 @@ void TestingCallback(const nav_msgs::Odometry::ConstPtr& msg)
   {
     onlyAngle = false;
     SetGoal(msg->pose.pose.position.x, msg->pose.pose.position.y, 2);
-  }
+  }*/
 }
 
 
 int main(int argc, char **argv)
 {
+  sprintf(buffer, "%f", 0.0);
+  sprintf(buffer+8, "%f", 0.0);
+  sprintf(buffer+16, "%f", 0.0);
+  sprintf(buffer+24, "%f", 0.0);
+  sprintf(buffer+32, "%f", 0.0);
+  sprintf(buffer+40, "%f", 0.0);
+  sprintf(buffer+48, "%d", 88); //Filler so the BBB dont crash!
+  std::string str(buffer);
+  controlMsg.data = str;
   ros::init(argc, argv, "control_publisher");
   ros::NodeHandle n;
   
-  ros::Publisher pub_control = n.advertise<mission_control::motion>("control", 1);
+  ros::Publisher pub_control = n.advertise<std_msgs::String>("control", 1);
   ros::Publisher pub_moving = n.advertise<mission_control::motion>("moving", 1);
   ros::Subscriber sub_heght_speed = n.subscribe("odom", 1, callback);
   ros::Subscriber sub_testing = n.subscribe("naiad_testing", 1, TestingCallback); 
@@ -256,12 +338,14 @@ int main(int argc, char **argv)
   SetPos(0,0,0,0,0,0);
   SetGoal(0,0,0,0,0,0);
   
-  ros::Rate r(20);
+  ros::Rate r(5);
 
   while(ros::ok())
   {
     ros::spinOnce();
-    pub_control.publish(message);
+    std::string str(buffer);
+    controlMsg.data = str;
+    pub_control.publish(controlMsg);
     //pub_moving.publish(movingMsg);
     r.sleep();
   }
