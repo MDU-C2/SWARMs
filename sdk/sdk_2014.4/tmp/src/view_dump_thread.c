@@ -212,8 +212,8 @@ char add_ms[4];
 
 
 //InitTcpServer(filename0, filename1); //send the stereo pairs to the odroid
-remove(filename0);
-remove(filename1);
+//remove(filename0);
+//remove(filename1);
 
 
 //	sprintf(filename0, "%d_0.bmp",im_save->seq_no);

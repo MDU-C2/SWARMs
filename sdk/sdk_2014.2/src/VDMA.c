@@ -373,6 +373,9 @@ while (index < size){
   ////// do{
      //stat = write(socket, send_buffer, size); //read_size);
 	   /////stat = write(socket, memo_data, size);
+	if(size - index < offs){
+		offs = size - index;
+	}
 	int sent_bytes = send(socket, memo_data+index, offs,0 ); //I MAD CHANGES HERE, CHECK IT AND PERHAPS DO THE SAME IN CLIENT OR REDO THIS
    /////}while (stat < 0);
 index = index + offs;
@@ -504,8 +507,8 @@ while(recv_size < size) {
 
 
 
-//int InitTcpServer(unsigned char *memory_data, char *name, unsigned long mem_size)//, char *filename1)  , char *name
-int InitTcpServer(char *filename0, char *filename1)
+int InitTcpServer(unsigned char *memory_data, char *name, unsigned long mem_size)//, char *filename1)  , char *name
+//int InitTcpServer(char *filename0, char *filename1)
 {
   int socket_desc, new_socket, size_struct;///////////////////////, read_size,buffer = 0;
   struct sockaddr_in server, client;
@@ -576,10 +579,11 @@ if (new_socket<0)
 
 //init finished, now send the image pair
 
-//SendTcpImgDataFromServer(new_socket, memory_data, name, mem_size);
+SendTcpImgDataFromServer(new_socket, memory_data, name, mem_size);
+SendTcpImgDataFromServer(new_socket, memory_data, name, mem_size);
 
-SendTcpImageFromServer(new_socket, filename0);
-SendTcpImageFromServer(new_socket, filename1);
+//SendTcpImageFromServer(new_socket, filename0);
+//SendTcpImageFromServer(new_socket, filename1);
 
 
 
@@ -984,11 +988,11 @@ int SaveImage(uint32_t BaseAddress, char* filename, uint16_t width, uint16_t hei
 
 //the next four rows are for sending image data and not images
 	memcpy(&mem_arr, mem_base, map_len); //copy the image data from the shared memory, from start address mem_base, copy the length of map_len to the char array mem_arr
-	//unsigned char * mem = NULL;
-	//unsigned long mem_size = 0;
-	ConvertImage(filename, mem_arr, width, height, bpp);
+	unsigned char mem[400000];
+	unsigned long mem_size = 0;
+	ConvertImage(filename, mem_arr, width, height, bpp, mem, &mem_size);
 
-	//InitTcpServer(mem, filename, mem_size);
+	InitTcpServer(mem, filename, mem_size);
 	//free(mem);
 
 
