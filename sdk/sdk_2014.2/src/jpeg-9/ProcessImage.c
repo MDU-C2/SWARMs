@@ -103,7 +103,7 @@ if ( !outfile )
 printf("Error opening output jpeg file %s\n!", filename );
 return -1;
 }
-printf("created file!");
+printf("created file!\n");
 cinfo.err = jpeg_std_error( &jerr );
 jpeg_create_compress(&cinfo);
 jpeg_stdio_dest(&cinfo, outfile);
