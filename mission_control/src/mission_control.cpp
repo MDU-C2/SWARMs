@@ -153,6 +153,8 @@ void GoToCurrentGoal()
   if (pos.x <= (goal.x+positionTolerance) && pos.x > (goal.x-positionTolerance) && pos.y <= (goal.y+positionTolerance) && pos.y > (goal.y-positionTolerance) && !onlyAngle)
   {
     ROS_INFO("GOAL REACHED");
+    std::cout << "Checkpoint: " << checkpoint << std::endl;
+    
     //gotGoal = false;
   
   //ROS_INFO("GOAL: (%f, %f, %f)", goal.x, goal.y, goal.z);
@@ -162,29 +164,34 @@ void GoToCurrentGoal()
       //Dive 2 meters and go in a square pattern of length 50 meters.
       switch(checkpoint){
         //starting position
-        case 'O' :
+        case '0' :
          SetGoal(0, 0, 0);
          checkpoint = 'A';
+         std::cout << "Checkpoint: " << checkpoint << std::endl;
          break;
         //move to the initial position but 2 meters lower
         case 'A' :
-         SetGoal(0, 0, 2);
+         SetGoal(0, 0, 0);
          checkpoint = 'B';
+         std::cout << "Checkpoint: " << checkpoint << std::endl;
          break;
         //move to the upper left corner
         case 'B' :
-          SetGoal(0, 50, 2);
+          SetGoal(0, 50, 0);
           checkpoint = 'C';
+          std::cout << "Checkpoint: " << checkpoint << std::endl;
           break;
         //move to the upper right corner
         case 'C' :
-         SetGoal(50, 50, 2);
+         SetGoal(50, 50, 0);
          checkpoint = 'D';
+         std::cout << "Checkpoint: " << checkpoint << std::endl;
          break;
         //move to the lower right corner
         case 'D' :
-         SetGoal(50, 0, 2);
+         SetGoal(50, 0, 0);
          checkpoint = 'A';
+         std::cout << "Checkpoint: " << checkpoint << std::endl;
          break;
       }
     }

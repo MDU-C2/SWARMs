@@ -108,7 +108,7 @@ void GoToSurfaceCallback(const mission_control::motion &msg)
 
 int main(int argc, char **argv)
 {
-	ros::init(argc, argv, "tcp_coord_service");
+	ros::init(argc, argv, "Control_sender");
 	ros::NodeHandle n;
 
 	//ros::ServiceServer service = n.advertiseService("coord_service", client_service);

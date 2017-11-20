@@ -1,4 +1,6 @@
 #ignore all kind of files
+
+# Ignore all the images inside the Odroid.
 *.bmp
 *.jpg
 *.png
