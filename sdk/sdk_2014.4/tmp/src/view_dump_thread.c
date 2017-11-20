@@ -187,12 +187,12 @@ char add_ms[4];
 	strncpy(filename0,time_str,9);   //copy no more than 8 char from time_str to filename0
 	strncpy(filename0+9, add_ms, nr_el*sizeof(char));
 	strcat(filename0,"_0.bmp");      // append _0.bmp onto filename0, THEY ARE FIRST SAVED AS BMP BUT WITH .JPG EXTENSION
-	SaveBmpImage(im_save->fb_addr0, filename0, im_save->image_size.w, im_save->image_size.h, im_save->image_size.bpp, 1); //_0 is left cam from behind
+	SaveBmpImageData(im_save->fb_addr0, filename0, im_save->image_size.w, im_save->image_size.h, im_save->image_size.bpp, 1); //_0 is left cam from behind
 
 	strncpy(filename1,time_str,9);
 	strncpy(filename1+9, add_ms, nr_el*sizeof(char));
 	strcat(filename1,"_1.bmp");
-	SaveBmpImage(im_save->fb_addr1, filename1, im_save->image_size.w, im_save->image_size.h, im_save->image_size.bpp, 1); //_1 is right cam from behind
+	SaveBmpImageData(im_save->fb_addr1, filename1, im_save->image_size.w, im_save->image_size.h, im_save->image_size.bpp, 1); //_1 is right cam from behind
 
 
 	////////////// ctrl+z until here
