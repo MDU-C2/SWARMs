@@ -27,6 +27,7 @@ void SendTcpImageFromServer(int socket, char* filename);
 void SendTcpImgDataFromServer(int socket, unsigned char *memo_data, char *name, unsigned long mem_size);
 int receive_tcp_image_client(int socket);
 int InitTcpImgDataServer(unsigned char *memory_data, char *name, unsigned long mem_size); //, char *filename1);
+int InitTcpImageServer(char *filename0);//, char *filename1);
 //int InitTcpServer( char *filename0, char *filename1);
 int init_tcp_client();
 //end added
@@ -37,7 +38,10 @@ void InitFB(off_t FB_addr, uint16_t width, uint16_t height, uint16_t bpp);
 int CheckResults(uint32_t BaseAddress, int memLen, int resolution);
 int SendImage(uint32_t BaseAddress, uint16_t width, uint16_t height, uint16_t bpp);
 int SendImage_mem(image_t* img, char id);
-int SaveImage(uint32_t BaseAddress, char* filename, uint16_t width, uint16_t height, uint16_t bpp, uint8_t scale);
+
+int SaveJpgImageData(uint32_t BaseAddress, char* filename, uint16_t width, uint16_t height, uint16_t bpp, uint8_t scale);
+int SaveBmpImage(uint32_t BaseAddress, char* filename, uint16_t width, uint16_t height, uint16_t bpp, uint8_t scale);
+
 int SaveImage32(uint32_t BaseAddress, char* filename);
 int SaveImage_mem(image_t* im, char* filename);
 int LoadImage_mem(image_t* im, char* filename);

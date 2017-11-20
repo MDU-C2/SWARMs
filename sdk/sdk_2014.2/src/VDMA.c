@@ -592,6 +592,91 @@ return 0;
 }
 
 
+int InitTcpImageServer(char *filename0)//, char *filename1)
+{
+  int socket_desc, new_socket, size_struct;///////////////////////, read_size,buffer = 0;
+  struct sockaddr_in server, client;
+  //char *readin;                  //////////////////////
+
+  //Create a socket
+  socket_desc = socket(PF_INET , SOCK_STREAM , 0); //ipv4 and tcp   //changed AF_INET to PF_INET
+  if (socket_desc == -1)
+  {
+     printf("Could not create socket");
+  }
+
+  printf("socket returns socket_desc: %d\n",socket_desc);
+
+  int optval;
+  // set the SO_REUSEADDR on the socket to true
+  optval = 1;
+  setsockopt(socket_desc, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof optval);//reuses the address
+//between the sending of image pairs
+
+
+
+  //Assign the sockaddr_in structure
+  server.sin_family = AF_INET;
+  server.sin_addr.s_addr = INADDR_ANY;
+  server.sin_port = htons( 8765 );
+
+ //if( bind(socket_desc,(struct sockaddr *)&server , sizeof(server)) < 0)//struct sockaddr
+ //{
+ //  puts("bind failed");
+ //  return 1;
+ //}
+  int bind_result = bind(socket_desc, (struct sockaddr *)&server, sizeof(server));
+  if (bind_result < 0){
+	  puts("bind failed");
+	  int errnum = errno; //assign the error nr
+	  fprintf(stderr, "value of errno: %d\n", errno);
+	  perror("the reason of errno");
+	  fprintf(stderr, "error binding: %s\n", strerror(errnum));
+	  //printf("bind returns: %d\n",bind_result);
+	  return 1;
+  }
+
+ puts("bind done");
+
+
+ //Listen to socket
+ listen(socket_desc , 3);
+
+
+  puts("Waiting for incoming connections...");
+  size_struct = sizeof(struct sockaddr_in);
+
+  //Accept the connection for client
+ if((new_socket = accept(socket_desc, (struct sockaddr *)&client,(socklen_t*)&size_struct))){
+puts("Connection accepted");
+     }
+
+fflush(stdout);
+
+if (new_socket<0)
+{
+  perror("Accept Failed");
+  return 1;
+}
+
+//send_image(new_socket);
+
+//init finished, now send the image pair
+
+//SendTcpImgDataFromServer(new_socket, memory_data, name, mem_size);
+//SendTcpImgDataFromServer(new_socket, memory_data, name, mem_size);
+
+SendTcpImageFromServer(new_socket, filename0);
+//SendTcpImageFromServer(new_socket, filename1);
+
+
+
+close(socket_desc);
+fflush(stdout);
+return 0;
+}
+
+
 
 int init_tcp_client()
 {
@@ -960,7 +1045,8 @@ int SendImage_mem(image_t* img, char id)
 
 ////////////////////////////////////////////////////////////////////////////
 //Save image from in RAM at [BaseAddress] to disk as [filename]
-int SaveImage(uint32_t BaseAddress, char* filename, uint16_t width, uint16_t height, uint16_t bpp, uint8_t scale)
+//SaveImage()
+int SaveJpgImageData(uint32_t BaseAddress, char* filename, uint16_t width, uint16_t height, uint16_t bpp, uint8_t scale)
 {
 
 	////char mem_arr[PIXELS_PER_FRAME]; //CHECK HERE IF IT FAILS
@@ -1087,6 +1173,132 @@ int SaveImage(uint32_t BaseAddress, char* filename, uint16_t width, uint16_t hei
 	return 0;
 
 }
+
+
+
+int SaveBmpImage(uint32_t BaseAddress, char* filename, uint16_t width, uint16_t height, uint16_t bpp, uint8_t scale)
+{
+
+	////char mem_arr[PIXELS_PER_FRAME]; //CHECK HERE IF IT FAILS
+//char mem_arr[width*height*bpp];
+
+	int map_len = (width*height*bpp);
+	int fd = open( "/dev/mem", (O_RDWR | O_SYNC));
+	if(fd < 0)
+	{
+		printf("Failed to open /dev/mem!\n");
+		return -1;
+	}
+
+	unsigned char* mem_base = (unsigned char*)mmap(NULL, map_len, PROT_READ | PROT_WRITE, MAP_SHARED, fd, (off_t)BaseAddress);
+
+	if(mem_base == MAP_FAILED)
+	{
+		perror("Mapping memory for absolute memory access failed.\n");
+		close(fd);
+		return -1;
+	}
+
+
+
+//the next four rows are for sending image data and not images
+	//memcpy(&mem_arr, mem_base, map_len); //copy the image data from the shared memory, from start address mem_base, copy the length of map_len to the char array mem_arr
+	//printf("after mem\n");
+
+	//printf("map_len: %d\n",map_len);
+	//printf("size of mem: %d\n",sizeof mem_arr);
+
+///////////////////////////////////////////////////////////////////// //////////////////////////// ctrl+z until here
+	//InitTcpServer(mem_arr, filename); //, filename
+
+	FILE *ofp;
+
+	ofp = fopen(filename, "w");
+
+	if (ofp == NULL) {
+	  printf( "Can't open output file!\n");
+	  exit(1);
+	}
+
+	uint32_t w = width/scale;
+	uint32_t h = height/scale;
+	uint32_t filesize = w*h*bpp + 54;
+//	uint32_t pix;
+//	uint8_t col;
+
+
+	//fwrite(mem_base,1,w*h*bpp,mem_arr);
+
+
+	unsigned char bmpfileheader[14] = {'B','M', 0,0,0,0, 0,0, 0,0, 54,0,0,0};
+	unsigned char bmpinfoheader[40] = {40,0,0,0,
+										0,0,0,0,
+										0,0,0,0,
+										1,0,
+										24,0};
+
+	bmpfileheader[ 2] = (unsigned char)(filesize      );
+	bmpfileheader[ 3] = (unsigned char)(filesize >>  8);
+	bmpfileheader[ 4] = (unsigned char)(filesize >> 16);
+	bmpfileheader[ 5] = (unsigned char)(filesize >> 24);
+
+	bmpinfoheader[ 4] = (unsigned char)(       w      );
+	bmpinfoheader[ 5] = (unsigned char)(       w >>  8);
+	bmpinfoheader[ 6] = (unsigned char)(       w >> 16);
+	bmpinfoheader[ 7] = (unsigned char)(       w >> 24);
+	bmpinfoheader[ 8] = (unsigned char)(       h      );
+	bmpinfoheader[ 9] = (unsigned char)(       h >>  8);
+	bmpinfoheader[10] = (unsigned char)(       h >> 16);
+	bmpinfoheader[11] = (unsigned char)(       h >> 24);
+
+	fwrite(bmpfileheader,1,14,ofp);
+	fwrite(bmpinfoheader,1,40,ofp);
+	fwrite(mem_base,1,w*h*bpp,ofp); //the elements from shared mem
+
+
+
+
+
+//	int x,y;
+//	for (y = 0; y<HEIGHT; y++)
+//	{
+//		if (y % scale == 0) {
+//			for(x = 0; x<WIDTH; x++)
+//			{
+//				if (x % scale == 0) {
+//					pix = REG_READ(mem_base,(y*WIDTH+x)*bpp);
+////					pix = REG_READ(mem_base,(y*WIDTH+(WIDTH-x-1))*bpp);
+//					//b,g,r 8 bits PIX[0x00RRBBGG] --> COL[BB], COL[GG], COL[RR]
+//					col = (pix) & 0xFF;
+//					fwrite (&col, sizeof(col), 1, ofp);
+//					col = (pix >> 8) & 0xFF;
+//					fwrite (&col, sizeof(col), 1, ofp);
+//					col = (pix >> 16) & 0xFF;
+//					fwrite (&col, sizeof(col), 1, ofp);
+//				}
+//			}
+//		}
+//	}
+
+	fclose(ofp);
+	printf("Image saved...%s \n",filename);
+
+	munmap((void *)mem_base, map_len); // deallocate the space of the image elements in shared mem when sent
+	close(fd);
+
+	//init_tcp_server(filename); //send pics to odroid
+
+	//init_tcp_client();
+
+	InitTcpImageServer(filename);
+
+
+	//printf("Image sent and returned! \n");
+	return 0;
+
+}
+
+
 
 
 //Save image from in RAM at [BaseAddress] to disk as [filename]
