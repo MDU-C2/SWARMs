@@ -247,9 +247,9 @@ int main(int argc, char *argv[])
 	uint32_t pin_dir = 0x0;
 
 	//const image_size_t im_size = {.w = 3840, .h = 2748, .bpp = 3};
-	const image_size_t im_size = {.w = 1920, .h = 1080, .bpp = 3}; //if changing here, dont forget to change in the client too!!!
+	//const image_size_t im_size = {.w = 1920, .h = 1080, .bpp = 3}; //if changing here, dont forget to change in the client too!!!
 	//const image_size_t im_size = {.w = 768, .h = 432, .bpp = 3};
-	//const image_size_t im_size = {.w = 640, .h = 480, .bpp = 3};
+	const image_size_t im_size = {.w = 640, .h = 480, .bpp = 3};
 	image_save_t im_save;
 	im_save.image_size = im_size;
 	im_save.seq_no = 0;

@@ -379,8 +379,8 @@ while (index < size){
 	int sent_bytes = send(socket, memo_data+index, offs,0 ); //I MAD CHANGES HERE, CHECK IT AND PERHAPS DO THE SAME IN CLIENT OR REDO THIS
    /////}while (stat < 0);
 index = index + offs;
-   printf("sent_bytes: %d\n", sent_bytes);
-   printf("Packet Number: %i\n",packet_index);
+////   printf("sent_bytes: %d\n", sent_bytes);
+////   printf("Packet Number: %i\n",packet_index);
    //printf("Packet Size Sent: %i\n",size);//read_size);
    //printf(" \n");
    //printf(" \n");
@@ -389,6 +389,7 @@ index = index + offs;
    packet_index++;
 
 }
+
    //Zero out our send buffer
    bzero(send_buffer, sizeof(send_buffer));
 
