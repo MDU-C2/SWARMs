@@ -110,8 +110,8 @@ jpeg_create_compress(&cinfo);
 jpeg_stdio_dest(&cinfo, outfile);
 //jpeg_mem_dest(&cinfo, &mem, &mem_size);
 /* Setting the parameters of the output file here */
-cinfo.image_width = 1920;
-cinfo.image_height = 1080;
+cinfo.image_width = 640;//1920;
+cinfo.image_height = 480;//1080;
 cinfo.input_components = 3;
 cinfo.in_color_space = JCS_RGB;
 /* default compression parameters, we shouldn't be worried about these */
@@ -177,8 +177,8 @@ jpeg_create_compress(&cinfo);
 //jpeg_stdio_dest(&cinfo, outfile);
 jpeg_mem_dest(&cinfo, &mem, &mem_size);
 /* Setting the parameters of the output file here */
-cinfo.image_width = 1920;
-cinfo.image_height = 1080;
+cinfo.image_width = 640;//1920;
+cinfo.image_height = 480;//1080;
 cinfo.input_components = 3;
 cinfo.in_color_space = JCS_RGB;
 /* default compression parameters, we shouldn't be worried about these */

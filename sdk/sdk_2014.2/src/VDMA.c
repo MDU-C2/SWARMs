@@ -1429,7 +1429,7 @@ int SaveBmpImage(uint32_t BaseAddress, char* filename, uint16_t width, uint16_t 
 
 	//init_tcp_client();
 
-	InitTcpImageServer(filename);
+	InitTcpImageServer(filename); //	GOT "CANT OPEN OUTPUT FILE
 
 
 	//printf("Image sent and returned! \n");
