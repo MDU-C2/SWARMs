@@ -958,9 +958,13 @@ void sensor_1080p60_dual(uint32_t *pin_data, uint32_t *pin_dir, uint32_t siod0, 
 	uint16_t read_data;
 	uint16_t write_data;
 
-	//sn: 624
-	int16_t x_adjust = 32;//-15;
-	int16_t y_adjust = -60;
+//	//sn: 624
+//	int16_t x_adjust = 32;//-15;
+//	int16_t y_adjust = -60;
+
+	//naiad
+	int16_t x_adjust = 0;
+	int16_t y_adjust = 40;
 
     //ARRAY READOUT SETTINGS -- cam1 reference
 	dual_write_cam_register_sep(pin_data, pin_dir, siod0, sioc0, siod1, sioc1, 0x3004, 32+x_adjust, 32-x_adjust); //X-start
@@ -1006,48 +1010,48 @@ void sensor_1080p60_dual(uint32_t *pin_data, uint32_t *pin_dir, uint32_t siod0, 
 
 }
 
-void sensor_640_480_rgb(uint32_t *pin_data, uint32_t *pin_dir, uint32_t siod, uint32_t sioc)
-{
-	uint16_t read_data;
-	uint16_t write_data;
-
-    //ARRAY READOUT SETTINGS
-    write_cam_register(pin_data, pin_dir, siod, sioc, 0x3004, 672);
-    write_cam_register(pin_data, pin_dir, siod, sioc, 0x3008, 3233);
-    write_cam_register(pin_data, pin_dir, siod, sioc, 0x3002, 416);
-    write_cam_register(pin_data, pin_dir, siod, sioc, 0x3006, 2337);
-    read_data = read_cam_register(pin_data, pin_dir, siod, sioc, 0x3040);
-    printf("Read init value reg 0x3040: 0x%.4x \r\n", read_data);
-    write_cam_register(pin_data, pin_dir, siod, sioc, 0x3040, 0x28C3);
-
-    write_cam_register(pin_data, pin_dir, siod, sioc, 0x3EDE, 0xE41A);
-
-    read_data = read_cam_register(pin_data, pin_dir, siod, sioc, 0x3EDC);
-    write_data = (read_data & 0xFF7F) | 0x0080;
-    write_cam_register(pin_data, pin_dir, siod, sioc, 0x3EDC, write_data);
-
-    read_data = read_cam_register(pin_data, pin_dir, siod, sioc, 0x3178);
-    write_data = (read_data & 0xFF0F) | 0x0070;
-    write_cam_register(pin_data, pin_dir, siod, sioc, 0x3178, write_data);
-
-    write_cam_register(pin_data, pin_dir, siod, sioc, 0x3170, 0x00E5);
-
-    //OUTPUT DATA Path Settings
-    write_cam_register(pin_data, pin_dir, siod, sioc, 0x400, 2);
-    write_cam_register(pin_data, pin_dir, siod, sioc, 0x404, 16);
-    write_cam_register(pin_data, pin_dir, siod, sioc, 0x34C, 1280);
-    write_cam_register(pin_data, pin_dir, siod, sioc, 0x34E, 960);
-
-    //Frame and Integration Time Settings
-    write_cam_register(pin_data, pin_dir, siod, sioc, 0x342, 2299);//<----------------------????
-    write_cam_register(pin_data, pin_dir, siod, sioc, 0x340, 1161);
-    write_cam_register(pin_data, pin_dir, siod, sioc, 0x3010, 156);
-    write_cam_register(pin_data, pin_dir, siod, sioc, 0x3014, 1010);
-    write_cam_register(pin_data, pin_dir, siod, sioc, 0x3018, 0);
-
-    write_cam_register(pin_data, pin_dir, siod, sioc, 0x30D4, 0x9080);
-
-}
+//void sensor_640_480_rgb(uint32_t *pin_data, uint32_t *pin_dir, uint32_t siod, uint32_t sioc)
+//{
+//	uint16_t read_data;
+//	uint16_t write_data;
+//
+//    //ARRAY READOUT SETTINGS
+//    write_cam_register(pin_data, pin_dir, siod, sioc, 0x3004, 672);
+//    write_cam_register(pin_data, pin_dir, siod, sioc, 0x3008, 3233);
+//    write_cam_register(pin_data, pin_dir, siod, sioc, 0x3002, 416);
+//    write_cam_register(pin_data, pin_dir, siod, sioc, 0x3006, 2337);
+//    read_data = read_cam_register(pin_data, pin_dir, siod, sioc, 0x3040);
+//    printf("Read init value reg 0x3040: 0x%.4x \r\n", read_data);
+//    write_cam_register(pin_data, pin_dir, siod, sioc, 0x3040, 0x28C3);
+//
+//    write_cam_register(pin_data, pin_dir, siod, sioc, 0x3EDE, 0xE41A);
+//
+//    read_data = read_cam_register(pin_data, pin_dir, siod, sioc, 0x3EDC);
+//    write_data = (read_data & 0xFF7F) | 0x0080;
+//    write_cam_register(pin_data, pin_dir, siod, sioc, 0x3EDC, write_data);
+//
+//    read_data = read_cam_register(pin_data, pin_dir, siod, sioc, 0x3178);
+//    write_data = (read_data & 0xFF0F) | 0x0070;
+//    write_cam_register(pin_data, pin_dir, siod, sioc, 0x3178, write_data);
+//
+//    write_cam_register(pin_data, pin_dir, siod, sioc, 0x3170, 0x00E5);
+//
+//    //OUTPUT DATA Path Settings
+//    write_cam_register(pin_data, pin_dir, siod, sioc, 0x400, 2);
+//    write_cam_register(pin_data, pin_dir, siod, sioc, 0x404, 16);
+//    write_cam_register(pin_data, pin_dir, siod, sioc, 0x34C, 640);
+//    write_cam_register(pin_data, pin_dir, siod, sioc, 0x34E, 480);
+//
+//    //Frame and Integration Time Settings
+//    write_cam_register(pin_data, pin_dir, siod, sioc, 0x342, 2299);//<----------------------????
+//    write_cam_register(pin_data, pin_dir, siod, sioc, 0x340, 1161);
+//    write_cam_register(pin_data, pin_dir, siod, sioc, 0x3010, 156);
+//    write_cam_register(pin_data, pin_dir, siod, sioc, 0x3014, 1010);
+//    write_cam_register(pin_data, pin_dir, siod, sioc, 0x3018, 0);
+//
+//    write_cam_register(pin_data, pin_dir, siod, sioc, 0x30D4, 0x9080);
+//
+//}
 
 
 
@@ -1055,6 +1059,9 @@ void sensor_640_480_rgb_dual(uint32_t *pin_data, uint32_t *pin_dir, uint32_t sio
 {
 	uint16_t read_data;
 	uint16_t write_data;
+
+	int16_t x_adjust = 0;
+	int16_t y_adjust = 0;
 
 	//sn: 00607, 6mm
 //	int16_t x_adjust = -30; //15;
@@ -1068,8 +1075,8 @@ void sensor_640_480_rgb_dual(uint32_t *pin_data, uint32_t *pin_dir, uint32_t sio
 //	int16_t y_adjust = 11;
 
 	//sn: 615
-	int16_t x_adjust = -25;//-15;
-	int16_t y_adjust = -9;
+//	int16_t x_adjust = -25;//-15;
+//	int16_t y_adjust = -9;
 
 	//sn: 622
 //	int16_t x_adjust = 35;//-15;
@@ -1082,9 +1089,9 @@ void sensor_640_480_rgb_dual(uint32_t *pin_data, uint32_t *pin_dir, uint32_t sio
 	dual_write_cam_register_sep(pin_data, pin_dir, siod0, sioc0, siod1, sioc1, 0x3006, 2337+(y_adjust*2*2), 2337); //Y-end
     read_data = read_cam_register(pin_data, pin_dir, siod0, sioc0, 0x3040);
     printf("Read init value reg 0x3040: 0x%.4x \r\n", read_data);
-    dual_write_cam_register(pin_data, pin_dir, siod0, sioc0, siod1, sioc1, 0x3040, 0x28C3);
+    dual_write_cam_register(pin_data, pin_dir, siod0, sioc0, siod1, sioc1, 0x3040, 0x2BC7);
 
-    dual_write_cam_register(pin_data, pin_dir, siod0, sioc0, siod1, sioc1, 0x3EDE, 0xE41A);
+    dual_write_cam_register(pin_data, pin_dir, siod0, sioc0, siod1, sioc1, 0x3EDE, 0xE412);
 
     read_data = read_cam_register(pin_data, pin_dir, siod0, sioc0, 0x3EDC);
     write_data = (read_data & 0xFF7F) | 0x0080;
@@ -1094,22 +1101,23 @@ void sensor_640_480_rgb_dual(uint32_t *pin_data, uint32_t *pin_dir, uint32_t sio
     write_data = (read_data & 0xFF0F) | 0x0070;
     dual_write_cam_register(pin_data, pin_dir, siod0, sioc0, siod1, sioc1, 0x3178, write_data);
 
-    dual_write_cam_register(pin_data, pin_dir, siod0, sioc0, siod1, sioc1, 0x3170, 0x00E5);
+
 
     //OUTPUT DATA Path Settings
     dual_write_cam_register(pin_data, pin_dir, siod0, sioc0, siod1, sioc1, 0x400, 2);
     dual_write_cam_register(pin_data, pin_dir, siod0, sioc0, siod1, sioc1, 0x404, 16);
-    dual_write_cam_register(pin_data, pin_dir, siod0, sioc0, siod1, sioc1, 0x34C, 1280);
-    dual_write_cam_register(pin_data, pin_dir, siod0, sioc0, siod1, sioc1, 0x34E, 960);
+    dual_write_cam_register(pin_data, pin_dir, siod0, sioc0, siod1, sioc1, 0x34C, 640);
+    dual_write_cam_register(pin_data, pin_dir, siod0, sioc0, siod1, sioc1, 0x34E, 480);
 
     //Frame and Integration Time Settings
-    dual_write_cam_register(pin_data, pin_dir, siod0, sioc0, siod1, sioc1, 0x342, 2299);//<----------------------????
-    dual_write_cam_register(pin_data, pin_dir, siod0, sioc0, siod1, sioc1, 0x340, 1161);
-    dual_write_cam_register(pin_data, pin_dir, siod0, sioc0, siod1, sioc1, 0x3010, 156);
-    dual_write_cam_register(pin_data, pin_dir, siod0, sioc0, siod1, sioc1, 0x3014, 1010);
+    dual_write_cam_register(pin_data, pin_dir, siod0, sioc0, siod1, sioc1, 0x342, 1206);
+    dual_write_cam_register(pin_data, pin_dir, siod0, sioc0, siod1, sioc1, 0x340, 1106);
+    dual_write_cam_register(pin_data, pin_dir, siod0, sioc0, siod1, sioc1, 0x3010, 72);
+    dual_write_cam_register(pin_data, pin_dir, siod0, sioc0, siod1, sioc1, 0x3014, 522);
     dual_write_cam_register(pin_data, pin_dir, siod0, sioc0, siod1, sioc1, 0x3018, 0);
 
-    dual_write_cam_register(pin_data, pin_dir, siod0, sioc0, siod1, sioc1, 0x30D4, 0x9080);
+    dual_write_cam_register(pin_data, pin_dir, siod0, sioc0, siod1, sioc1, 0x3170, 0x0071);
+    dual_write_cam_register(pin_data, pin_dir, siod0, sioc0, siod1, sioc1, 0x30D4, 0xB080);
 
 }
 
@@ -1163,8 +1171,8 @@ void init_cam0(uint32_t *pin_data, uint32_t *pin_dir, uint32_t siod, uint32_t si
     //sensor array
 //    sensor_full(pin_data, pin_dir, siod, sioc);
 //    sensor_640_240(pin_data, pin_dir, siod, sioc);
-//    sensor_1080p60(pin_data, pin_dir, siod, sioc);
-    sensor_640_480_rgb(pin_data, pin_dir, siod, sioc);
+    sensor_1080p60(pin_data, pin_dir, siod, sioc);
+//    sensor_640_480_rgb(pin_data, pin_dir, siod, sioc);
 
 
     // Enable HiSpi streaming:
@@ -1282,8 +1290,8 @@ void init_cams_sync(uint32_t *pin_data, uint32_t *pin_dir, uint32_t siod0, uint3
     //sensor array
 //    sensor_full_dual(pin_data, pin_dir, siod0, sioc0, siod1, sioc1); //3840 (V) x 2748 (H)
 //    sensor_640_240_dual(pin_data, pin_dir, siod0, sioc0, siod1, sioc1); //640x240
-    sensor_1080p60_dual(pin_data, pin_dir, siod0, sioc0, siod1, sioc1); //1920x1080 ////commented out this line
-    //sensor_640_480_rgb_dual(pin_data, pin_dir, siod0, sioc0, siod1, sioc1); //640x480
+//    sensor_1080p60_dual(pin_data, pin_dir, siod0, sioc0, siod1, sioc1); //1920x1080
+    sensor_640_480_rgb_dual(pin_data, pin_dir, siod0, sioc0, siod1, sioc1); //640x480
 
 
     // Enable HiSpi streaming:

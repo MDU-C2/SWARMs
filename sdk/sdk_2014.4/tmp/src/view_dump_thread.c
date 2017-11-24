@@ -447,12 +447,12 @@ int main(int argc, char *argv[])
 
 		if (update_integration) {
 			if (it.coarse > itl.coarse_max) {
-				printf("WARNING: Coarse integration time > MAX\n");
-				//it.coarse = itl.coarse_max; //uncomment for LONG exposure
+				////printf("WARNING: Coarse integration time > MAX\n");
+				it.coarse = itl.coarse_max; //uncomment for LONG exposure
 			}
 			if (it.coarse < itl.coarse_min) {
-				printf("WARNING: Coarse integration time < MIN\n");
-				//it.coarse = itl.coarse_min; ////////////////////////////////
+				////printf("WARNING: Coarse integration time < MIN\n");
+				it.coarse = itl.coarse_min; ////////////////////////////////
 			}
 			set_integration_time_dual(&it,&pin_data,&pin_dir,SIOD_0,SIOC_0,SIOD_1,SIOC_1);
 			get_integration_time(&it,&pin_data,&pin_dir,SIOD_0,SIOC_0);
