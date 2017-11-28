@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if cd /media/card/lib && scp libjpeg.so.62 /lib/
+then 
+echo "copied!"
+fi
+
+exit 0

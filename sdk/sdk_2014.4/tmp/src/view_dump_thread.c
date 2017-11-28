@@ -186,13 +186,13 @@ char add_ms[4];
 
 	strncpy(filename0,time_str,9);   //copy no more than 8 char from time_str to filename0
 	strncpy(filename0+9, add_ms, nr_el*sizeof(char));
-	strcat(filename0,"_0.jpg");      // append _0.bmp onto filename0, THEY ARE FIRST SAVED AS BMP BUT WITH .JPG EXTENSION
-	SaveJpgImageData(im_save->fb_addr0, filename0, im_save->image_size.w, im_save->image_size.h, im_save->image_size.bpp, 1); //_0 is left cam from behind
+	strcat(filename0,"_0.bmp");      // append _0.bmp onto filename0, THEY ARE FIRST SAVED AS BMP BUT WITH .JPG EXTENSION
+	SaveBmpImageData(im_save->fb_addr0, filename0, im_save->image_size.w, im_save->image_size.h, im_save->image_size.bpp, 1); //_0 is left cam from behind
 
 	strncpy(filename1,time_str,9);
 	strncpy(filename1+9, add_ms, nr_el*sizeof(char));
-	strcat(filename1,"_1.jpg");
-	SaveJpgImageData(im_save->fb_addr1, filename1, im_save->image_size.w, im_save->image_size.h, im_save->image_size.bpp, 1); //_1 is right cam from behind
+	strcat(filename1,"_1.bmp");
+	SaveBmpImageData(im_save->fb_addr1, filename1, im_save->image_size.w, im_save->image_size.h, im_save->image_size.bpp, 1); //_1 is right cam from behind
 
 
 	////////////// ctrl+z until here
@@ -268,6 +268,7 @@ int main(int argc, char *argv[])
 	uint8_t quit = 0;
 	uint8_t update_integration = 0;
 	uint8_t dump_image = 0; // 0;
+	uint8_t dump_image_cont = 0;
 	uint8_t auto_expose = 1;
 
 	integration_time_limits_t itl;
@@ -361,6 +362,9 @@ int main(int argc, char *argv[])
 			case 'w':
 				dump_image = (dump_image+1)%2;
 				break;
+			case 'o':
+				dump_image_cont = (dump_image_cont+1)%2;
+				break;
 			case 't':
 				toggle_cam_stream(&pin_data);
 				break;
@@ -443,6 +447,9 @@ int main(int argc, char *argv[])
 				set_harris_th(false, harris_edge_th);
 				printf("Harris edge th: %f\n",harris_edge_th);
 				break;
+			case 'p':
+				stream = (stream+1)%2;//added stream, turn on/off video stream. default = 0 = off
+				break;
 			}
 
 		if (update_integration) {
@@ -470,7 +477,7 @@ int main(int argc, char *argv[])
 
 
 
-		if (dump_image) {
+		if (dump_image || dump_image_cont) {
 			if ((frame_ptr & 0x3F) == 0 || (frame_ptr & 0x3F) == 3)
 				im_save.fb_addr0 = FB1_ADDR;
 			else
@@ -485,9 +492,9 @@ int main(int argc, char *argv[])
 			saving_image_tmp = saving_image;
 			pthread_mutex_unlock(&saving_image_mutex);
 			if (!saving_image_tmp) {
-				//dump_image = 0; //comment out to take pictures continuously
+				dump_image = 0; //comment out to take pictures continuously
 				im_save.seq_no++;
-				//im_save.seq_no += 2; //testing this, remove if it doesnt work
+
 
 				pthread_create(&SaveImageThread, NULL, SaveImageThreadFcn, &im_save);
 				pthread_detach(SaveImageThread);
