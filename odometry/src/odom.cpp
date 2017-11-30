@@ -76,6 +76,7 @@ int main(int argc, char** argv)
   ros::Publisher odom_pub = n.advertise<nav_msgs::Odometry>("odom", 5);
   ros::Subscriber axis_speed_listener = n.subscribe("IMU_data_for_odom", 1, GetImuData);
   ros::Subscriber moving_listener = n.subscribe("moving", 1, MovingCallback);
+  ros::Subscriber position_reset =  
   ros::Time current_time, last_time;
   position.x = 0.0;
   position.y = 0.0;

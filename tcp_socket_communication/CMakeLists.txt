@@ -213,3 +213,19 @@ target_link_libraries(tcp_image_socket_client ${catkin_LIBRARIES})
 
 add_executable(udp_imu_data src/udp_imu_data.cpp)
 target_link_libraries(udp_imu_data ${catkin_LIBRARIES})
+
+
+add_executable(TcpClientJpgData src/TcpClientJpgData.cpp)
+target_link_libraries(TcpClientJpgData ${catkin_LIBRARIES})
+
+
+add_executable(TcpClientBmp src/TcpClientBmp.cpp)
+target_link_libraries(TcpClientBmp ${catkin_LIBRARIES})
+
+
+add_executable(TcpClientBmpData src/TcpClientBmpData.cpp)
+target_link_libraries(TcpClientBmpData ${catkin_LIBRARIES})
+
+
+add_executable(TcpClientJpg src/TcpClientJpg.cpp)
+target_link_libraries(TcpClientJpg ${catkin_LIBRARIES})

@@ -6,12 +6,6 @@
 
 
 #include "udp_imu_data.h"
-#include <iostream>
-#include <fstream>
-
-std::ofstream accXFile;
-std::ofstream angleYawFile;
-std::ofstream accYFile;
 
 tcp_client client;
 imuData orientation;
@@ -47,12 +41,6 @@ int main(int argc, char **argv)
   ros::Subscriber sub_moving = n.subscribe("moving", 1, MovingCallback);
   nav_msgs::Odometry odom;
 
-  /* Date gathering files
-  accXFile.open("X_data.txt");
-  angleYawFile.open("Yaw_data.txt");
-  accYFile.open("Y_data.txt");
-  */
-
 	int valread;
   char buffer[33];
   client.init();
@@ -77,47 +65,15 @@ int main(int argc, char **argv)
   orientation.velocityY = 0.0;
   orientation.velocityZ = 0.0;
   
-  ros::Time startTotal = ros::Time::now();
-  ros::Time startTimeX = startTotal;
-  ros::Time startTimeY = startTotal;
-  ros::Time startTimeZ = startTotal;
-  ros::Duration stopWatch;
+  ros::Time startTimeX = ros::Time::now();
+  ros::Time startTimeY = ros::Time::now();
+  ros::Time startTimeZ = ros::Time::now();
   
   while(n.ok())
   {
     std::cout << std::endl;
     recv(client.sock, buffer,sizeof(buffer), 0);
-    //stopWatch = (ros::Time::now() - startTotal);
-    char strX[7];
-    char strYaw[7];
-    char strY[7];
-    std::cout << buffer << " || " << std::endl;
-    for (int iii = 0; iii < 7; iii++)
-    {
-      strYaw[iii] = buffer[iii];
-      strX[iii] = buffer[iii+7];
-      strY[iii] = buffer[iii+14];
-    }
-
-        orientation.yaw = atof(strYaw);
-        //angleYawFile << orientation.yaw << " " << stopWatch << std::endl;
-        std::cout << "Yaw: " << orientation.yaw << std::endl;
-        odom.pose.pose.orientation.z = orientation.yaw;
-
-
-        orientation.accX = atof(strX);
-        //accXFile << orientation.accX << " " << stopWatch << std::endl;
-        orientation.velocityX = ComputeVelocity(orientation.accX, orientation.velocityX, startTimeX);
-        startTimeX = ros::Time::now();
-        odom.twist.twist.linear.x = orientation.velocityX;
-    
-        
-        orientation.accY = atof(strY);
-        //accYFile << orientation.accY << " " << stopWatch << std::endl;
-        orientation.velocityY = ComputeVelocity(orientation.accY, orientation.velocityY, startTimeY);
-        startTimeY = ros::Time::now();
-        odom.twist.twist.linear.y = orientation.velocityY;
-        /*
+    char str[7];
     for(int iii = 0; iii < 8; iii++)
     {
       str[iii] = buffer[iii+4];
@@ -132,7 +88,6 @@ int main(int argc, char **argv)
       // Data contained in the buffer related to the acceleration in x axis.
       case '2':
         orientation.accX = atof(str);
-        accXFile << orientation.accX << " " << ros::Time::now() << std::endl;
         orientation.velocityX = ComputeVelocity(orientation.accX, orientation.velocityX, startTimeX);
         startTimeX = ros::Time::now();
         odom.twist.twist.linear.x = orientation.velocityX;
@@ -141,7 +96,6 @@ int main(int argc, char **argv)
       // Data contatined in the buffer related to the acceleration in y axis
       case '3':
         orientation.accY = atof(str);
-        accYFile << orientation.accY << " " << ros::Time::now() << std::endl;
         orientation.velocityY = ComputeVelocity(orientation.accY, orientation.velocityY, startTimeY);
         startTimeY = ros::Time::now();
         odom.twist.twist.linear.y = orientation.velocityY;
@@ -150,7 +104,6 @@ int main(int argc, char **argv)
       // Data contatined in the buffer related to the acceleration in z axis
       case '4':
         orientation.accZ = atof(str);
-        accZFile << orientation.accZ << " " << ros::Time::now() << std::endl;
         orientation.velocityZ = ComputeVelocity(orientation.accZ, orientation.velocityZ, startTimeZ);
         startTimeZ = ros::Time::now();
         odom.twist.twist.linear.z = orientation.velocityZ;
@@ -170,7 +123,6 @@ int main(int argc, char **argv)
       default:
         std::cout << "Invalid data! " << std::endl;
     }
-    */
     // Publish data over ROS topic.
     ros::spinOnce();
     pub.publish(odom);

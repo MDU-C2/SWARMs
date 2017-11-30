@@ -2,7 +2,12 @@
 
 
 nav_msgs::Odometry msg;
+//message to quit:
+mission_control::motion qMsg;
 //std_msgs::Int16 commandMsg;
+
+// used for resetting coordinates.
+ros::Publisher quit = n.advertise<mission_control::motion>("command", 1);
 
 
 int CheckInput()
@@ -11,6 +16,9 @@ int CheckInput()
   float inputY;
   float inputAngle;
   char firstArgument;
+  //flag to be sent to quit
+  qMsg.x = 0.0;
+
   //print command list:
   std::cout << "Enter '0' for help" << std::endl;
   std::cin >> firstArgument;
@@ -21,6 +29,7 @@ int CheckInput()
   std::cout << firstArgument << std::endl;
   switch(firstArgument)
   {
+    // Used to disply the menu. It is a sort of help.
     case '0':
       std::cout << "Enter '1' to increase the thrusters threshold" << std::endl;
       std::cout << "Enter '2' to decrease the thrusters threshold" << std::endl;
@@ -32,15 +41,19 @@ int CheckInput()
       std::cout << "Enter '8' to stop" << std::endl;
       std::cout << "Enter '9' to quit" << std::endl;
       break;
+    // Used to let the user increase the thrusters threshhold.
     case '1': 
       msg.pose.pose.position.z = 1;
       break;
+    // Used to let the user decrease the thrusters threshhold.
     case '2':
       msg.pose.pose.position.z = 2;
       break;
+    // Let the Naiad move and perform a square.
     case '3':
       msg.pose.pose.position.z = 3;
       break;
+    // Let the user inser custom coordinates.
     case '4':
       msg.pose.pose.position.z = 4;
       std::cout << "Enter x coordinate: ";
@@ -93,6 +106,9 @@ int CheckInput()
       break;
     case '8':
       msg.pose.pose.position.z = 8;
+      //Flag to quit
+      qMsg.x = 1;
+      quit.publish(qMsg);
     case '9':
       msg.pose.pose.position.z = 9;
       std::cout << "Exitng...\n" << std::endl;
@@ -154,7 +170,6 @@ int main(int argc, char **argv)
   ros::NodeHandle n;
 
   ros::Publisher pub = n.advertise<nav_msgs::Odometry>("naiad_testing", 1);
-  ros::Publisher quit = n.advertise<mission_control::motion>("command", 1);
 
   std::cout << "Enter '1' to increase the thrusters threshold" << std::endl;
   std::cout << "Enter '2' to decrease the thrusters threshold" << std::endl;
