@@ -22,6 +22,8 @@ void loadParams(const ros::NodeHandle& local_nh, Matcher::parameters& params)
   local_nh.getParam("multi_stage",            params.multi_stage);
   local_nh.getParam("half_resolution",        params.half_resolution);
   local_nh.getParam("refinement",             params.refinement);
+  params.match_disp_tolerance = 20;
+  params.outlier_disp_tolerance = 10;
 }
 
 /// loads bucketing params

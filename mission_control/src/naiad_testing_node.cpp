@@ -6,6 +6,8 @@ nav_msgs::Odometry msg;
 mission_control::motion qMsg;
 //std_msgs::Int16 commandMsg;
 
+ros::NodeHandle n;
+
 // used for resetting coordinates.
 ros::Publisher quit = n.advertise<mission_control::motion>("command", 1);
 
@@ -18,6 +20,7 @@ int CheckInput()
   char firstArgument;
   //flag to be sent to quit
   qMsg.x = 0.0;
+  qMsg.y = 0.0;
 
   //print command list:
   std::cout << "Enter '0' for help" << std::endl;
@@ -54,6 +57,7 @@ int CheckInput()
       msg.pose.pose.position.z = 3;
       break;
     // Let the user inser custom coordinates.
+    // Check for inputs and allows only integers.
     case '4':
       msg.pose.pose.position.z = 4;
       std::cout << "Enter x coordinate: ";
@@ -80,12 +84,16 @@ int CheckInput()
 
       std::cout << std::endl;
       break;
+    // Move the Naiad up.
     case '5':
       msg.pose.pose.position.z = 5;
       break;
+    // Move the Naiad down.
     case '6':
       msg.pose.pose.position.z = 6;
       break;
+    // Let the user set an angle to face the Naiad.
+    // Check for inputs and allows only integers.
     case '7' :
       msg.pose.pose.position.z = 7;
       std::cout << "Enter a angle from -180 - 180: ";
@@ -104,13 +112,17 @@ int CheckInput()
       }
       msg.pose.pose.orientation.z = inputAngle;
       break;
+    // Stop the Naiad.
     case '8':
       msg.pose.pose.position.z = 8;
-      //Flag to quit
       qMsg.x = 1;
       quit.publish(qMsg);
+    // Quit.
     case '9':
       msg.pose.pose.position.z = 9;
+      //Flag to quit
+      qMsg.y = 1;
+      quit.publish(qMsg);
       std::cout << "Exitng...\n" << std::endl;
       break;
 others:
@@ -167,7 +179,7 @@ int main(int argc, char **argv)
 {
   int inputChecked;
   ros::init(argc, argv,"Naiad_test_node");
-  ros::NodeHandle n;
+  //ros::NodeHandle n;
 
   ros::Publisher pub = n.advertise<nav_msgs::Odometry>("naiad_testing", 1);
 

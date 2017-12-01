@@ -65,6 +65,25 @@ void MovingCallback(const mission_control::motion &msg)
     moving = false;
   }
 }
+
+void ResetCallback(const mission_control::motion &qMsg){
+  // received a message to reset
+  if(qMsg.x ==  1) {
+    position.vx = 0.0;
+    position.vy = 0.0;
+    position.vz = 0.0;
+    position.vyaw = 0.0;
+    position.vroll = 0.0;
+    position.vpitch = 0.0;
+    position.x = 0.0;
+    position.y = 0.0;
+    position.z = 0.0;
+    position.yaw = 0.0;
+    position.roll = 0.0;
+    position.pitch = 0.0;
+    ROS_INFO("Everything has been reset!");;
+  }
+}
   
 
 int main(int argc, char** argv)
@@ -76,7 +95,7 @@ int main(int argc, char** argv)
   ros::Publisher odom_pub = n.advertise<nav_msgs::Odometry>("odom", 5);
   ros::Subscriber axis_speed_listener = n.subscribe("IMU_data_for_odom", 1, GetImuData);
   ros::Subscriber moving_listener = n.subscribe("moving", 1, MovingCallback);
-  ros::Subscriber position_reset =  
+  ros::Subscriber position_reset = n.subscribe("qMsg",1, ResetCallback); 
   ros::Time current_time, last_time;
   position.x = 0.0;
   position.y = 0.0;
