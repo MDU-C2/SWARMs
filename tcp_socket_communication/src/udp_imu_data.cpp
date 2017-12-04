@@ -1,6 +1,6 @@
 //----------------------------
 // UDP IMU communication
-// Last modified: 25.10.2017
+// Last modified: 04.12.2017
 // Extra notes: 
 //----------------------------
 
@@ -42,7 +42,7 @@ int main(int argc, char **argv)
   nav_msgs::Odometry odom;
 
 	int valread;
-  char buffer[33];
+  char buffer[64];
   client.init();
   //int dataSize = sizeof( "{""id"": 2, ""name"": ""abc""}" );
   client.sock = socket(AF_INET, SOCK_DGRAM, 0);
@@ -65,6 +65,10 @@ int main(int argc, char **argv)
   orientation.velocityY = 0.0;
   orientation.velocityZ = 0.0;
   
+  float gyroX = 0.0;
+  float gyroY = 0.0;
+  float gyroZ = 0.0;
+
   ros::Time startTimeX = ros::Time::now();
   ros::Time startTimeY = ros::Time::now();
   ros::Time startTimeZ = ros::Time::now();
@@ -73,56 +77,63 @@ int main(int argc, char **argv)
   {
     std::cout << std::endl;
     recv(client.sock, buffer,sizeof(buffer), 0);
-    char str[7];
-    for(int iii = 0; iii < 8; iii++)
+    char strX[7];
+    char strY[7];
+    char strPitch[7];
+    char strYaw[7];
+    char strGyroX[7];
+    char strGyroY[7];
+    char strGyroZ[7];
+    for(int iii = 0; iii < 7; iii++)
     {
-      str[iii] = buffer[iii+4];
+      strPitch[iii] = buffer[iii];
+      strYaw[iii] = buffer[iii+7];
+      strX[iii] = buffer[iii+14];
+      strY[iii] = buffer[iii+21];
+      strGyroX[iii] = buffer[iii+28];
+      strGyroY[iii] = buffer[iii+35];
+      strGyroZ[iii] = buffer[iii+42];    
     }
-    switch(buffer[1]){
-      // Data contained in the buffer realted to yaw values.
-      case '1':
-        orientation.yaw = atof(str);
-        std::cout << "Yaw: " << orientation.yaw << std::endl;
-        odom.pose.pose.orientation.z = orientation.yaw;
-        break;
-      // Data contained in the buffer related to the acceleration in x axis.
-      case '2':
-        orientation.accX = atof(str);
-        orientation.velocityX = ComputeVelocity(orientation.accX, orientation.velocityX, startTimeX);
-        startTimeX = ros::Time::now();
-        odom.twist.twist.linear.x = orientation.velocityX;
-        std::cout << "Velocity in X: " << orientation.velocityX << std::endl;
-        break;
-      // Data contatined in the buffer related to the acceleration in y axis
-      case '3':
-        orientation.accY = atof(str);
-        orientation.velocityY = ComputeVelocity(orientation.accY, orientation.velocityY, startTimeY);
-        startTimeY = ros::Time::now();
-        odom.twist.twist.linear.y = orientation.velocityY;
-        std::cout << "Velocity in Y: " << orientation.velocityY << std::endl;
-        break;
-      // Data contatined in the buffer related to the acceleration in z axis
-      case '4':
-        orientation.accZ = atof(str);
-        orientation.velocityZ = ComputeVelocity(orientation.accZ, orientation.velocityZ, startTimeZ);
-        startTimeZ = ros::Time::now();
-        odom.twist.twist.linear.z = orientation.velocityZ;
-        std::cout << "Velocity in Z: " << orientation.velocityZ << std::endl;
-        break;
-      // Data contained in the buffer related to the roll angle.
-      case '5':
-        orientation.roll = atof(str);
-        odom.pose.pose.orientation.x = orientation.roll;
-        break;
-      // Data contatined in the buffer related to the pitch angle.
-      case '6':
-        orientation.pitch = atof(str);
-        odom.pose.pose.orientation.y = orientation.pitch;
-        std::cout << std::endl << "==================================" << std::endl;
-        break;
-      default:
-        std::cout << "Invalid data! " << std::endl;
-    }
+    std::cout << "Buffer content: " << buffer << std::endl;
+    
+    // Data contained in the buffer realted to pitch values.
+    orientation.pitch = atof(strPitch);
+    std::cout << "Pitch: " << orientation.pitch << std::endl;
+    odom.pose.pose.orientation.y = orientation.pitch;
+    // Data contained in the buffer realted to yaw values.
+    orientation.yaw = atof(strYaw);
+    std::cout << "Yaw: " << orientation.yaw << std::endl;
+    odom.pose.pose.orientation.z = orientation.yaw;
+    // Data contained in the buffer related to the acceleration in x axis.
+    orientation.accX = atof(strX);
+    //correction for excluding gravity effect:
+    orientation.accX = orientation.accX - (sin(orientation.pitch*PI/180)*9.81);
+    orientation.velocityX = ComputeVelocity(orientation.accX, orientation.velocityX, startTimeX);
+    startTimeX = ros::Time::now();
+    odom.twist.twist.linear.x = orientation.velocityX;
+    std::cout << "Acceleration in X: " << orientation.accX << std::endl;
+    // Data contatined in the buffer related to the acceleration in y axis
+    orientation.accY = atof(strY);
+    orientation.velocityY = ComputeVelocity(orientation.accY, orientation.velocityY, startTimeY);
+    startTimeY = ros::Time::now();
+    odom.twist.twist.linear.y = orientation.velocityY;
+    std::cout << "Acceleration in Y: " << orientation.accY << std::endl;
+    // Data contatined in the buffer related to the gyroX axis
+    gyroX = atof(strGyroX);
+    std::cout << "GyroX: " << gyroX << std::endl;
+    odom.twist.twist.angular.x = gyroX;
+    // Data contatined in the buffer related to the gyroY axis
+    gyroY = atof(strGyroY);
+    std::cout << "GyroY: " << gyroY << std::endl;
+    odom.twist.twist.angular.y = gyroY;
+    // Data contatined in the buffer related to the gyroZ axis
+    gyroZ = atof(strGyroZ);
+    std::cout << "GyroZ: " << gyroZ << std::endl;
+    odom.twist.twist.angular.z = gyroZ;
+
+    
+    std::cout << std::endl << "==================================" << std::endl;
+    
     // Publish data over ROS topic.
     ros::spinOnce();
     pub.publish(odom);

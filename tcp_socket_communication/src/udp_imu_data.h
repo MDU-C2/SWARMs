@@ -18,6 +18,9 @@
 //define a prot to be used.
 #define server_port 12345
 
+//define constants
+#define PI 3.14159264
+
 //Definition of IMU variables
 struct imuData{
   double yaw;
