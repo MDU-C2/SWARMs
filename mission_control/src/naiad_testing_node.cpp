@@ -3,24 +3,45 @@
 
 nav_msgs::Odometry msg;
 //message to quit:
-mission_control::motion qMsg;
+//mission_control::motion qMsg;
 //std_msgs::Int16 commandMsg;
 
-ros::NodeHandle n;
+//ros::NodeHandle n;
 
 // used for resetting coordinates.
-ros::Publisher quit = n.advertise<mission_control::motion>("command", 1);
+//ros::Publisher quit = n.advertise<mission_control::motion>("command", 1);
 
+class QuitController
+{
+  public:
+    QuitController();
+    mission_control::motion qMsg;
+    void QuitPublish();
 
-int CheckInput()
+  private:
+    ros::NodeHandle n;
+    ros::Publisher quit;
+};
+
+void QuitController::QuitPublish()
+{
+  quit.publish(qMsg);
+}
+
+QuitController::QuitController()
+{
+  quit = n.advertise<mission_control::motion>("qMsg", 1);
+}
+
+int CheckInput(QuitController quitController)
 { 
   float inputX;
   float inputY;
   float inputAngle;
   char firstArgument;
   //flag to be sent to quit
-  qMsg.x = 0.0;
-  qMsg.y = 0.0;
+  quitController.qMsg.x = 0.0;
+  quitController.qMsg.y = 0.0;
 
   //print command list:
   std::cout << "Enter '0' for help" << std::endl;
@@ -115,14 +136,15 @@ int CheckInput()
     // Stop the Naiad.
     case '8':
       msg.pose.pose.position.z = 8;
-      qMsg.x = 1;
-      quit.publish(qMsg);
+      quitController.qMsg.x = 1;
+      quitController.QuitPublish();
+      break;
     // Quit.
     case '9':
       msg.pose.pose.position.z = 9;
       //Flag to quit
-      qMsg.y = 1;
-      quit.publish(qMsg);
+      quitController.qMsg.y = 1;
+      quitController.QuitPublish();
       std::cout << "Exitng...\n" << std::endl;
       break;
 others:
@@ -180,8 +202,10 @@ int main(int argc, char **argv)
   int inputChecked;
   ros::init(argc, argv,"Naiad_test_node");
   //ros::NodeHandle n;
+  ros::NodeHandle nh;
+  ros::Publisher pub = nh.advertise<nav_msgs::Odometry>("naiad_testing", 1);
 
-  ros::Publisher pub = n.advertise<nav_msgs::Odometry>("naiad_testing", 1);
+  QuitController quitController;
 
   std::cout << "Enter '1' to increase the thrusters threshold" << std::endl;
   std::cout << "Enter '2' to decrease the thrusters threshold" << std::endl;
@@ -195,7 +219,7 @@ int main(int argc, char **argv)
   
   while(ros::ok())
   {
-    inputChecked = CheckInput();
+    inputChecked = CheckInput(quitController);
     pub.publish(msg);
   }
 }
