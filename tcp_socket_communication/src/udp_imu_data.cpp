@@ -6,9 +6,21 @@
 
 
 #include "udp_imu_data.h"
+#include "iostream"
+#include "fstream"
 
 tcp_client client;
 imuData orientation;
+
+
+//Files for collecting IMU data
+std::ofstream accXFile;
+std::ofstream angleYawFile;
+std::ofstream accYFile;
+std::ofstream yawFile;
+std::ofstream gyroXFile;
+std::ofstream gyroYFile;
+std::ofstream gyroZFile;
 
 // This function compute the velocity given the acceleration. 
 // The parameters are: the acceleration from the IMU, the previous velocity
@@ -100,34 +112,45 @@ int main(int argc, char **argv)
     orientation.pitch = atof(strPitch);
     std::cout << "Pitch: " << orientation.pitch << std::endl;
     odom.pose.pose.orientation.y = orientation.pitch;
+
     // Data contained in the buffer realted to yaw values.
     orientation.yaw = atof(strYaw);
+    angleYawFile << orientation.yaw << std::endl; //write data in file,
     std::cout << "Yaw: " << orientation.yaw << std::endl;
     odom.pose.pose.orientation.z = orientation.yaw;
+    
     // Data contained in the buffer related to the acceleration in x axis.
     orientation.accX = atof(strX);
     //correction for excluding gravity effect:
     orientation.accX = orientation.accX - (sin(orientation.pitch*PI/180)*9.81);
+    accXFile << orientation.accX << std::endl; //write data into file
     orientation.velocityX = ComputeVelocity(orientation.accX, orientation.velocityX, startTimeX);
     startTimeX = ros::Time::now();
     odom.twist.twist.linear.x = orientation.velocityX;
     std::cout << "Acceleration in X: " << orientation.accX << std::endl;
+    
     // Data contatined in the buffer related to the acceleration in y axis
     orientation.accY = atof(strY);
     orientation.velocityY = ComputeVelocity(orientation.accY, orientation.velocityY, startTimeY);
     startTimeY = ros::Time::now();
     odom.twist.twist.linear.y = orientation.velocityY;
     std::cout << "Acceleration in Y: " << orientation.accY << std::endl;
+    
     // Data contatined in the buffer related to the gyroX axis
     gyroX = atof(strGyroX);
+    gyroXFile << gyroX << std::endl; //write data into file
     std::cout << "GyroX: " << gyroX << std::endl;
     odom.twist.twist.angular.x = gyroX;
+    
     // Data contatined in the buffer related to the gyroY axis
     gyroY = atof(strGyroY);
+    gyroYFile << gyroY << std::endl;
     std::cout << "GyroY: " << gyroY << std::endl;
     odom.twist.twist.angular.y = gyroY;
+    
     // Data contatined in the buffer related to the gyroZ axis
     gyroZ = atof(strGyroZ);
+    gyroZFile << gyroZ << std::endl;
     std::cout << "GyroZ: " << gyroZ << std::endl;
     odom.twist.twist.angular.z = gyroZ;
 

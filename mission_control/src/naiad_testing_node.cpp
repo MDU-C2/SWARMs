@@ -10,8 +10,14 @@ nav_msgs::Odometry msg;
 
 // used for resetting coordinates.
 //ros::Publisher quit = n.advertise<mission_control::motion>("command", 1);
+/*
+virtual class Node
+{
+  private:
+    ros::NodeHandle n;
+};*/
 
-class QuitController
+class QuitController : private Node
 {
   public:
     QuitController();
