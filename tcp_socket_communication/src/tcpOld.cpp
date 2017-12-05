@@ -1,9 +1,3 @@
-//-------------------------
-// TCP
-// Last modified: 04.12.17
-// Notes:
-// -------------------------
-
 #include "tcp.h"
 /*
  * This ROS node listen to the control topic and transfer that information to the 
@@ -13,25 +7,12 @@
 bool goToSurface = false;
 
 //Callcback function used for sending control information to the BBB:
-bool TcpSender(const std_msgs::String msg)
+bool TcpSender(const mission_control::motion msg)
 {
-  //std::cout << std::endl << "|| " << msg.data << " ||" << std::endl ;
   tcp_client client;
   //TODO check the buffer size! not sure!
-  //int bufferSize = 1024;
-  //std::cout << "BS: " << bufferSize << std::endl;
-	char buffer[1024];
-  strcpy(buffer, msg.data.c_str());
-  std::cout << std::endl << "|| " << buffer << " ||" << std::endl ;
-  
-  
-  //buffer = msg.data.c_str();
-  /*
-  for (int iii = 0; iii < bufferSize; iii++)
-  {
-    buffer[iii] = msg.data[iii];
-  }
-  */
+	int buffer_size = 1024;
+	char buffer[buffer_size];
   client.init();
   client.sock = socket(AF_INET, SOCK_STREAM, 0);
   //If an error occurs
@@ -41,7 +22,7 @@ bool TcpSender(const std_msgs::String msg)
     return 0;
   }
 
- // std::cout << msg.x << " " << msg.y << std::endl;
+  std::cout << msg.x << " " << msg.y << std::endl;
 
   //If no error occurs
   ROS_INFO("Connecting to server");
@@ -64,25 +45,25 @@ bool TcpSender(const std_msgs::String msg)
 	//}
 	ROS_INFO("Connection established");
 	//Putting the values to be sent into a character array
-	//sprintf(buffer, "%f", msg.x);
-	//sprintf(buffer+8, "%f", msg.y);
-	//sprintf(buffer+16, "%f", msg.z);
-	//sprintf(buffer+24, "%f", msg.roll);
-	//sprintf(buffer+32, "%f", msg.pitch);
-	//sprintf(buffer+40, "%f", msg.yaw);
+	sprintf(buffer, "%f", msg.x);
+	sprintf(buffer+8, "%f", msg.y);
+	sprintf(buffer+16, "%f", msg.z);
+	sprintf(buffer+24, "%f", msg.roll);
+	sprintf(buffer+32, "%f", msg.pitch);
+	sprintf(buffer+40, "%f", msg.yaw);
 
-  //if (goToSurface)
-  //{
-   // sprintf(buffer+48, "%d", 99);
-//    goToSurface = false;
- // }
- // else
- // {
-  //  sprintf(buffer+48, "%d", 88);
-//  }
+  if (goToSurface)
+  {
+    sprintf(buffer+48, "%d", 99);
+    goToSurface = false;
+  }
+  else
+  {
+    sprintf(buffer+48, "%d", 88);
+  }
 
   //Just a print to see that all is OK
- // std::cout << buffer << " " << strlen(buffer);
+  std::cout << buffer << " " << strlen(buffer);
   //Send the information to the ADA server.
   ROS_INFO("Sending...");
   if (send(client.sock, buffer, strlen(buffer), 0) < 0)
@@ -96,7 +77,7 @@ bool TcpSender(const std_msgs::String msg)
 }
 
 //
-void ControlTcpCallback(const std_msgs::String &msg)
+void ControlTcpCallback(const mission_control::motion &msg)
 {
   if(TcpSender(msg))
   {
@@ -114,7 +95,7 @@ void GoToSurfaceCallback(const mission_control::motion &msg)
 
 int main(int argc, char **argv)
 {
-	ros::init(argc, argv, "Control_sender");
+	ros::init(argc, argv, "tcp_coord_service");
 	ros::NodeHandle n;
 
 	//ros::ServiceServer service = n.advertiseService("coord_service", client_service);

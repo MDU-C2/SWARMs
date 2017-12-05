@@ -140,6 +140,7 @@ int main(int argc, char **argv)
     
     // Data contatined in the buffer related to the acceleration in y axis
     orientation.accY = atof(strY);
+    accYFile << orientation.accY << std::endl; //write data into file
     orientation.velocityY = ComputeVelocity(orientation.accY, orientation.velocityY, startTimeY);
     startTimeY = ros::Time::now();
     odom.twist.twist.linear.y = orientation.velocityY;

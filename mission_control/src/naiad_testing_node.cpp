@@ -37,12 +37,14 @@ class QuitController
 {
   public:
     QuitController();
-    mission_control::motion qMsg;
     void QuitPublish();
+    void SetQuitMsg(int setData);
+    std_msgs::Int16 GetQuitMsg();
 
   private:
     ros::NodeHandle n;
     ros::Publisher quit;
+    std_msgs::Int16 qMsg;
 };
 
 void QuitController::QuitPublish()
@@ -50,20 +52,56 @@ void QuitController::QuitPublish()
   quit.publish(qMsg);
 }
 
+void QuitController::SetQuitMsg(int setData)
+{
+  qMsg.data = setData;
+}
+
+std_msgs::Int16 QuitController::GetQuitMsg()
+{
+  return qMsg;
+}
+
 QuitController::QuitController()
 {
-  quit = n.advertise<mission_control::motion>("qMsg", 1);
+  quit = n.advertise<std_msgs::Int16>("qMsg", 1);
+  qMsg.data = 0;
 }
+
+int EnterCoordinate()
+{
+  float inputX;
+  float inputY;
+  msg.pose.pose.position.z = 4;
+  std::cout << "Enter x coordinate: ";
+  std::cin >> inputX;
+  if (std::cin.fail())
+  {
+		std::cin.clear();
+    std::cin.ignore();
+    std::cout << "Not a number..." << std::endl;
+    return -1;
+  }
+  std::cout << std::endl;
+  std::cout << "Enter y coordinate: ";
+  std::cin >> inputY;
+  if (std::cin.fail())
+  {
+  	std::cin.clear();
+    std::cin.ignore();
+    std::cout << "Not a number..." << std::endl;
+    return -1;
+  }
+  msg.pose.pose.position.x = inputX;
+  msg.pose.pose.position.y = inputY;
+}
+
 
 int CheckInput(QuitController quitController)
 { 
-  float inputX;
-  float inputY;
   float inputAngle;
   char firstArgument;
   //flag to be sent to quit
-  quitController.qMsg.x = 0.0;
-  quitController.qMsg.y = 0.0;
 
   //print command list:
   std::cout << "Enter '0' for help" << std::endl;
@@ -102,29 +140,7 @@ int CheckInput(QuitController quitController)
     // Let the user inser custom coordinates.
     // Check for inputs and allows only integers.
     case '4':
-      msg.pose.pose.position.z = 4;
-      std::cout << "Enter x coordinate: ";
-      std::cin >> inputX;
-      if (std::cin.fail())
-      {
-        std::cin.clear();
-        std::cin.ignore();
-        std::cout << "Not a number..." << std::endl;
-        break;
-      }
-      std::cout << std::endl;
-      std::cout << "Enter y coordinate: ";
-      std::cin >> inputY;
-      if (std::cin.fail())
-      {
-        std::cin.clear();
-        std::cin.ignore();
-        std::cout << "Not a number..." << std::endl;      
-        break;
-      }
-      msg.pose.pose.position.x = inputX;
-      msg.pose.pose.position.y = inputY;
-
+			EnterCoordinate();
       std::cout << std::endl;
       break;
     // Move the Naiad up.
@@ -158,14 +174,14 @@ int CheckInput(QuitController quitController)
     // Stop the Naiad.
     case '8':
       msg.pose.pose.position.z = 8;
-      quitController.qMsg.x = 1;
+      quitController.SetQuitMsg(1);
       quitController.QuitPublish();
       break;
     // Quit.
     case '9':
       msg.pose.pose.position.z = 9;
       //Flag to quit
-      quitController.qMsg.y = 1;
+      quitController.SetQuitMsg(2);
       quitController.QuitPublish();
       std::cout << "Exitng...\n" << std::endl;
       break;

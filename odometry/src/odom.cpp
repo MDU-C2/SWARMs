@@ -1,4 +1,5 @@
 #include "odom.h"
+#include "std_msgs/Int16.h"
 
 
 bool moving = false;
@@ -66,9 +67,9 @@ void MovingCallback(const mission_control::motion &msg)
   }
 }
 
-void ResetCallback(const mission_control::motion &qMsg){
+void ResetCallback(const std_msgs::Int16 &qMsg){
   // received a message to reset
-  if(qMsg.x ==  1) {
+  if(qMsg.data ==  1) {
     position.vx = 0.0;
     position.vy = 0.0;
     position.vz = 0.0;
