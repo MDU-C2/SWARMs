@@ -17,7 +17,23 @@ virtual class Node
     ros::NodeHandle n;
 };*/
 
+//-----------------------------------------
+/* PREVIOUS IMPLEMENTATION!!!!!!!!!!!!!
 class QuitController : private Node
+{
+  public:
+    QuitController();
+    mission_control::motion qMsg;
+    void QuitPublish();
+
+  private:
+    ros::NodeHandle n;
+    ros::Publisher quit;
+};
+*/
+//-----------------------------------------
+
+class QuitController
 {
   public:
     QuitController();

@@ -17,7 +17,7 @@ imuData orientation;
 std::ofstream accXFile;
 std::ofstream angleYawFile;
 std::ofstream accYFile;
-std::ofstream yawFile;
+std::ofstream anglePitchFile;
 std::ofstream gyroXFile;
 std::ofstream gyroYFile;
 std::ofstream gyroZFile;
@@ -52,6 +52,15 @@ int main(int argc, char **argv)
   ros::Publisher pub = n.advertise<nav_msgs::Odometry>("IMU_data_for_odom", 1);
   ros::Subscriber sub_moving = n.subscribe("moving", 1, MovingCallback);
   nav_msgs::Odometry odom;
+  
+  accXFile.open("X_data.txt");
+  accYFile.open("Y_data.txt");
+  angleYawFile.open("Yaw_data.txt");
+  anglePitchFile.open("Pitch_data.txt");
+  gyroXFile.open("GyroX_data.txt");
+  gyroYFile.open("GyroY_data.txt");
+  gyroZFile.open("GyroZ_data.txt");
+
 
 	int valread;
   char buffer[64];
