@@ -229,3 +229,4 @@ add_dependencies(test_edge ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED
 add_executable(test_squares src/test_squares.cpp)
 target_link_libraries(test_squares ${catkin_LIBRARIES} ${OpenCV_LIBS})
 add_dependencies(test_squares ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+

@@ -35,26 +35,26 @@ int thresh = 50, N = 11;
 const char* wndname = "Square Detection Demo";
 const char* crpd_wndname = "Found Squares";
 
-int red_iLowH = 0;//110;//47;
-int red_iHighH = 9;//179;//179;
+int red_iLowH = 0;
+int red_iHighH = 179;
 
-int red_iLowS = 171;//74;//154; 
+int red_iLowS = 176; 
 int red_iHighS = 255;
 
-int red_iLowV = 53;//39;//54;
+int red_iLowV = 47;
 int red_iHighV = 255;
 
 
 //////////////////////////
 
-int green_iLowH = 21;//51;//33;
-int green_iHighH = 119;//179;//99;
+int green_iLowH = 25;//21;//51;//33;
+int green_iHighH = 166;//119;//179;//99;
 
-int green_iLowS = 119;//175;//121; 
+int green_iLowS = 85;//119;//175;//121; 
 int green_iHighS = 255;
 
 int green_iLowV = 0;
-int green_iHighV = 62;//105;//121;
+int green_iHighV = 76;//62;//105;//121;
 
 
 // helper function:
@@ -180,18 +180,22 @@ Point findColor( Mat &cropped, Rect bbox, int iLowH, int iLowS, int iLowV, int i
     // previous implementation (Arman)
 		//cout << "iLowH: " << iLowH << ", arcLength: " << arcLength(contour[0], false) << endl;
     fitLine(contour[0], line, CV_DIST_L2, 0, 0.01, 0.01);
-		cout << "iLowH: " << iLowH << ", Line_x0: " << line[2] << ", Line_y0: " << line[3] << endl;
+    Moments m = moments(imgThresholded, false);
+    center = Point( m.m10/m.m00 , m.m01/m.m00 );
+    center.x += bbox.x;
+    center.y += bbox.y;
+	  cout << "iLowH: " << iLowH << ", Line_vX: " << line[0] << ", Line_vY: " << line[1] << endl;
     //cout << "--------------------" << endl;
     //cout << "iLowH: " << iLowH;
     //cout << "Line"
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   }
 
-	Moments m = moments(imgThresholded, false);
-	center = Point( m.m10/m.m00 , m.m01/m.m00 );
+	//Moments m = moments(imgThresholded, false);
+	//center = Point( m.m10/m.m00 , m.m01/m.m00 );
 
-	center.x += bbox.x;
-	center.y += bbox.y;
+	//center.x += bbox.x;
+	//center.y += bbox.y;
 	
 	//cout << "x: " <<  center.x << endl;
 	//cout << "y: " <<  center.y << endl;
@@ -207,20 +211,20 @@ Point findGate(Mat cropped, Rect bbox)
 {
   vector<float> redLine (4);
   vector<float> greenLine (4);
+  Point centroid = Point(-1,-1);
   //Mat redLine;
   //Mat greenLine;
 	Point red = findColor( cropped, bbox, red_iLowH, red_iLowS, red_iLowV, red_iHighH, red_iHighS, red_iHighV, redLine ); //red
 	Point green = findColor( cropped, bbox, green_iLowH, green_iLowS, green_iLowV, green_iHighH, green_iHighS, green_iHighV, greenLine ); //green
 
-	if(red.x != -1 && red.y != -1 && green.x != -1 && green.y != -1)
+	if(red.x != -1 && red.y != -1 && green.x != -1 && green.y != -1 &&
+      abs(redLine[0] - greenLine[0]) < 0.1 && abs(redLine[1] - greenLine[1]) < 0.1)
 	{
-		Point centroid = Point( (red.x + green.x) / 2, (red.y + green.y) / 2 );
+		centroid = Point( (red.x + green.x) / 2, (red.y + green.y) / 2 );
 		cout << "Distance: " << sqrt( (red.x - green.x) * (red.x - green.x) + (red.y - green.y) * (red.y - green.y) ) << endl;
-		return centroid;
 	}
 
-	else
-		return Point(-1, -1);	
+	return centroid;	
 }
 
 // the function draws all the squares in the image
