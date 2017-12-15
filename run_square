@@ -1,0 +1,11 @@
+#!/bin/bash
+ 
+xterm -title "Core" -hold -e "roscore"&
+#sleep 1
+xterm -title "Calibration1" -hold -e "rosrun cv_camera cv_camera_node"&
+#sleep 1
+xterm -title "Calibration2" -hold -e "ROS_NAMESPACE=cv_camera rosrun image_proc image_proc"&
+#sleep 1
+xterm -title "test_square" -hold -e "rosrun color_detection test_squares"
+#sleep 1 
+exit 0

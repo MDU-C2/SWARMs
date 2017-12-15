@@ -1,0 +1,2 @@
+color_detection:cv_camera:vision_opencv/cv_bridge:vision_opencv/image_geometry:vision_opencv/opencv_tests:vision_opencv/vision_opencv:viso2-arm/libviso2:viso2-arm/viso2:viso2-arm/viso2_ros
+-DCATKIN_DEVEL_PREFIX=/home/naiad/catkin_ws/devel -DCMAKE_INSTALL_PREFIX=/home/naiad/catkin_ws/install -G Unix Makefiles

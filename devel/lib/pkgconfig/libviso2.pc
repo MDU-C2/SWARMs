@@ -1,0 +1,8 @@
+prefix=/home/naiad/catkin_ws/devel
+
+Name: libviso2
+Description: Description of libviso2
+Version: 0.0.1
+Cflags: -I/home/naiad/catkin_ws/src/viso2-arm/libviso2/libviso2/src
+Libs: -L/home/naiad/catkin_ws/devel/lib -lviso2
+Requires: 
