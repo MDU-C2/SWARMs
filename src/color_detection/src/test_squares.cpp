@@ -152,7 +152,7 @@ static void findSquares( const Mat& image, vector<vector<Point> >& squares )
 }
 
 
-Point findColor( Mat &cropped, Rect bbox, int iLowH, int iLowS, int iLowV, int iHighH, int iHighS, int iHighV, vector<float> &line) //vector<Point> &line )
+Point findColor( Mat &cropped, Rect bbox, int iLowH, int iLowS, int iLowV, int iHighH, int iHighS, int iHighV, vector<float> &line, double &length) //vector<Point> &line )
 {
 	Point center = Point(-1,-1);
 	Mat imgHSV;
@@ -177,17 +177,13 @@ Point findColor( Mat &cropped, Rect bbox, int iLowH, int iLowS, int iLowV, int i
 	findContours(imgThresholded, contour, RETR_LIST, CHAIN_APPROX_SIMPLE);
 	if(contour.size() > 0) 
   {
-    // previous implementation (Arman)
-		//cout << "iLowH: " << iLowH << ", arcLength: " << arcLength(contour[0], false) << endl;
+		length = arcLength(contour[0], false);
     fitLine(contour[0], line, CV_DIST_L2, 0, 0.01, 0.01);
     Moments m = moments(imgThresholded, false);
     center = Point( m.m10/m.m00 , m.m01/m.m00 );
     center.x += bbox.x;
     center.y += bbox.y;
 	  cout << "iLowH: " << iLowH << ", Line_vX: " << line[0] << ", Line_vY: " << line[1] << endl;
-    //cout << "--------------------" << endl;
-    //cout << "iLowH: " << iLowH;
-    //cout << "Line"
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   }
 
@@ -212,16 +208,28 @@ Point findGate(Mat cropped, Rect bbox)
   vector<float> redLine (4);
   vector<float> greenLine (4);
   Point centroid = Point(-1,-1);
-  //Mat redLine;
-  //Mat greenLine;
-	Point red = findColor( cropped, bbox, red_iLowH, red_iLowS, red_iLowV, red_iHighH, red_iHighS, red_iHighV, redLine ); //red
-	Point green = findColor( cropped, bbox, green_iLowH, green_iLowS, green_iLowV, green_iHighH, green_iHighS, green_iHighV, greenLine ); //green
+  double redLength = 0.0;
+  double greenLength = 0.0;
+	Point red = findColor( cropped, bbox, red_iLowH, red_iLowS, red_iLowV, red_iHighH, red_iHighS, red_iHighV, redLine, redLength ); //red
+	Point green = findColor( cropped, bbox, green_iLowH, green_iLowS, green_iLowV, green_iHighH, green_iHighS, green_iHighV, greenLine, greenLength ); //green
 
 	if(red.x != -1 && red.y != -1 && green.x != -1 && green.y != -1 &&
       abs(redLine[0] - greenLine[0]) < 0.1 && abs(redLine[1] - greenLine[1]) < 0.1)
 	{
 		centroid = Point( (red.x + green.x) / 2, (red.y + green.y) / 2 );
 		cout << "Distance: " << sqrt( (red.x - green.x) * (red.x - green.x) + (red.y - green.y) * (red.y - green.y) ) << endl;
+    if(redLength > greenLength)
+    {
+      cout << "Go right!" << endl;
+    } 
+    else if (redLength < greenLength) 
+    {
+      cout << "Go left!" << endl;
+    }
+    else 
+    {
+      cout << "Go straight!" << endl;
+    }
 	}
 
 	return centroid;	
