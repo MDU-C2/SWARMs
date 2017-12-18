@@ -11,6 +11,7 @@ std_msgs::String controlMsg;
 bool gotGoal = false;
 bool onlyAngle = false;
 bool square = false;
+bool goX = false;
 float height = 0.0;
 char buffer[BUFFER_SIZE];
 
@@ -244,13 +245,13 @@ void TestingCallback(const nav_msgs::Odometry::ConstPtr& msg)
 {
   ros::Rate r(0.1);
   //int sw = (int)msg->pose.pose.position.z;
-  
+  sprintf(buffer+48, "00");
   switch((int)msg->pose.pose.position.z)
   {
     // Increase the trashold.
     case 1:
       sprintf(buffer+48, "%d", 11);
-      std::cout << "" << std::endl;
+      std::cout << "Case 1" << std::endl;
       break;
     // Decrease the trashold.
     case 2:
@@ -306,6 +307,17 @@ void TestingCallback(const nav_msgs::Odometry::ConstPtr& msg)
         checkpoint = '0';
         break;
         //quit
+    case 10:
+        if (!goX)
+        {
+          sprintf(buffer, "%f", 50.0);
+          goX = true;
+        }else{
+          sprintf(buffer, "%f", 0.0);
+          goX = false;
+        }
+        ROS_INFO("Case 10!!");
+        break;
   }
   /*
   if (msg->pose.pose.position.x == 100)

@@ -185,6 +185,9 @@ int CheckInput(QuitController quitController)
       quitController.QuitPublish();
       std::cout << "Exitng...\n" << std::endl;
       break;
+    case 'x':
+      msg.pose.pose.position.z = 10;
+      break;
 others:
       break;
   }

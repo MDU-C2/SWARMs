@@ -8,6 +8,7 @@
 #include "udp_imu_data.h"
 #include "iostream"
 #include "fstream"
+#include "std_msgs/Float64.h"
 
 tcp_client client;
 imuData orientation;
@@ -50,8 +51,10 @@ int main(int argc, char **argv)
   ros::init(argc, argv, "UDP_YAW_Receiver");
   ros::NodeHandle n;
   ros::Publisher pub = n.advertise<nav_msgs::Odometry>("IMU_data_for_odom", 1);
+  ros::Publisher pubAccX = n.advertise<std_msgs::Float64>("AccX", 1);
   ros::Subscriber sub_moving = n.subscribe("moving", 1, MovingCallback);
   nav_msgs::Odometry odom;
+  std_msgs::Float64 accMsg;
   
   accXFile.open("X_data.txt");
   accYFile.open("Y_data.txt");
@@ -132,6 +135,7 @@ int main(int argc, char **argv)
     orientation.accX = atof(strX);
     //correction for excluding gravity effect:
     orientation.accX = orientation.accX - (sin(orientation.pitch*PI/180)*9.81);
+    accMsg.data = orientation.accX;
     accXFile << orientation.accX << std::endl; //write data into file
     orientation.velocityX = ComputeVelocity(orientation.accX, orientation.velocityX, startTimeX);
     startTimeX = ros::Time::now();
@@ -170,5 +174,6 @@ int main(int argc, char **argv)
     // Publish data over ROS topic.
     ros::spinOnce();
     pub.publish(odom);
+    pubAccX.publish(accMsg);
   }
 }

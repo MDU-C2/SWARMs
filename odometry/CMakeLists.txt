@@ -210,5 +210,8 @@ add_executable(axis_speed src/axis_speed.cpp)
 target_link_libraries(axis_speed ${catkin_LIBRARIES})
 add_executable(testing_tracking src/testing_tracking.cpp)
 target_link_libraries(testing_tracking ${catkin_LIBRARIES})
+add_executable(kalman_filter src/kalman_filter.cpp)
+target_link_libraries(kalman_filter ${catkin_LIBRARIES})
+
 #add_executable(test_imu src/test_imu.cpp)
 #target_link_libraries(test_imu ${catkin_LIBRARIES})
