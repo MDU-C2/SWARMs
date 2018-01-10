@@ -149,6 +149,7 @@ void *SaveImageThreadFcn(void *arg)
 	//clock_t ms;
 char add_ms[4];
 
+
 	pthread_mutex_lock(&saving_image_mutex);
 	saving_image = true;
 	pthread_mutex_unlock(&saving_image_mutex);
@@ -181,46 +182,34 @@ char add_ms[4];
 	time_str[2] = '_';
 	time_str[5] = '_';
 	time_str[8] = '_';
-	int nr_el = LengthHelper(abs(res)); //dont forget to add something about if x == 0!
+	int nr_el = LengthHelper(abs(res));
 	printf("ELEMENTS: %d\n", nr_el);
 
-	strncpy(filename0,time_str,9);   //copy no more than 8 char from time_str to filename0
+	strncpy(filename0,time_str,9);   //copy no more than 9 char from time_str to filename0
 	strncpy(filename0+9, add_ms, nr_el*sizeof(char));
 	strcat(filename0,"_0.bmp");      // append _0.bmp onto filename0, THEY ARE FIRST SAVED AS BMP BUT WITH .JPG EXTENSION
-	SaveBmpImageData(im_save->fb_addr0, filename0, im_save->image_size.w, im_save->image_size.h, im_save->image_size.bpp, 1); //_0 is left cam from behind
+	//SaveBmpImageData(im_save->fb_addr0, filename0, im_save->image_size.w, im_save->image_size.h, im_save->image_size.bpp, 1); //_0 is left cam from behind
+
+
 
 	strncpy(filename1,time_str,9);
 	strncpy(filename1+9, add_ms, nr_el*sizeof(char));
 	strcat(filename1,"_1.bmp");
-	SaveBmpImageData(im_save->fb_addr1, filename1, im_save->image_size.w, im_save->image_size.h, im_save->image_size.bpp, 1); //_1 is right cam from behind
 
 
-	////////////// ctrl+z until here
-//	//int ret = system("cd /media/card && ./ResizeConvert filename0"); //files are saved as jpeg but the name is still .bmp
-//	int ret = execl("/media/card/ResizeConvert", filename0,(char*) NULL);
-//	printf("return value from system(): %d\n", ret);
-//
-//	  if (ret < 0){
-//		  puts("system() failed");
-//		  int errnum = errno; //assign the error nr
-//		  fprintf(stderr, "value of errno: %d\n", errno);
-//		  perror("the reason of errno");
-//		  fprintf(stderr, "error binding: %s\n", strerror(errnum));
-//		  //printf("bind returns: %d\n",bind_result);
-//		  return 1;
-//	  }
+	//SaveBmpImageData(im_save->fb_addr0,im_save->fb_addr1, filename0,filename1, im_save->image_size.w, im_save->image_size.h, im_save->image_size.bpp, 1); //_0 is left cam from behind
+	//SaveBmpImage(im_save->fb_addr0,im_save->fb_addr1, filename0,filename1, im_save->image_size.w, im_save->image_size.h, im_save->image_size.bpp, 1);
+	//SaveJpgImageData(im_save->fb_addr0,im_save->fb_addr1, filename0,filename1, im_save->image_size.w, im_save->image_size.h, im_save->image_size.bpp, 1);
+	SaveJpgImage(im_save->fb_addr0,im_save->fb_addr1, filename0,filename1, im_save->image_size.w, im_save->image_size.h, im_save->image_size.bpp, 1);
+
+
+	//SaveBmpImageData(im_save->fb_addr1, filename1, im_save->image_size.w, im_save->image_size.h, im_save->image_size.bpp, 1); //_1 is right cam from behind
 
 
 
-//InitTcpServer(filename0, filename1); //send the stereo pairs to the odroid
 //remove(filename0);
 //remove(filename1);
 
-
-//	sprintf(filename0, "%d_0.bmp",im_save->seq_no);
-//	SaveImage(im_save->fb_addr0, filename0, im_save->image_size.w, im_save->image_size.h, im_save->image_size.bpp, 1);
-//	sprintf(filename1, "%d_1.bmp",im_save->seq_no);
-//	SaveImage(im_save->fb_addr1, filename1, im_save->image_size.w, im_save->image_size.h, im_save->image_size.bpp, 1);
 
 	printf("Saving to FB: %x %x\n",im_save->fb_addr0,im_save->fb_addr1);
 

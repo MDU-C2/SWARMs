@@ -39,9 +39,12 @@ int CheckResults(uint32_t BaseAddress, int memLen, int resolution);
 int SendImage(uint32_t BaseAddress, uint16_t width, uint16_t height, uint16_t bpp);
 int SendImage_mem(image_t* img, char id);
 
-int SaveJpgImageData(uint32_t BaseAddress, char* filename, uint16_t width, uint16_t height, uint16_t bpp, uint8_t scale);
-int SaveBmpImage(uint32_t BaseAddress, char* filename, uint16_t width, uint16_t height, uint16_t bpp, uint8_t scale);
-int SaveBmpImageData(uint32_t BaseAddress, char* filename, uint16_t width, uint16_t height, uint16_t bpp, uint8_t scale);
+int SaveJpgImage(uint32_t BaseAddress,uint32_t BaseAddress1, char* filename,char* filename1, uint16_t width, uint16_t height, uint16_t bpp, uint8_t scale);
+int SaveJpgImageData(uint32_t BaseAddress,uint32_t BaseAddress1, char* filename,char* filename1, uint16_t width, uint16_t height, uint16_t bpp, uint8_t scale);
+//int SaveJpgImageData(uint32_t BaseAddress, char* filename, uint16_t width, uint16_t height, uint16_t bpp, uint8_t scale);
+//int SaveBmpImage(uint32_t BaseAddress, char* filename, uint16_t width, uint16_t height, uint16_t bpp, uint8_t scale);
+int SaveBmpImage(uint32_t BaseAddress,uint32_t BaseAddress1, char* filename,char* filename1, uint16_t width, uint16_t height, uint16_t bpp, uint8_t scale);
+int SaveBmpImageData(uint32_t BaseAddress,uint32_t BaseAddress1, char* filename,char* filename1, uint16_t width, uint16_t height, uint16_t bpp, uint8_t scale);
 
 int SaveImage32(uint32_t BaseAddress, char* filename);
 int SaveImage_mem(image_t* im, char* filename);

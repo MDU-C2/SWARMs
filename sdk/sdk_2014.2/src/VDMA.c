@@ -40,6 +40,12 @@ uint32_t DEADBEEF = 0xDEADBEEF;
 #define BMPINFOHEADER_SIZE_32 108
 
 uint32_t BPP = 4;
+
+
+int SaveBmpToSd = 0;
+int SaveJpgToSd = 0;
+
+
 //#define BPP 4 //bytes per pixel
 //#define bpp 3 //bytes per pixel
 
@@ -311,7 +317,7 @@ printf("Total Picture size: %i\n",size);
 
 //Send Picture Size
 printf("Sending picture size\n");
-write(socket, (void *)&size, sizeof(int)); //sending size of the image
+write(socket, (void *)&size, sizeof(int)); //sending size of the data
 
 //Send Picture as Byte Array
 printf("Sending picture as byte array\n");
@@ -1045,11 +1051,20 @@ int SendImage_mem(image_t* img, char id)
 }
 
 
-
-int SaveJpgImage(uint32_t BaseAddress, char* filename, uint16_t width, uint16_t height, uint16_t bpp, uint8_t scale)
+int SaveJpgImage(uint32_t BaseAddress,uint32_t BaseAddress1, char* file_name,char* file_name1, uint16_t width, uint16_t height, uint16_t bpp, uint8_t scale)
+//int SaveJpgImage(uint32_t BaseAddress, char* file_name, uint16_t width, uint16_t height, uint16_t bpp, uint8_t scale)//FIXED THE FILENAME EXTENSION, DO THE SAME WITH JPG DATA
 {
 
+//char filename[strlen(file_name)];
+//char filename1[strlen(file_name1)];
+
+char filename[20];
+char filename1[20];
+memset(filename, '\0', sizeof(filename));
+memset(filename1, '\0', sizeof(filename));
+
 	char mem_arr[width*height*bpp];
+	char mem_arr1[width*height*bpp];
 
 	int map_len = (width*height*bpp);
 	int fd = open( "/dev/mem", (O_RDWR | O_SYNC));
@@ -1060,6 +1075,7 @@ int SaveJpgImage(uint32_t BaseAddress, char* filename, uint16_t width, uint16_t 
 	}
 
 	unsigned char* mem_base = (unsigned char*)mmap(NULL, map_len, PROT_READ | PROT_WRITE, MAP_SHARED, fd, (off_t)BaseAddress);
+	unsigned char* mem_base1 = (unsigned char*)mmap(NULL, map_len, PROT_READ | PROT_WRITE, MAP_SHARED, fd, (off_t)BaseAddress1);
 
 	if(mem_base == MAP_FAILED)
 	{
@@ -1067,35 +1083,61 @@ int SaveJpgImage(uint32_t BaseAddress, char* filename, uint16_t width, uint16_t 
 		close(fd);
 		return -1;
 	}
+	if(mem_base1 == MAP_FAILED)
+	{
+		perror("Mapping memory for absolute memory access failed.\n");
+		close(fd);
+		return -1;
+	}
 
 
+	strncpy(filename,file_name,strlen(file_name)-3); //change extension to jpg
+	strncpy(filename1,file_name1,strlen(file_name1)-3);
 
-
+//if (file_name[strlen(file_name)-5] == '0'){
+	strcat(filename,"jpg");
+//}else if (file_name[strlen(file_name)-5] == '1'){
+	strcat(filename1,"jpg");
+//}else{
+//	printf("sometings wrong when appending jpg extension\n");
+//}
+//printf("filename on appanded file: %s\n",filename);
 	memcpy(&mem_arr, mem_base, map_len); //copy the image data from the shared memory, from start address mem_base, copy the length of map_len to the char array mem_arr
+	memcpy(&mem_arr1, mem_base1, map_len);
+
 	//unsigned char mem[400000];
 	//unsigned long mem_size = 0;
 	ConvertImage(filename, mem_arr, width, height, bpp); //send img data to this function, the img file is created and saved to sd card
+	ConvertImage(filename1, mem_arr1, width, height, bpp);
 
-	//InitTcpImageServer(filename);
-
+	//if(!SaveJpgToSd){
+	InitTcpImageServer(filename);
+	InitTcpImageServer(filename1);
+	//}
 
 
 	printf("Image saved...%s \n",filename);
+	printf("Image saved...%s \n",filename1);
 
 	munmap((void *)mem_base, map_len); // deallocate the space of the image elements in shared mem when sent
+	munmap((void *)mem_base1, map_len);
+
 	close(fd);
 
 
 	return 0;
 
 }
+////////////////////////////////////////////7 /////////////////////////
 
-
-
-int SaveJpgImageData(uint32_t BaseAddress, char* filename, uint16_t width, uint16_t height, uint16_t bpp, uint8_t scale)
+int SaveJpgImageData(uint32_t BaseAddress,uint32_t BaseAddress1, char* file_name,char* file_name1, uint16_t width, uint16_t height, uint16_t bpp, uint8_t scale)
+//int SaveJpgImageData(uint32_t BaseAddress, char* filename, uint16_t width, uint16_t height, uint16_t bpp, uint8_t scale) //cant be saved to the gimme2 sdcard since the img data is sent away
 {
+	char filename[strlen(file_name)];
+	char filename1[strlen(file_name1)];
 
 	char mem_arr[width*height*bpp];
+	char mem_arr1[width*height*bpp];
 
 	int map_len = (width*height*bpp);
 	int fd = open( "/dev/mem", (O_RDWR | O_SYNC));
@@ -1106,6 +1148,7 @@ int SaveJpgImageData(uint32_t BaseAddress, char* filename, uint16_t width, uint1
 	}
 
 	unsigned char* mem_base = (unsigned char*)mmap(NULL, map_len, PROT_READ | PROT_WRITE, MAP_SHARED, fd, (off_t)BaseAddress);
+	unsigned char* mem_base1 = (unsigned char*)mmap(NULL, map_len, PROT_READ | PROT_WRITE, MAP_SHARED, fd, (off_t)BaseAddress1);
 
 	if(mem_base == MAP_FAILED)
 	{
@@ -1113,24 +1156,43 @@ int SaveJpgImageData(uint32_t BaseAddress, char* filename, uint16_t width, uint1
 		close(fd);
 		return -1;
 	}
+	if(mem_base1 == MAP_FAILED)
+	{
+		perror("Mapping memory for absolute memory access failed.\n");
+		close(fd);
+		return -1;
+	}
 
+	strncpy(filename,file_name,strlen(file_name)-3); //change extension to jpg
+	strncpy(filename1,file_name1,strlen(file_name1)-3);
 
+//if (file_name[strlen(file_name)-5] == '0'){
+	strcat(filename,"jpg");
+//}else if (file_name[strlen(file_name)-5] == '1'){
+	strcat(filename1,"jpg");
 
 
 	//the next four rows are for sending image data and not full images. the image file is created in the client on the odroid.
 	memcpy(&mem_arr, mem_base, map_len); //copy the image data from the shared memory, from start address mem_base, copy the length of map_len to the char array mem_arr
+	memcpy(&mem_arr1, mem_base1, map_len);
+
 	unsigned char mem[400000];
 	unsigned long mem_size = 0;
-	ConvertImageData(filename, mem_arr, width, height, bpp, mem, &mem_size);
+	unsigned char mem1[400000];
+	unsigned long mem_size1 = 0;
 
+	ConvertImageData(filename, mem_arr, width, height, bpp, mem, &mem_size);
+	ConvertImageData(filename1, mem_arr1, width, height, bpp, mem1, &mem_size1);
 
 	InitTcpImgDataServer(mem, filename, mem_size);
-
+	InitTcpImgDataServer(mem1, filename1, mem_size1);
 
 
 	printf("Image saved...%s \n",filename);
+	printf("Image saved...%s \n",filename1);
 
 	munmap((void *)mem_base, map_len); // deallocate the space of the image elements in shared mem when sent
+	munmap((void *)mem_base1, map_len);
 	close(fd);
 
 	return 0;
@@ -1138,12 +1200,14 @@ int SaveJpgImageData(uint32_t BaseAddress, char* filename, uint16_t width, uint1
 }
 
 
-
-int SaveBmpImage(uint32_t BaseAddress, char* filename, uint16_t width, uint16_t height, uint16_t bpp, uint8_t scale)
+int SaveBmpImage(uint32_t BaseAddress,uint32_t BaseAddress1, char* filename,char* filename1, uint16_t width, uint16_t height, uint16_t bpp, uint8_t scale)
+//int SaveBmpImage(uint32_t BaseAddress, char* filename, uint16_t width, uint16_t height, uint16_t bpp, uint8_t scale)
 {
 
 
 	int map_len = (width*height*bpp);
+	int map_len1 = (width*height*bpp);
+
 	int fd = open( "/dev/mem", (O_RDWR | O_SYNC));
 	if(fd < 0)
 	{
@@ -1152,8 +1216,16 @@ int SaveBmpImage(uint32_t BaseAddress, char* filename, uint16_t width, uint16_t 
 	}
 
 	unsigned char* mem_base = (unsigned char*)mmap(NULL, map_len, PROT_READ | PROT_WRITE, MAP_SHARED, fd, (off_t)BaseAddress);
+	unsigned char* mem_base1 = (unsigned char*)mmap(NULL, map_len, PROT_READ | PROT_WRITE, MAP_SHARED, fd, (off_t)BaseAddress1);
 
 	if(mem_base == MAP_FAILED)
+	{
+		perror("Mapping memory for absolute memory access failed.\n");
+		close(fd);
+		return -1;
+	}
+
+	if(mem_base1 == MAP_FAILED)
 	{
 		perror("Mapping memory for absolute memory access failed.\n");
 		close(fd);
@@ -1163,10 +1235,16 @@ int SaveBmpImage(uint32_t BaseAddress, char* filename, uint16_t width, uint16_t 
 
 
 	FILE *ofp;
+	FILE *ofp1;
 
 	ofp = fopen(filename, "w");
+	ofp1 = fopen(filename1, "w");
 
 	if (ofp == NULL) {
+	  printf( "Can't open output file!\n");
+	  exit(1);
+	}
+	if (ofp1 == NULL) {
 	  printf( "Can't open output file!\n");
 	  exit(1);
 	}
@@ -1206,7 +1284,9 @@ int SaveBmpImage(uint32_t BaseAddress, char* filename, uint16_t width, uint16_t 
 	fwrite(bmpinfoheader,1,40,ofp);
 	fwrite(mem_base,1,w*h*bpp,ofp); //the elements from shared mem
 
-
+	fwrite(bmpfileheader,1,14,ofp1);
+	fwrite(bmpinfoheader,1,40,ofp1);
+	fwrite(mem_base1,1,w*h*bpp,ofp1);
 
 
 
@@ -1232,14 +1312,20 @@ int SaveBmpImage(uint32_t BaseAddress, char* filename, uint16_t width, uint16_t 
 //	}
 
 	fclose(ofp);
+	fclose(ofp1);
+
 	printf("Image saved...%s \n",filename);
+	printf("Image saved...%s \n",filename1);
 
 	munmap((void *)mem_base, map_len); // deallocate the space of the image elements in shared mem when sent
+	munmap((void *)mem_base1, map_len);
+
 	close(fd);
 
-
+//if(!SaveBmpToSd){
 	InitTcpImageServer(filename); //	GOT "CANT OPEN OUTPUT FILE
-
+	InitTcpImageServer(filename1);
+//}
 
 	return 0;
 
@@ -1247,10 +1333,12 @@ int SaveBmpImage(uint32_t BaseAddress, char* filename, uint16_t width, uint16_t 
 
 
 
-int SaveBmpImageData(uint32_t BaseAddress, char* filename, uint16_t width, uint16_t height, uint16_t bpp, uint8_t scale)
+int SaveBmpImageData(uint32_t BaseAddress,uint32_t BaseAddress1, char* filename,char* filename1, uint16_t width, uint16_t height, uint16_t bpp, uint8_t scale) //cant be saved to the gimme2 sdcard since the img data is sent away
 {
 
 	char mem_arr[width*height*bpp];
+
+	char mem_arr1[width*height*bpp];
 
 	int map_len = (width*height*bpp);
 	int fd = open( "/dev/mem", (O_RDWR | O_SYNC));
@@ -1262,7 +1350,15 @@ int SaveBmpImageData(uint32_t BaseAddress, char* filename, uint16_t width, uint1
 
 	unsigned char* mem_base = (unsigned char*)mmap(NULL, map_len, PROT_READ | PROT_WRITE, MAP_SHARED, fd, (off_t)BaseAddress);
 
+	unsigned char* mem_base1 = (unsigned char*)mmap(NULL, map_len, PROT_READ | PROT_WRITE, MAP_SHARED, fd, (off_t)BaseAddress1);
+
 	if(mem_base == MAP_FAILED)
+	{
+		perror("Mapping memory for absolute memory access failed.\n");
+		close(fd);
+		return -1;
+	}
+	if(mem_base1 == MAP_FAILED)
 	{
 		perror("Mapping memory for absolute memory access failed.\n");
 		close(fd);
@@ -1274,13 +1370,18 @@ int SaveBmpImageData(uint32_t BaseAddress, char* filename, uint16_t width, uint1
 	//the next four rows are for sending image data and not full images. the image file is created in the client on the odroid.
 	memcpy(&mem_arr, mem_base, map_len); //copy the image data from the shared memory, from start address mem_base, copy the length of map_len to the char array mem_arr
 
+	memcpy(&mem_arr1, mem_base1, map_len);
 
 	InitTcpImgDataServer(mem_arr, filename, map_len);
+
+	InitTcpImgDataServer(mem_arr1, filename1, map_len);
 
 
 	printf("Image saved...%s \n",filename);
 
 	munmap((void *)mem_base, map_len); // deallocate the space of the image elements in shared mem when sent
+
+	munmap((void *)mem_base1, map_len);
 	close(fd);
 
 
