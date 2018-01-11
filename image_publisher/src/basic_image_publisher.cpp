@@ -8,29 +8,35 @@ int main(int argc, char** argv)
   ros::init(argc, argv, "image_publisher");
   ros::NodeHandle nh;
   image_transport::ImageTransport it(nh);
+  // Left and right image publishers
   image_transport::Publisher left_pub = it.advertise("camera_left/image_color", 1);
   image_transport::Publisher right_pub = it.advertise("camera_right/image_color", 1);
+  // Previous pictures used for manual synchronization when image pairs are unsynchronized
   cv::Mat previous_left_image;
   cv::Mat previous_right_image;
+  // The loop rate dictates the framerate - it should be at least twice as large as the rate at which the images are received from the Gimme2
   ros::Rate loop_rate(2);
   while (nh.ok()) {
-    cv::Mat left_image = cv::imread("/root/catkin_ws/src/SWARMs/publisher_test/src/scene_l.jpg", CV_LOAD_IMAGE_COLOR);
+    // Read the image pairs from the folder where the TCP client is placing them
+    cv::Mat left_image = cv::imread("/root/catkin_ws/src/SWARMs/image_publisher/src/scene_l.jpg", CV_LOAD_IMAGE_COLOR);
     //cv::waitKey(30);
-    cv::Mat right_image = cv::imread("/root/catkin_ws/src/SWARMs/publisher_test/src/scene_r.jpg", CV_LOAD_IMAGE_COLOR);
+    cv::Mat right_image = cv::imread("/root/catkin_ws/src/SWARMs/image_publisher/src/scene_r.jpg", CV_LOAD_IMAGE_COLOR);
     //cv::waitKey(30);
+    // Check if a stereo image pair is read now and in the previous iteration
     if( !left_image.empty() && !right_image.empty() && !previous_left_image.empty() && !previous_right_image.empty() ){
 
       sensor_msgs::ImagePtr left_msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", left_image).toImageMsg();
       sensor_msgs::ImagePtr right_msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", previous_right_image).toImageMsg();
-
+      
       left_pub.publish(left_msg);
       right_pub.publish(right_msg);
-      system("cd /root/catkin_ws/src/SWARMs/publisher_test/src/ && rm *.jpg");
+      // Remove the image pair from the folder, so that no duplicate images are published
+      system("cd /root/catkin_ws/src/SWARMs/image_publisher/src/ && rm *.jpg");
+      // Debugging message that show images were published
       ROS_INFO("Publish");
     }
     previous_left_image = left_image;
     previous_right_image = right_image;
-    //system("cd /root/catkin_ws/src/SWARMs/publisher_test/src/ && rm *.jpg");
     ros::spinOnce();
     loop_rate.sleep();
   }

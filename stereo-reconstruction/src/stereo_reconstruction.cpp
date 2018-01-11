@@ -41,11 +41,12 @@ FileStorage calib_file;
 
 #define scaling_factor 3
 
+// Size of the calibration and output images can be changed
+// Sizes need to be synced with the actual size of the calibration images and the size set for rectification
 Size out_img_size(640, 480); // 320x240
 // Size out_img_size(1920/scaling_factor, 1080/scaling_factor);
 // Size calib_img_size(1920, 1080); // 640 x 480
 Size calib_img_size(640, 480); // 640 x 480
-
 
 // image_transport::Publisher dmap_pub;
 image_transport::Publisher dmap_filtered_pub;
@@ -57,7 +58,6 @@ typedef pcl::PointCloud<pcl::PointXYZRGB> PointCloud;
 long unsigned int pcl_time = 0;
 
 double fMaxDistance;
-
 
 Mat composeRotationCamToRobot(float x, float y, float z) {
   Mat X = Mat::eye(3, 3, CV_64FC1);
@@ -179,16 +179,15 @@ Mat generateDisparityMap(Mat& left, Mat& right, std_msgs::Header header) {
 //   // Get the ROI that was used in the last filter call:
   ROI = wls_filter->getROI();
 
-  Mat show_filtered = Mat( left.rows, left.cols, CV_8UC1, Scalar(0) ); // Test without Scalar(0)
-  minMaxLoc( filtered_disp, &minVal, &maxVal );
-
-
-  filtered_disp.convertTo( show_filtered, CV_8U , 0.1); // 255/(maxVal-minVal)
+  // Downsampling of the disparity map to 8 bits
+  Mat show_filtered = Mat( left.rows, left.cols, CV_8UC1, Scalar(0) );
+  filtered_disp.convertTo( show_filtered, CV_8U , 0.1);
   minMaxLoc( show_filtered, &minVal, &maxVal );
-
-  fMaxDistance = (1. / Q.at<double>(3, 2)) * Q.at<double>(2, 3); // 49.816870
+  
+  // Calculate the distance of the closest object to the camera
+  fMaxDistance = (1. / Q.at<double>(3, 2)) * Q.at<double>(2, 3);
   double fDisparity = maxVal / (double)StereoMatcher::DISP_SCALE;
-  double dist = fMaxDistance / (fDisparity * 10); // * scaling_factor);
+  double dist = fMaxDistance / (fDisparity * 10); 
 
   std_msgs::Float32 dist_msg;
   dist_msg.data = dist;
@@ -196,23 +195,22 @@ Mat generateDisparityMap(Mat& left, Mat& right, std_msgs::Header header) {
 
 
   if (!show_filtered.empty()) {
-    // string disp_filename = to_string(left.header.stamp.sec);
-    ostringstream convert;
-    convert << header.stamp.sec;
-    string disp_filename = "/home/odroid/Documents/cpp/pcds/";
-    disp_filename += convert.str();
-    convert << header.stamp.nsec;
-    disp_filename += "_" + convert.str();
-    disp_filename += ".png";
-    //imwrite(disp_filename, show_filtered);
-
-
+    if(false) // Change to true for saving of the disparity map
+    {
+      ostringstream convert;
+      convert << header.stamp.sec;
+      string disp_filename = "/home/odroid/Documents/cpp/pcds/";
+      disp_filename += convert.str();
+      convert << header.stamp.nsec;
+      disp_filename += "_" + convert.str();
+      disp_filename += ".png";
+      imwrite(disp_filename, show_filtered);
+    }
+    // Publishing the disparity map
     sensor_msgs::ImagePtr disp_filt_msg;
     disp_filt_msg = cv_bridge::CvImage(std_msgs::Header(), "mono8", show_filtered).toImageMsg();
-    // dmap_filtered_pub.publish(disp_filt_msg);
     dmap_filtered_pub.publish(disp_filt_msg);
   }
-
   return show_filtered;
 
 }
@@ -227,6 +225,8 @@ sensor_msgs::CompressedImageConstPtr& msg_right) {
   std_msgs::Header header = msg_left->header;
 
   Mat dmap = generateDisparityMap(img_left, img_right, header);
+
+  // Pointcloud publishing increases execution time
   // publishPointCloud(img_left_color, dmap);
 }
 
@@ -234,8 +234,7 @@ void findRectificationMap(FileStorage& calib_file, Size finalSize) {
   Rect validRoi[2];
   cout << "starting rectification" << endl;
   stereoRectify(K1, D1, K2, D2, calib_img_size, R, Mat(T), R1, R2, P1, P2, Q, 
-                CV_CALIB_ZERO_DISPARITY, 0, finalSize, &validRoi[0], 
-&validRoi[1]);
+                CV_CALIB_ZERO_DISPARITY, 0, finalSize, &validRoi[0], &validRoi[1]);
   cout << "done rectification" << endl;
 }
 
@@ -245,7 +244,7 @@ void paramsCallback(stereo_dense_reconstruction::CamToRobotCalibParamsConfig
 }
 
 int main(int argc, char** argv) {
-  ros::init(argc, argv, "jpp_dense_reconstruction");
+  ros::init(argc, argv, "stereo_reconstruction");
   ros::NodeHandle nh;
   image_transport::ImageTransport it(nh);
   image_transport::ImageTransport it2(nh);
@@ -282,8 +281,6 @@ CamToRobotCalibParamsConfig>::CallbackType f;
   f = boost::bind(&paramsCallback, _1, _2);
   server.setCallback(f);
   
-  // dmap_pub = it.advertise("/camera_left_rect/disparity_map", 1);
-
   dmap_filtered_pub = it2.advertise("/camera_left_rect/disparity_map_filtered", 1);
   pcl_pub = 
 nh.advertise<PointCloud>("/camera_left_rect/point_cloud",100);

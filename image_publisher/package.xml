@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package>
-  <name>publisher_test</name>
+  <name>image_publisher</name>
   <version>0.0.0</version>
-  <description>The publisher_test package</description>
+  <description>The image_publisher package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
   <!-- Example:  -->

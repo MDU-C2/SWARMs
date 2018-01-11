@@ -12,14 +12,15 @@ using namespace cv;
 
 Mat XR, XT, Q, P1, P2;
 Mat R1, R2, K1, K2, D1, D2, R;
-//float D_left[5], D_right[5];
+
 Vec3d T;
 Mat lmapx, lmapy, rmapx, rmapy;
 FileStorage calib_file;
-// Size out_img_size(768, 432); //kitti - 489x180, 1392x512 320x240
+
 
 #define scaling_factor 3
 
+// The size of calibration images needs to be synchronized with the size of actual calibration images used
 Size out_img_size(640 , 480); // 320x240
 //Size out_img_size(1920/scaling_factor, 1080/scaling_factor);
 //Size calib_img_size(1920, 1080); // 640 x 480
@@ -117,6 +118,8 @@ dst).toImageMsg();
   }
 }
 
+// Publish camera data read from calibration file
+// Makes the Gimme2 seem as a regular stereo camera
 void initCameraInfo(){
   ci_left.header.frame_id = "base_link";
   ci_left.height = out_img_size.height;
