@@ -22,15 +22,12 @@
 //#define HEIGHT 						1374
 #include <stdint.h>
 #include "mem_op.h"
-//added
+
 void SendTcpImageFromServer(int socket, char* filename);
 void SendTcpImgDataFromServer(int socket, unsigned char *memo_data, char *name, unsigned long mem_size);
-int receive_tcp_image_client(int socket);
-int InitTcpImgDataServer(unsigned char *memory_data, char *name, unsigned long mem_size); //, char *filename1);
-int InitTcpImageServer(char *filename0);//, char *filename1);
-//int InitTcpServer( char *filename0, char *filename1);
-int init_tcp_client();
-//end added
+int InitTcpImgDataServer(unsigned char *memory_data, char *name, unsigned long mem_size);
+int InitTcpImageServer(char *filename0);
+
 void SetSize (uint32_t w, uint32_t h, uint32_t bpp);
 int CheckAndClearErrors(uint32_t BaseAdress);
 int DumpRegisters(uint32_t uBaseAddr);
@@ -41,8 +38,6 @@ int SendImage_mem(image_t* img, char id);
 
 int SaveJpgImage(uint32_t BaseAddress,uint32_t BaseAddress1, char* filename,char* filename1, uint16_t width, uint16_t height, uint16_t bpp, uint8_t scale);
 int SaveJpgImageData(uint32_t BaseAddress,uint32_t BaseAddress1, char* filename,char* filename1, uint16_t width, uint16_t height, uint16_t bpp, uint8_t scale);
-//int SaveJpgImageData(uint32_t BaseAddress, char* filename, uint16_t width, uint16_t height, uint16_t bpp, uint8_t scale);
-//int SaveBmpImage(uint32_t BaseAddress, char* filename, uint16_t width, uint16_t height, uint16_t bpp, uint8_t scale);
 int SaveBmpImage(uint32_t BaseAddress,uint32_t BaseAddress1, char* filename,char* filename1, uint16_t width, uint16_t height, uint16_t bpp, uint8_t scale);
 int SaveBmpImageData(uint32_t BaseAddress,uint32_t BaseAddress1, char* filename,char* filename1, uint16_t width, uint16_t height, uint16_t bpp, uint8_t scale);
 

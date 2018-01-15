@@ -1,0 +1,27 @@
+the libjpeg library is added as source code to the tmp project in xilinx sdk.
+
+downloaded the library from: http://www.ijg.org/files/jpegsrc.v9.tar.gz
+, extracted and put the files in 2014.2/src (in the search path i xilinx sdk). 
+
+i think we ran the :/configure command from: 
+http://www.ridgesolutions.ie/index.php/2013/05/15/cross-compiling-libjpeg-for-linux-on-arm/
+but not sure if that helped us.
+
+followed the code here:
+https://stackoverflow.com/questions/13384104/jpeg-encoding-bitmap-bmp-image-from-file-using-libjpeg-c
+but had to tweak it a bit. the structs contained WORD, DWORD and other windows variables so they
+had to be changed. we declared them like this:
+https://stackoverflow.com/questions/14279242/read-bitmap-file-into-structure
+but with corresponding int, ex: uint16_t WORD
+
+we checked the arguments and changed from fread_s() to fread().
+
+the function write_JPEG_file was not the one we wanted so we used write_jpeg_file from:
+http://www.aaronmr.com/en/2010/03/test/
+
+the last part was that the number of bytes in the fileheader and infoheader that are used to save bmp
+in the sdk was not the same as the number of bytes that was read for the input file in the code.
+
+
+to fix the colors and the uside-down-pictures, download code file at bottom:
+http://tipsandtricks.runicsoft.com/Cpp/BitmapTutorial.html#chapter4

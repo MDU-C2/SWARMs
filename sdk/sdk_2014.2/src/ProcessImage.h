@@ -4,9 +4,7 @@
 
 #include "stdio.h"
 #include "jpeglib.h"
-//#include <fstream>
 #include <stdlib.h>
-//#include <inttypes.h>
 #include <stdint.h>
 
 typedef uint8_t BYTE;

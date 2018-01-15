@@ -88,9 +88,6 @@ BYTE* ConvertBMPToRGBBuffer ( BYTE* Buffer, int width, int height )
 
 int write_jpeg_file_img( unsigned char *filename )
 {
-	//unsigned char *mem = NULL;
-	//unsigned long mem_size = 0;
-
 
 struct jpeg_compress_struct cinfo;
 struct jpeg_error_mgr jerr;
@@ -108,23 +105,19 @@ printf("created file!\n");
 cinfo.err = jpeg_std_error( &jerr );
 jpeg_create_compress(&cinfo);
 jpeg_stdio_dest(&cinfo, outfile);
-//jpeg_mem_dest(&cinfo, &mem, &mem_size);
 /* Setting the parameters of the output file here */
 cinfo.image_width = 640;//1920;
 cinfo.image_height = 480;//1080;
 cinfo.input_components = 3;
 cinfo.in_color_space = JCS_RGB;
 /* default compression parameters, we shouldn't be worried about these */
-//printf("parameters set!");
 jpeg_set_defaults( &cinfo );
 cinfo.num_components = 3;
-//cinfo.data_precision = 4;
 cinfo.dct_method = JDCT_FLOAT; //Try JDCT_IFAST
 jpeg_set_quality(&cinfo, 85, TRUE);
 /* Now do the compression .. */
 jpeg_start_compress( &cinfo, TRUE );
 /* like reading a file, this time write one row at a time */
-//printf("start writing!");
 BYTE * newbuf =  ConvertBMPToRGBBuffer (image_buffer, cinfo.image_width, cinfo.image_height );
 while( cinfo.next_scanline < cinfo.image_height )
 {
@@ -132,22 +125,13 @@ row_pointer[0] = &newbuf[ cinfo.next_scanline * cinfo.image_width * cinfo.input_
 jpeg_write_scanlines( &cinfo, row_pointer, 1 );
 }
 
-//printf("finninshed writing!");
 /* similar to read file, clean up after we're done compressing */
 jpeg_finish_compress( &cinfo );
-//printf("size of mem_size: %d\n", mem_size);
 
-//int i;
-//for (i = 0 ;i < mem_size ;i++){
-//	mem_out[i] = mem[i];
-//}
 
 jpeg_destroy_compress( &cinfo );
-//fclose( outfile );
 free(newbuf);
-//free(mem);
-/* success code is 1! */
-//return mem_size;
+
 }
 
 
@@ -164,17 +148,9 @@ struct jpeg_error_mgr jerr;
 printf("start jpeg processing!\n");
 /* this is a pointer to one row of image data */
 JSAMPROW row_pointer[1];
-//FILE *outfile = fopen( filename, "wb" );
 
-//if ( !outfile )
-//{
-//printf("Error opening output jpeg file %s\n!", filename );
-//return -1;
-//}
-//printf("created file!\n");
 cinfo.err = jpeg_std_error( &jerr );
 jpeg_create_compress(&cinfo);
-//jpeg_stdio_dest(&cinfo, outfile);
 jpeg_mem_dest(&cinfo, &mem, &mem_size);
 /* Setting the parameters of the output file here */
 cinfo.image_width = 640;//1920;
@@ -182,16 +158,13 @@ cinfo.image_height = 480;//1080;
 cinfo.input_components = 3;
 cinfo.in_color_space = JCS_RGB;
 /* default compression parameters, we shouldn't be worried about these */
-//printf("parameters set!");
 jpeg_set_defaults( &cinfo );
 cinfo.num_components = 3;
-//cinfo.data_precision = 4;
 cinfo.dct_method = JDCT_FLOAT; //Try JDCT_IFAST
 jpeg_set_quality(&cinfo, 85, TRUE);
 /* Now do the compression .. */
 jpeg_start_compress( &cinfo, TRUE );
 /* like reading a file, this time write one row at a time */
-//printf("start writing!");
 BYTE * newbuf =  ConvertBMPToRGBBuffer (image_buffer, cinfo.image_width, cinfo.image_height );
 while( cinfo.next_scanline < cinfo.image_height )
 {
@@ -199,7 +172,6 @@ row_pointer[0] = &newbuf[ cinfo.next_scanline * cinfo.image_width * cinfo.input_
 jpeg_write_scanlines( &cinfo, row_pointer, 1 );
 }
 
-//printf("finninshed writing!");
 /* similar to read file, clean up after we're done compressing */
 jpeg_finish_compress( &cinfo );
 printf("size of mem_size: %d\n", mem_size);
@@ -210,56 +182,22 @@ for (i = 0 ;i < mem_size ;i++){
 }
 
 jpeg_destroy_compress( &cinfo );
-//fclose( outfile );
 free(newbuf);
 free(mem);
-/* success code is 1! */
 return mem_size;
 }
 
-//rename this to ConvertImageData instead and create a new file for saving jpgs to the card. this file could be renamed to ProcessImageData.c
 
 
 int ConvertImage(unsigned char *img, unsigned char *img_arr, int image_width, int image_height, int bpp){
 
-//BITMAPFILEHEADER bfh;
-//BITMAPINFO bi;
-//BITMAPINFOHEADER *bih;
-//FILE *input;
-//int image_height;
-//int image_width;
-//int bpp;
-//
-//input = fopen( img, "rb" ); // Open existing file
-//
-//// Read bitmap file header
-////fread( &bfh, sizeof(BITMAPFILEHEADER),1, input );
-//fread( &bfh,1, 14, input );
-//
-//// Read bitmap info header
-////fread( &bi, sizeof(BITMAPINFO),1, input );
-//fread( &bi, 1, 40, input );
-//
-//bih = &bi.bmiHeader;
-//image_height = bih->biHeight;
-//image_width = bih->biWidth;
-//bpp = 3;
-//int data_size = image_width * image_height * bpp; // Compute image data size
 
-// Allocate image buffer; this is the buffer write_JPEG_file() will use
-image_buffer = img_arr;//(JSAMPLE *)malloc( data_size );
+// Allocate image buffer, this is the buffer that write_jpeg_file_img() will use
+image_buffer = img_arr;
 
-// Read image pixel data from file
-//fread( image_buffer, 1, data_size, input );
-
-//fclose( input );
 
 write_jpeg_file_img( img );
 
-//printf("MEM SIZE = %d", sizeof(mem));
-//mem = mem_cpy;
-//*mem_size = mem_cpy_size;
-//free(image_buffer);//       <----------------------------------------------------------------
 return 0;
 }
 
@@ -267,43 +205,12 @@ return 0;
 
 int ConvertImageData(unsigned char *img, unsigned char *img_arr, int image_width, int image_height, int bpp, unsigned char * mem, unsigned long *mem_size ){
 
-//BITMAPFILEHEADER bfh;
-//BITMAPINFO bi;
-//BITMAPINFOHEADER *bih;
-//FILE *input;
-//int image_height;
-//int image_width;
-//int bpp;
-//
-//input = fopen( img, "rb" ); // Open existing file
-//
-//// Read bitmap file header
-////fread( &bfh, sizeof(BITMAPFILEHEADER),1, input );
-//fread( &bfh,1, 14, input );
-//
-//// Read bitmap info header
-////fread( &bi, sizeof(BITMAPINFO),1, input );
-//fread( &bi, 1, 40, input );
-//
-//bih = &bi.bmiHeader;
-//image_height = bih->biHeight;
-//image_width = bih->biWidth;
-//bpp = 3;
-//int data_size = image_width * image_height * bpp; // Compute image data size
 
-// Allocate image buffer; this is the buffer write_JPEG_file() will use
-image_buffer = img_arr;//(JSAMPLE *)malloc( data_size );
 
-// Read image pixel data from file
-//fread( image_buffer, 1, data_size, input );
-
-//fclose( input );
+// Allocate image buffer; this is the buffer write_jpeg_file() will use
+image_buffer = img_arr;
 
 *mem_size = write_jpeg_file( img, mem );
 
-//printf("MEM SIZE = %d", sizeof(mem));
-//mem = mem_cpy;
-//*mem_size = mem_cpy_size;
-//free(image_buffer);//       <----------------------------------------------------------------
 return 0;
 }

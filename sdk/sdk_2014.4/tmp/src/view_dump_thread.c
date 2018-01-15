@@ -46,13 +46,8 @@
 #include "histogram.h"
 
 #include "jpeglib.h"
-//#include "libjpeg-turbo/turbojpeg.h"
 #include "ProcessImage.h"
 
-//#include <convert.h>
-//#include "ResizeImage.h"
-//#include <cv.h>
-//#include <highgui.h>
 
 extern int errno;
 struct termios orig_termios;
@@ -126,6 +121,8 @@ int GetClockMs ()
     struct timespec ts;
 
     if (clock_gettime (CLOCK_MONOTONIC, &ts) == 0)
+    	//time_t tv_sec : is the number of seconds since 1970
+    	//time_t tv_nsec : the number of nanoseconds expired in the current second
         return (uint64_t) ((ts.tv_sec * 1000000 + ts.tv_nsec / 1000000)%1000); //mod by 1000 to return ms
     else //Clock that retrieves the time, that cannot be set and represents monotonic time since an unspecified starting point
         return 0;
@@ -143,10 +140,10 @@ void *SaveImageThreadFcn(void *arg)
 {
 	image_save_t *im_save = arg;
 	char filename0[20], filename1[20];
-	//char time_str[8];
+
 	char time_str[9];
 	time_t t;
-	//clock_t ms;
+
 char add_ms[4];
 
 
@@ -154,30 +151,16 @@ char add_ms[4];
 	saving_image = true;
 	pthread_mutex_unlock(&saving_image_mutex);
 
-//	memset(filename0, '\0', sizeof(filename0));
-//	memset(filename1, '\0', sizeof(filename1));
-//	time(&t);
-//	strncpy(time_str, ctime(&t)+11, 8);
-//	time_str[2] = '_';
-//	time_str[5] = '_';
-//	strncpy(filename0,time_str,8);   //copy no more than 8 char from time_str to filename0
-//	strcat(filename0,"_0.bmp");      // append _0.bmp onto filename0
-//	SaveImage(im_save->fb_addr0, filename0, im_save->image_size.w, im_save->image_size.h, im_save->image_size.bpp, 1); //_0 is left cam from behind
-//	//printf("First image saved!!!");
-//	strncpy(filename1,time_str,8);
-//	strcat(filename1,"_1.bmp");
-//	SaveImage(im_save->fb_addr1, filename1, im_save->image_size.w, im_save->image_size.h, im_save->image_size.bpp, 1); //_1 is right cam from behind
 
 	memset(filename0, '\0', sizeof(filename0));
 	memset(filename1, '\0', sizeof(filename1));
 	time(&t);
-	//ms = (clock() / (CLOCKS_PER_SEC / 1000)) % 1000;
 
 	int res = GetClockMs ();
-	//add_ms = res;
-	sprintf(add_ms, "%d", abs(res)); //add int res to add_ms as char
+
+	sprintf(add_ms, "%d", abs(res)); //add res to add_ms as char
 		printf("milliseconds: %s\n",add_ms);
-	//printf("milliseconds: %d\n",ms);
+
 	strncpy(time_str, ctime(&t)+11, 9);
 	time_str[2] = '_';
 	time_str[5] = '_';
@@ -188,14 +171,12 @@ char add_ms[4];
 	strncpy(filename0,time_str,9);   //copy no more than 9 char from time_str to filename0
 	strncpy(filename0+9, add_ms, nr_el*sizeof(char));
 	strcat(filename0,"_0.bmp");      // append _0.bmp onto filename0, THEY ARE FIRST SAVED AS BMP BUT WITH .JPG EXTENSION
-	//SaveBmpImageData(im_save->fb_addr0, filename0, im_save->image_size.w, im_save->image_size.h, im_save->image_size.bpp, 1); //_0 is left cam from behind
-
-
 
 	strncpy(filename1,time_str,9);
 	strncpy(filename1+9, add_ms, nr_el*sizeof(char));
 	strcat(filename1,"_1.bmp");
 
+/*choose one of the functions below and run the corresponding script on the Odroid*/
 
 	//SaveBmpImageData(im_save->fb_addr0,im_save->fb_addr1, filename0,filename1, im_save->image_size.w, im_save->image_size.h, im_save->image_size.bpp, 1); //_0 is left cam from behind
 	//SaveBmpImage(im_save->fb_addr0,im_save->fb_addr1, filename0,filename1, im_save->image_size.w, im_save->image_size.h, im_save->image_size.bpp, 1);
@@ -203,17 +184,9 @@ char add_ms[4];
 	SaveJpgImage(im_save->fb_addr0,im_save->fb_addr1, filename0,filename1, im_save->image_size.w, im_save->image_size.h, im_save->image_size.bpp, 1);
 
 
-	//SaveBmpImageData(im_save->fb_addr1, filename1, im_save->image_size.w, im_save->image_size.h, im_save->image_size.bpp, 1); //_1 is right cam from behind
-
-
-
-//remove(filename0);
-//remove(filename1);
-
 
 	printf("Saving to FB: %x %x\n",im_save->fb_addr0,im_save->fb_addr1);
 
-//	printf("Saving to FB: testing\n");
 
 	pthread_mutex_lock(&saving_image_mutex);
 	saving_image = false;
@@ -245,8 +218,8 @@ int main(int argc, char *argv[])
 	image_send_t im_send;
 //	im_send.image_size.w = im_size.w/8;
 //	im_send.image_size.h = im_size.h/8;
-	im_send.image_size.w = im_size.w/4;//*0.75;///4;///////////
-	im_send.image_size.h = im_size.h/4;//*0.5625;///4;///////////
+	im_send.image_size.w = im_size.w/4;
+	im_send.image_size.h = im_size.h/4;
 	im_send.image_size.bpp = im_size.bpp;
 
 	uint32_t frame_ptr = 0x0; //first fb
@@ -309,7 +282,7 @@ int main(int argc, char *argv[])
 
 
 //	SetSize(w,h,bpp);
-	init_broadcast_address(VASA_FV_PORT);  //floods network with udp (init i think)
+	init_broadcast_address(VASA_FV_PORT);  //init UDP broadcasting
 	if (init_vasa_socket_udp () == -1) return -1;
 
 	axi_gpio_init_dir();
@@ -349,10 +322,10 @@ int main(int argc, char *argv[])
 				quit = 1;
 				break;
 			case 'w':
-				dump_image = (dump_image+1)%2;
+				dump_image = (dump_image+1)%2; //single image pair
 				break;
 			case 'o':
-				dump_image_cont = (dump_image_cont+1)%2;
+				dump_image_cont = (dump_image_cont+1)%2; // continuous capturing
 				break;
 			case 't':
 				toggle_cam_stream(&pin_data);
@@ -448,7 +421,7 @@ int main(int argc, char *argv[])
 			}
 			if (it.coarse < itl.coarse_min) {
 				////printf("WARNING: Coarse integration time < MIN\n");
-				it.coarse = itl.coarse_min; ////////////////////////////////
+				it.coarse = itl.coarse_min;
 			}
 			set_integration_time_dual(&it,&pin_data,&pin_dir,SIOD_0,SIOC_0,SIOD_1,SIOC_1);
 			get_integration_time(&it,&pin_data,&pin_dir,SIOD_0,SIOC_0);
@@ -481,7 +454,7 @@ int main(int argc, char *argv[])
 			saving_image_tmp = saving_image;
 			pthread_mutex_unlock(&saving_image_mutex);
 			if (!saving_image_tmp) {
-				dump_image = 0; //comment out to take pictures continuously
+				dump_image = 0;
 				im_save.seq_no++;
 
 

@@ -21,13 +21,10 @@
 #include "hw_base.h"
 #include <stdbool.h>
 #include "mem_op.h"
-//added
+
 #include<sys/socket.h>
 #include<arpa/inet.h>
-//#include <iostream>
-//#include<fstream>
 #include<errno.h>
-//end added
 
 extern int errno;
 
@@ -50,29 +47,6 @@ int SaveJpgToSd = 0;
 //#define bpp 3 //bytes per pixel
 
 
-//typedef struct { uint8_t c[bpp]; } color_t;
-//color_t DEADBEEF = {{0xDE,0xEA,0xBE}};
-//color_t DEADBEEF = {{0xDE,0xEA,0xBE,0xEF}};
-
-//bool col_equal(color_t c1, color_t c2)
-//{
-//	uint8_t i;
-//	for (i=0; i<bpp; i++)
-//		if (c1.c[i] /= c2.c[i]) return false;
-//	return true;
-//}
-
-//typedef struct {
-//    uint8_t r;
-//    uint8_t g;
-//    uint8_t b;
-//} color_t;
-
-////////////////////// ADDED////////////////////////////
-//////////////////////////////////////////////////////////
-//using namespace std;//////////////////////////////////////////////////////
-
-//////////////////////////////////////////
 void SendTcpImageFromServer(int socket, char* filename){
 
 FILE *picture;
@@ -105,25 +79,17 @@ do { //Read while we get errors that are due to signals.
 
 
 void *p = filename;
-//int bytes_read = sizeof(filename);
-//int bytes_read = length(filename);
 int bytes_read = 18; //this is the length of the filename
 printf("bytes_read %i\n",bytes_read);
 
-//while (bytes_read > 0){
-	//printf("in the while loop!\n");
-////
+
 	int fn_check = send(socket, filename, bytes_read,0);
 	printf("fn_check: %i\n",fn_check);
 	if (fn_check <= 0){
 		printf("something wrong in server!\n");
 	}
-	//bytes_read -= fn_check;
-	//p += fn_check;
+
 	printf("sending!\n");
-	/////
-//}
-//printf("out of while loop!\n");
 
 
 char read_veri[256];
@@ -135,10 +101,8 @@ do{
 
 
 printf("Received data in socket\n");
-//printf("Socket data: %c\n", read_buffer);//////////////
 
 while(!feof(picture)) {
-//while(packet_index = 1){
    //Read from the file into our send buffer
    read_size = fread(send_buffer, 1, sizeof(send_buffer)-1, picture);
 
@@ -155,164 +119,34 @@ while(!feof(picture)) {
 
    packet_index++;
 
-   //Zero out our send buffer
+   //Zero out the send buffer
    bzero(send_buffer, sizeof(send_buffer));
   }
-////
+
 char im_veri[256];
 do {
 	   stat2 = read(socket, &im_veri, 255);
 }while(stat2 < 0);
 printf("Image received on the server side, sending next pic\n");
-////
 }
-/////////////
 
 
 
-
-//void SendTcpImageFromServer(int socket, char *filename){
-//
-//FILE *pic; //picture
-//	//char *pic = NULL;
-//int read_size, stat,stat2, packet_index;
-//char send_buffer[10240], read_buffer[256];
-//packet_index = 1;
-//int size = 0;
-//
-//pic = fopen(filename, "r");
-////pic = memo_data;
-//printf("Getting Picture Size\n");
-//
-//if(pic == NULL) {
-//     printf("Error opening pic"); }
-//
-//fseek(pic, 0, SEEK_END);
-//size = ftell(pic);
-////size = sizeof memo_data / sizeof memo_data[0]; //////
-////size_t size = strlen(memo_data);
-//
-//fseek(pic, 0, SEEK_SET);
-//printf("Total Picture size: %i\n",size);
-//
-////Send Picture Size
-//printf("Sending picture size\n");
-//write(socket, (void *)&size, sizeof(int)); //sending size of the image
-//
-////Send Picture as Byte Array
-//printf("Sending picture as byte array\n");
-//
-//do { //Read while we get errors that are due to signals.
-//   stat=read(socket, &read_buffer , 255); //read verification of size
-//   printf("Bytes read: %i\n",stat);
-//} while (stat < 0);
-//
-//printf("Received data in socket\n");
-////printf("Socket data: %c\n", read_buffer);//////////////
-//
-//
-////send the name of the file
-////int fn_check = write(socket, filename, 14);//sizeof(filename));
-////printf("filename sent!\n");
-////printf("writing filename: %i\n",fn_check);
-//
-//void *p = filename;
-////int bytes_read = sizeof(filename);
-////int bytes_read = length(filename);
-//int bytes_read = 18; //this is the length of the filename
-//printf("bytes_read %i\n",bytes_read);
-//
-////while (bytes_read > 0){
-//	//printf("in the while loop!\n");
-//////
-//	int fn_check = send(socket, filename, bytes_read,0);
-//	printf("fn_check: %i\n",fn_check);
-//	if (fn_check <= 0){
-//		printf("something wrong in server!\n");
-//	}
-//	bytes_read -= fn_check;
-//	p += fn_check;
-//	printf("sending!\n");
-//	/////
-////}
-////printf("out of while loop!\n");
-//
-//
-//char read_veri[256];
-////read the verification that the name is received
-//do{
-//	stat2 = read(socket, &read_veri, 255);
-//	printf("verification of filename received: %i\n", stat2);
-//}while(stat2 < 0);
-//
-//
-////int a = 1;
-//while(!feof(pic)) {
-//////////////while (stat < 0){
-////while(packet_index = 1){
-//   //Read from the file into our send buffer
-//   read_size = fread(send_buffer, 1, sizeof(send_buffer)-1, pic);
-//////////////int offs = 10240;
-//////////////int index=0;
-//////////////while (index < size){
-//   //Send data through our socket
-//  ////// do{
-//     stat = write(socket, send_buffer, size); //read_size);
-//	   /////stat = write(socket, memo_data, size);
-//	//////////int sent_bytes = send(socket, memo_data+index, offs,0 ); //I MAD CHANGES HERE, CHECK IT AND PERHAPS DO THE SAME IN CLIENT OR REDO THIS
-//   /////}while (stat < 0);
-//////////////index = index + offs;
-//   //printf("sent_bytes: %d\n", sent_bytes);
-//   //printf("Packet Number: %i\n",packet_index);
-//   //printf("Packet Size Sent: %i\n",size);//read_size);
-//   //printf(" \n");
-//   //printf(" \n");
-//
-//
-//   packet_index++;
-//   printf("CHECK1");
-//}
-//   //Zero out our send buffer
-//   bzero(send_buffer, sizeof(send_buffer));
-//
-//  /////////////////}
-//   printf("CHECK2");
-//char im_veri[256];
-//do {
-//	   stat2 = read(socket, &im_veri, 255);
-//}while(stat2 < 0);
-//printf("Image received on the server side, sending the next pic\n");
-//
-// }
-//
-
-
-
-
-
-//////////////////////////////////////////////////////
 void SendTcpImgDataFromServer(int socket, unsigned char *memo_data, char *name, unsigned long mem_size){
 
-//FILE *pic; //picture
 char *pic = NULL;
 int read_size, stat,stat2, packet_index;
 char send_buffer[10240], read_buffer[256];
 packet_index = 1;
 
-//pic = fopen(filename, "r");
 pic = memo_data;
 printf("Getting Picture Size\n");
 
 if(pic == NULL) {
      printf("Error opening pic\n"); }
 
-//fseek(pic, 0, SEEK_END);
-//size = ftell(pic);
-//size = sizeof memo_data / sizeof memo_data[0]; //////
-//size_t size = strlen(memo_data);
-size_t size = mem_size;
 
-//fseek(pic, 0, SEEK_SET);
+size_t size = mem_size;
 printf("Total Picture size: %i\n",size);
 
 //Send Picture Size
@@ -328,23 +162,13 @@ do { //Read while we get errors that are due to signals.
 } while (stat < 0);
 
 printf("Received data in socket\n");
-//printf("Socket data: %c\n", read_buffer);//////////////
 
-
-//send the name of the file
-//int fn_check = write(socket, filename, 14);//sizeof(filename));
-//printf("filename sent!\n");
-//printf("writing filename: %i\n",fn_check);
 
 void *p = name;
-//int bytes_read = sizeof filename;
-//int bytes_read = length(filename);
 int bytes_read = 18; //this is the length of the filename
 printf("bytes_read %i\n",bytes_read);
 
-//while (bytes_read > 0){
-	//printf("in the while loop!\n");
-////
+
 	int fn_check = send(socket, name, bytes_read,0);
 	printf("fn_check: %i\n",fn_check);
 	if (fn_check <= 0){
@@ -353,9 +177,6 @@ printf("bytes_read %i\n",bytes_read);
 	bytes_read -= fn_check;
 	p += fn_check;
 	printf("sending!\n");
-	/////
-//}
-//printf("out of while loop!\n");
 
 
 char read_veri[256];
@@ -366,31 +187,16 @@ do{
 }while(stat2 < 0);
 
 
-//int a = 1;
-//while(!feof(pic)) {
-////////////while (stat < 0){
-//while(packet_index = 1){
-   //Read from the file into our send buffer
-   ////read_size = fread(send_buffer, 1, sizeof(send_buffer)-1, pic);
 int offs = 10240;
 int index=0;
 while (index < size){
-   //Send data through our socket
-  ////// do{
-     //stat = write(socket, send_buffer, size); //read_size);
-	   /////stat = write(socket, memo_data, size);
-	if(size - index < offs){                             // might be changed for the bmps later!!!
+   //Send data through the socket
+
+	if(size - index < offs){
 		offs = size - index;
 	}
-	int sent_bytes = send(socket, memo_data+index, offs,0 ); //I MAD CHANGES HERE, CHECK IT AND PERHAPS DO THE SAME IN CLIENT OR REDO THIS
-   /////}while (stat < 0);
+	int sent_bytes = send(socket, memo_data+index, offs,0 );
 index = index + offs;
-////   printf("sent_bytes: %d\n", sent_bytes);
-////   printf("Packet Number: %i\n",packet_index);
-   //printf("Packet Size Sent: %i\n",size);//read_size);
-   //printf(" \n");
-   //printf(" \n");
-
 
    packet_index++;
 
@@ -398,8 +204,6 @@ index = index + offs;
 
    //Zero out our send buffer
    bzero(send_buffer, sizeof(send_buffer));
-
-  /////////////////}
 
 char im_veri[256];
 do {
@@ -412,116 +216,14 @@ printf("Image received on the server side, sending the next pic\n");
 
 
 
+int InitTcpImgDataServer(unsigned char *memory_data, char *name, unsigned long mem_size)
 
-//This function is to be used once we have confirmed that an image is to be sent
-//It should read and output an image file
-
-int receive_tcp_image_client(int socket)
-{ // Start function
-
-//int buffersize = 0,
-		int recv_size = 0,size = 0, read_size, write_size, packet_index =1,stat;
-
-char imagearray[10241];
-
-FILE *image;
-
-//Find the size of the image
-do{
-stat = read(socket, &size, sizeof(int));
-}while(stat<0);
-
-printf("Packet received.\n");
-printf("Packet size: %i\n",stat);
-printf("Image size: %i\n",size);
-printf(" \n");
-
-char buffer[] = "Got it";
-
-//Send our verification signal
-do{
-stat = write(socket, &buffer, sizeof(int));
-}while(stat<0);
-
-printf("Reply sent\n");
-printf(" \n");
-
-image = fopen("index2.bmp", "w");
-
-if( image == NULL) {
-printf("Error has occurred. Image file could not be opened\n");
-return -1; }
-
-//Loop while we have not received the entire file yet
-
-
-//int need_exit = 0;                                           ///////////////////////
-struct timeval timeout = {10,0};
-
-fd_set fds;
-int buffer_fd;
-//int buffer_out;                                              //////////////////////
-
-while(recv_size < size) {
-//while(packet_index < 2){
-
-    FD_ZERO(&fds);
-    FD_SET(socket,&fds);
-
-    buffer_fd = select(FD_SETSIZE,&fds,NULL,NULL,&timeout);
-
-    if (buffer_fd < 0)
-       printf("error: bad file descriptor set.\n");
-
-    if (buffer_fd == 0)
-       printf("error: buffer read timeout expired.\n");
-
-    if (buffer_fd > 0)
-    {
-        do{
-               read_size = read(socket,imagearray, 10241);
-            }while(read_size <0);
-
-            printf("Packet number received: %i\n",packet_index);
-        printf("Packet size: %i\n",read_size);
-
-
-        //Write the currently read data into our image file
-         write_size = fwrite(imagearray,1,read_size, image);
-         printf("Written image size: %i\n",write_size);
-
-             if(read_size !=write_size) {
-                 printf("error in read write\n");    }
-
-
-             //Increment the total number of bytes read
-             recv_size += read_size;
-             packet_index++;
-             printf("Total received image size: %i\n",recv_size);
-             printf(" \n");
-             printf(" \n");
-    }
-
-}
-
-
-  fclose(image);
-  printf("Image successfully Received!\n");
-  return 1;
-  }
-
-
-
-
-int InitTcpImgDataServer(unsigned char *memory_data, char *name, unsigned long mem_size)//, char *filename1)  , char *name
-//int InitTcpServer(char *filename0, char *filename1)
 {
-  int socket_desc, new_socket, size_struct;///////////////////////, read_size,buffer = 0;
+  int socket_desc, new_socket, size_struct;
   struct sockaddr_in server, client;
-  //char *readin;                  //////////////////////
 
   //Create a socket
-  socket_desc = socket(PF_INET , SOCK_STREAM , 0); //ipv4 and tcp   //changed AF_INET to PF_INET
+  socket_desc = socket(PF_INET , SOCK_STREAM , 0); //ipv4 and tcp. should work with AF_INET as well
   if (socket_desc == -1)
   {
      printf("Could not create socket");
@@ -532,8 +234,7 @@ int InitTcpImgDataServer(unsigned char *memory_data, char *name, unsigned long m
   int optval;
   // set the SO_REUSEADDR on the socket to true
   optval = 1;
-  setsockopt(socket_desc, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof optval);//reuses the address
-//between the sending of image pairs
+  setsockopt(socket_desc, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof optval);//reuses the address between the sending of image pairs
 
 
 
@@ -542,11 +243,7 @@ int InitTcpImgDataServer(unsigned char *memory_data, char *name, unsigned long m
   server.sin_addr.s_addr = INADDR_ANY;
   server.sin_port = htons( 8765 );
 
- //if( bind(socket_desc,(struct sockaddr *)&server , sizeof(server)) < 0)//struct sockaddr
- //{
- //  puts("bind failed");
- //  return 1;
- //}
+
   int bind_result = bind(socket_desc, (struct sockaddr *)&server, sizeof(server));
   if (bind_result < 0){
 	  puts("bind failed");
@@ -554,7 +251,6 @@ int InitTcpImgDataServer(unsigned char *memory_data, char *name, unsigned long m
 	  fprintf(stderr, "value of errno: %d\n", errno);
 	  perror("the reason of errno");
 	  fprintf(stderr, "error binding: %s\n", strerror(errnum));
-	  //printf("bind returns: %d\n",bind_result);
 	  return 1;
   }
 
@@ -580,18 +276,10 @@ if (new_socket<0)
   perror("Accept Failed");
   return 1;
 }
-
-//send_image(new_socket);
 
 //init finished, now send the image pair
 
 SendTcpImgDataFromServer(new_socket, memory_data, name, mem_size);
-//SendTcpImgDataFromServer(new_socket, memory_data, name, mem_size);                //comment out for bmp data and comment back for jpg data i think
-
-//SendTcpImageFromServer(new_socket, filename0);
-//SendTcpImageFromServer(new_socket, filename1);
-
-
 
 close(socket_desc);
 fflush(stdout);
@@ -599,11 +287,10 @@ return 0;
 }
 
 
-int InitTcpImageServer(char *filename0)//, char *filename1)
+int InitTcpImageServer(char *filename0)
 {
-  int socket_desc, new_socket, size_struct;///////////////////////, read_size,buffer = 0;
+  int socket_desc, new_socket, size_struct;
   struct sockaddr_in server, client;
-  //char *readin;                  //////////////////////
 
   //Create a socket
   socket_desc = socket(PF_INET , SOCK_STREAM , 0); //ipv4 and tcp   //changed AF_INET to PF_INET
@@ -627,11 +314,7 @@ int InitTcpImageServer(char *filename0)//, char *filename1)
   server.sin_addr.s_addr = INADDR_ANY;
   server.sin_port = htons( 8765 );
 
- //if( bind(socket_desc,(struct sockaddr *)&server , sizeof(server)) < 0)//struct sockaddr
- //{
- //  puts("bind failed");
- //  return 1;
- //}
+
   int bind_result = bind(socket_desc, (struct sockaddr *)&server, sizeof(server));
   if (bind_result < 0){
 	  puts("bind failed");
@@ -666,16 +349,10 @@ if (new_socket<0)
   return 1;
 }
 
-//send_image(new_socket);
 
 //init finished, now send the image pair
 
-//SendTcpImgDataFromServer(new_socket, memory_data, name, mem_size);
-//SendTcpImgDataFromServer(new_socket, memory_data, name, mem_size);
-
 SendTcpImageFromServer(new_socket, filename0);
-//SendTcpImageFromServer(new_socket, filename1);
-
 
 
 close(socket_desc);
@@ -683,51 +360,6 @@ fflush(stdout);
 return 0;
 }
 
-
-
-int init_tcp_client()
-{
-
-int socket_desc;
-struct sockaddr_in server;
-//char *parray;                    ////////////////////
-
-
-//Create socket
-socket_desc = socket(AF_INET , SOCK_STREAM , 0);
-
-if (socket_desc == -1) {
-printf("Could not create socket");
-}
-
-memset(&server,0,sizeof(server));
-server.sin_addr.s_addr = INADDR_ANY;
-server.sin_family = AF_INET;
-server.sin_port = htons( 8889 );
-
-//Connect to remote server
-if (connect(socket_desc , (struct sockaddr *)&server , sizeof(server)) < 0) {
-//cout<<strerror(errno);
-close(socket_desc);
-puts("Connect Error");
-//return 1;
-}
-
-puts("Connected\n");
-
-//receive_image(socket_desc);
-receive_tcp_image_client(socket_desc);
-
-close(socket_desc);
-
-return 0;
-}
-
-
-
-
-
-///////////////////// END ADDED ////////////////////////
 
 
 void SetSize (uint32_t w, uint32_t h, uint32_t bpp)
@@ -949,21 +581,8 @@ int CheckResults(uint32_t BaseAddress, int memLen, int resolution)
 	return 0;
 }
 
-//uint8_t msblsb(uint8_t v)
-//{
-//uint8_t r = v; // r will be reversed bits of v; first get LSB of v
-//uint8_t s = 7; // extra shift needed at end
-//
-//for (v >>= 1; v; v >>= 1)
-//{
-//  r <<= 1;
-//  r |= v & 1;
-//  s--;
-//}
-//r <<= s; // shift when v's highest bits are zero
-//
-//return r;
-//}
+
+
 
 #define MIN(a,b) (((a)<(b))?(a):(b))
 
@@ -1052,11 +671,8 @@ int SendImage_mem(image_t* img, char id)
 
 
 int SaveJpgImage(uint32_t BaseAddress,uint32_t BaseAddress1, char* file_name,char* file_name1, uint16_t width, uint16_t height, uint16_t bpp, uint8_t scale)
-//int SaveJpgImage(uint32_t BaseAddress, char* file_name, uint16_t width, uint16_t height, uint16_t bpp, uint8_t scale)//FIXED THE FILENAME EXTENSION, DO THE SAME WITH JPG DATA
 {
 
-//char filename[strlen(file_name)];
-//char filename1[strlen(file_name1)];
 
 char filename[20];
 char filename1[20];
@@ -1094,26 +710,18 @@ memset(filename1, '\0', sizeof(filename));
 	strncpy(filename,file_name,strlen(file_name)-3); //change extension to jpg
 	strncpy(filename1,file_name1,strlen(file_name1)-3);
 
-//if (file_name[strlen(file_name)-5] == '0'){
 	strcat(filename,"jpg");
-//}else if (file_name[strlen(file_name)-5] == '1'){
 	strcat(filename1,"jpg");
-//}else{
-//	printf("sometings wrong when appending jpg extension\n");
-//}
-//printf("filename on appanded file: %s\n",filename);
+
 	memcpy(&mem_arr, mem_base, map_len); //copy the image data from the shared memory, from start address mem_base, copy the length of map_len to the char array mem_arr
 	memcpy(&mem_arr1, mem_base1, map_len);
 
-	//unsigned char mem[400000];
-	//unsigned long mem_size = 0;
+
 	ConvertImage(filename, mem_arr, width, height, bpp); //send img data to this function, the img file is created and saved to sd card
 	ConvertImage(filename1, mem_arr1, width, height, bpp);
 
-	//if(!SaveJpgToSd){
 	InitTcpImageServer(filename);
 	InitTcpImageServer(filename1);
-	//}
 
 
 	printf("Image saved...%s \n",filename);
@@ -1128,10 +736,10 @@ memset(filename1, '\0', sizeof(filename));
 	return 0;
 
 }
-////////////////////////////////////////////7 /////////////////////////
+
+
 
 int SaveJpgImageData(uint32_t BaseAddress,uint32_t BaseAddress1, char* file_name,char* file_name1, uint16_t width, uint16_t height, uint16_t bpp, uint8_t scale)
-//int SaveJpgImageData(uint32_t BaseAddress, char* filename, uint16_t width, uint16_t height, uint16_t bpp, uint8_t scale) //cant be saved to the gimme2 sdcard since the img data is sent away
 {
 	char filename[strlen(file_name)];
 	char filename1[strlen(file_name1)];
@@ -1166,13 +774,10 @@ int SaveJpgImageData(uint32_t BaseAddress,uint32_t BaseAddress1, char* file_name
 	strncpy(filename,file_name,strlen(file_name)-3); //change extension to jpg
 	strncpy(filename1,file_name1,strlen(file_name1)-3);
 
-//if (file_name[strlen(file_name)-5] == '0'){
 	strcat(filename,"jpg");
-//}else if (file_name[strlen(file_name)-5] == '1'){
 	strcat(filename1,"jpg");
 
 
-	//the next four rows are for sending image data and not full images. the image file is created in the client on the odroid.
 	memcpy(&mem_arr, mem_base, map_len); //copy the image data from the shared memory, from start address mem_base, copy the length of map_len to the char array mem_arr
 	memcpy(&mem_arr1, mem_base1, map_len);
 
@@ -1201,7 +806,6 @@ int SaveJpgImageData(uint32_t BaseAddress,uint32_t BaseAddress1, char* file_name
 
 
 int SaveBmpImage(uint32_t BaseAddress,uint32_t BaseAddress1, char* filename,char* filename1, uint16_t width, uint16_t height, uint16_t bpp, uint8_t scale)
-//int SaveBmpImage(uint32_t BaseAddress, char* filename, uint16_t width, uint16_t height, uint16_t bpp, uint8_t scale)
 {
 
 
@@ -1256,9 +860,6 @@ int SaveBmpImage(uint32_t BaseAddress,uint32_t BaseAddress1, char* filename,char
 //	uint8_t col;
 
 
-	//fwrite(mem_base,1,w*h*bpp,mem_arr);
-
-
 	unsigned char bmpfileheader[14] = {'B','M', 0,0,0,0, 0,0, 0,0, 54,0,0,0};
 	unsigned char bmpinfoheader[40] = {40,0,0,0,
 										0,0,0,0,
@@ -1289,28 +890,6 @@ int SaveBmpImage(uint32_t BaseAddress,uint32_t BaseAddress1, char* filename,char
 	fwrite(mem_base1,1,w*h*bpp,ofp1);
 
 
-
-//	int x,y;
-//	for (y = 0; y<HEIGHT; y++)
-//	{
-//		if (y % scale == 0) {
-//			for(x = 0; x<WIDTH; x++)
-//			{
-//				if (x % scale == 0) {
-//					pix = REG_READ(mem_base,(y*WIDTH+x)*bpp);
-////					pix = REG_READ(mem_base,(y*WIDTH+(WIDTH-x-1))*bpp);
-//					//b,g,r 8 bits PIX[0x00RRBBGG] --> COL[BB], COL[GG], COL[RR]
-//					col = (pix) & 0xFF;
-//					fwrite (&col, sizeof(col), 1, ofp);
-//					col = (pix >> 8) & 0xFF;
-//					fwrite (&col, sizeof(col), 1, ofp);
-//					col = (pix >> 16) & 0xFF;
-//					fwrite (&col, sizeof(col), 1, ofp);
-//				}
-//			}
-//		}
-//	}
-
 	fclose(ofp);
 	fclose(ofp1);
 
@@ -1322,10 +901,8 @@ int SaveBmpImage(uint32_t BaseAddress,uint32_t BaseAddress1, char* filename,char
 
 	close(fd);
 
-//if(!SaveBmpToSd){
-	InitTcpImageServer(filename); //	GOT "CANT OPEN OUTPUT FILE
+	InitTcpImageServer(filename);
 	InitTcpImageServer(filename1);
-//}
 
 	return 0;
 
@@ -2151,70 +1728,7 @@ uint32_t GetImageWidth(char* filename)
 	return *width;
 }
 
-////Load Image from file [filename] on disk to RAM at [BaseAddress]
-//int LoadImage(uint32_t BaseAddress, char* filename)
-//{
-//	int map_len = (WIDTH*HEIGHT*bpp);
-//	int fd = open( "/dev/mem", (O_RDWR | O_SYNC));
-//	if(fd < 0)
-//	{
-//		printf("Failed to open /dev/mem!\n");
-//		return -1;
-//	}
-//	printf("\nMap memory for Frame Buffer at physical memory: 0x%X", BaseAddress);
-//	unsigned char* mem_base = (unsigned char*)mmap(NULL, map_len, PROT_READ | PROT_WRITE, MAP_SHARED, fd, (off_t)BaseAddress);
-//	printf("\nMapped memory for Frame Buffer at virtual memory: 0x%X", (uint32_t)mem_base);
-//	if(mem_base == MAP_FAILED)
-//	{
-//		perror("Mapping memory for absolute memory access failed.\n");
-//		close(fd);
-//		return -1;
-//	}
-//
-//	FILE *ofp;
-//
-//	ofp = fopen(filename, "r");
-//
-//	if (ofp == NULL) {
-//	  printf( "Can't open output file!\n");
-//	  exit(1);
-//	}
-//
-//	uint32_t pix;
-//	uint8_t col = 0;
-//
-//	unsigned char bmpfileheader[14] = {0};
-//	unsigned char bmpinfoheader[40] = {0};
-//
-//	fread(bmpfileheader, 1, 14, ofp);
-//	fread(bmpinfoheader, 1, 40, ofp);
-//	printf("\nWriting image data to memory:\n");
-//	int x,y;
-//	for (y = 0; y<HEIGHT; y++)
-//	{
-//		for(x = 0; x<WIDTH; x++)
-//		{
-//			pix = 0;
-//			//COL[BB], COL[GG], COL[RR] -> PIX[0x00RRBBGG]
-//			fread(&col, sizeof(col), 1, ofp);
-//			pix += (col << 2); //B
-//			fread(&col, sizeof(col), 1, ofp);
-//			pix += (col << 12); //G
-//			fread(&col, sizeof(col), 1, ofp);
-//			pix += (col << 22); //R
-//
-////			REG_WRITE(mem_base, ((WIDTH-1-x)+(y*WIDTH))*bpp, pix);
-//			REG_WRITE(mem_base, ((HEIGHT-1-y)*WIDTH+x)*bpp, pix);
-//		}
-//	}
-//
-//	fclose(ofp);
-//	printf("Image loaded...\n");
-//
-//	munmap((void *)mem_base, map_len);
-//	close(fd);
-//	return 0;
-//}
+
 
 //Feed VDMA with image data from memory
 void SetupVDMAmm2s(uint32_t BaseAddress, uint16_t width, uint16_t height, uint16_t bpp, uint32_t frameAddress1, uint32_t frameAddress2, uint32_t frameAddress3)
